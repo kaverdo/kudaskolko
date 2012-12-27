@@ -1,0 +1,495 @@
+==================================================
+TIME: 2012-12-27 23:32:58, METHOD: GET, URL: http://localhost/
+LIMITS: Max queries count: 1, Max query rows: 1, Max query time: 1 ms
+Connections: 5
+
+void		2		[2.002 ms/4 KB/4 blocks]
+table		2		[7 ms/4 KB/36 blocks]
+--------------------------------------------------
+TOTAL		4		[9.002 ms/8 KB/40 blocks] [queries limit exceeded]
+
+TYPE: table
+INFO: 4 ms/0 KB/32 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS group_id, name, description, rights, is_published, is_default FROM auser WHERE auser_type_id = 1 ORDER BY name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	ref	auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3	auser_type_id	1	const	1	Using where	
+
+
+TYPE: table
+INFO: 3 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT asession_id AS session_id, auser_id AS user_id, auid AS uid, sid, dt_access, dt_logon, dt_logout FROM asession WHERE auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264' ORDER BY dt_access DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	asession	ref	ix_asession_1	ix_asession_1	194	const	1	Using where	
+
+
+TYPE: void
+INFO: 1 ms/0 KB/0 blocks [time limit exceeded]
+QUERY:
+DELETE FROM asession WHERE auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264' AND asession_id != 2
+
+
+TYPE: void
+INFO: 1.002 ms/4 KB/4 blocks [time limit exceeded]
+QUERY:
+UPDATE asession SET auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264', sid = '127.0.0.1:NULL=49855c793a2fe81cb1422273c4102933', dt_access = NOW() WHERE asession_id = 2
+
+
+
+
+==================================================
+TIME: 2012-12-27 23:33:01, METHOD: GET, URL: http://localhost/
+LIMITS: Max queries count: 1, Max query rows: 1, Max query time: 1 ms
+Connections: 3
+
+table		2		[3.98 ms/4 KB/40 blocks]
+--------------------------------------------------
+TOTAL		2		[3.98 ms/4 KB/40 blocks] [queries limit exceeded]
+
+TYPE: table
+INFO: 2.008 ms/0 KB/36 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS group_id, name, description, rights, is_published, is_default FROM auser WHERE auser_type_id = 1 ORDER BY name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	ref	auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3	auser_type_id	1	const	1	Using where	
+
+
+TYPE: table
+INFO: 1.972 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT asession_id AS session_id, auser_id AS user_id, auid AS uid, sid, dt_access, dt_logon, dt_logout FROM asession WHERE auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264' ORDER BY dt_access DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	asession	ref	ix_asession_1	ix_asession_1	194	const	1	Using where	
+
+
+
+
+==================================================
+TIME: 2012-12-27 23:33:06, METHOD: POST, URL: http://localhost/
+LIMITS: Max queries count: 1, Max query rows: 1, Max query time: 1 ms
+Connections: 11
+
+table		11		[133.017 ms/28 KB/108 blocks]
+void		5		[38.005 ms/8 KB/20 blocks]
+string		2		[82.011 ms/0 KB/0 blocks]
+int		2		[8.03 ms/0 KB/0 blocks]
+hash		1		[20.003 ms/4 KB/4 blocks]
+--------------------------------------------------
+TOTAL		21		[281.066 ms/40 KB/132 blocks] [queries limit exceeded]
+
+TYPE: table
+INFO: 2.001 ms/0 KB/56 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS group_id, name, description, rights, is_published, is_default FROM auser WHERE auser_type_id = 1 ORDER BY name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	ref	auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3	auser_type_id	1	const	1	Using where	
+
+
+TYPE: table
+INFO: 0.999 ms/4 KB/24 blocks
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT asession_id AS session_id, auser_id AS user_id, auid AS uid, sid, dt_access, dt_logon, dt_logout FROM asession WHERE auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264' ORDER BY dt_access DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	asession	ref	ix_asession_1	ix_asession_1	194	const	1	Using where	
+
+
+TYPE: void
+INFO: 2 ms/0 KB/20 blocks [time limit exceeded]
+QUERY:
+UPDATE asession SET auser_id = 0, dt_access = NOW(), dt_logout = NOW() WHERE asession_id = 2
+
+
+TYPE: table
+INFO: 2.001 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS id, auser_id AS user_id, name, email, description, rights, passwd, new_passwd, dt_register, dt_logon, dt_logout, connections_limit, event_type FROM auser WHERE is_published = 1 AND auser_type_id = 0 AND LOWER(name) = 'roman@averkov.ru' ORDER BY dt_logon DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	ALL	auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3				40	Using where; Using filesort	
+
+
+TYPE: void
+INFO: 2 ms/4 KB/0 blocks [time limit exceeded]
+QUERY:
+UPDATE asession SET auser_id = '1', dt_access = NOW(), dt_logon = NOW(), dt_logout = '2012-12-24 22:16:01' WHERE asession_id = 2
+
+
+TYPE: void
+INFO: 2 ms/0 KB/0 blocks [time limit exceeded]
+QUERY:
+UPDATE auser SET dt_logon = NOW() WHERE auser_id = 1
+
+
+TYPE: void
+INFO: 31.004 ms/0 KB/0 blocks [time limit exceeded]
+QUERY:
+INSERT INTO aevent_log ( auser_id, event_type, dt, stat, content ) VALUES ( 1, 1, NOW(), 0, '127.0.0.1:NULL' )
+
+
+TYPE: table
+INFO: 2.999 ms/4 KB/0 blocks [time limit exceeded]
+ROWS: 28 [rows limit exceeded]
+OPTIONS: $.limit(30)
+QUERY:
+SELECT aevent_log_id AS id FROM aevent_log WHERE auser_id = 1 ORDER BY dt DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	aevent_log	ref	ix_aevent_log_0	ix_aevent_log_0	4	const	27	Using where	
+
+
+TYPE: void
+INFO: 1.001 ms/4 KB/0 blocks [time limit exceeded]
+QUERY:
+DELETE FROM aevent_log WHERE auser_id = 1 AND aevent_log_id NOT IN (181,180,179,178,177,176,166,165,164,163,111,110,109,108,107,106,105,104,103,102,101,100,99,98,97,94,93,89) AND dt < DATE_SUB(CURDATE(),INTERVAL 7 DAY)
+
+
+TYPE: table
+INFO: 3.999 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT auser_to_auser.parent_id AS group_id, auser_to_auser.auser_id, auser.name AS name, auser.rights, auser.is_default, auser_to_auser.rights AS user_rights FROM auser_to_auser, auser WHERE auser_to_auser.parent_id = auser.auser_id AND auser_to_auser.auser_id IN (1) AND auser.auser_type_id = 1 ORDER BY auser.name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+TYPE: table
+INFO: 72.01 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 13 [rows limit exceeded]
+QUERY:
+SELECT IFNULL(nd.type,1) AS type,SUBSTRING(t.operday,1,6) ym,SUM(t.amount) sum FROM transactions t LEFT JOIN nesting_data nd ON nd.iid = t.iid WHERE t.is_displayed = 1 AND t.user_id = 1 AND t.operday >= 20120701 AND t.operday <= 20130131 AND (nd.type & 1 = 1 OR nd.type & 2 = 2) AND nd.iid = nd.pid GROUP BY ym,nd.type
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	t	ALL	Index 2,Index 4,Index 7,Index 10				7734	Using where; Using temporary; Using filesort	
+1	SIMPLE	nd	ref	Index 1,Index 2	Index 1	8	budget_prod.t.iid,budget_prod.t.iid	1	Using where	
+
+
+TYPE: hash
+INFO: 20.003 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 5 [rows limit exceeded]
+OPTIONS: $.type[table]
+QUERY:
+SELECT WEEK(t.tdate, 3) w, BIT_OR(POW(2,(IF(DAYOFWEEK(t.tdate)=1,8,DAYOFWEEK(t.tdate))-1))) AS weekdays, MIN(t.tdate) mindate, MAX(t.tdate) maxdate, SUM(t.amount) sum FROM transactions t JOIN nesting_data nd ON nd.iid = t.iid LEFT JOIN items i ON nd.pid = i.iid WHERE t.is_displayed = 1 AND t.user_id = 1 AND t.operday >= 20121126 AND t.operday <= 20130106 AND nd.pid = (SELECT iid FROM items WHERE type & 1 = 1 AND user_id = 1) GROUP BY w
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t	range	Index 2,Index 4,Index 7,Index 10	Index 2	4		235	Using where; Using temporary; Using filesort	
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	8	budget_prod.t.iid,const	1	Using where; Using index	
+1	PRIMARY	i	const	PRIMARY	PRIMARY	4	const	1	Using index	
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: table
+INFO: 3 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT DISTINCT i.name, i.iid, np.level FROM nesting_data n LEFT JOIN items i ON i.iid = n.pid LEFT JOIN nesting_data np ON i.iid = np.iid WHERE n.user_id = 1 AND i.user_id = 1 AND n.iid = 0 ORDER BY np.level
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	n	ref	Index 1,Index 2,user_id	Index 1	4	const	1	Using where; Using temporary; Using filesort	
+1	SIMPLE	i	eq_ref	PRIMARY,user_id	PRIMARY	4	budget_prod.n.pid	1	Using where	
+1	SIMPLE	np	ref	Index 1	Index 1	4	budget_prod.i.iid	4		
+
+
+TYPE: int
+INFO: 3.03 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 20121226
+OPTIONS: $.limit(1) $.default(0)
+QUERY:
+SELECT operday FROM operdays ORDER BY operday DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	operdays	index		PRIMARY	4		1	Using index	
+
+
+TYPE: table
+INFO: 22.004 ms/8 KB/12 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT i.name, t2.tid, t2.ctid, t2.type, i.iid, ai.name AS extraname, ti.name AS tiname, i.pid, sum(t2.amount) AS sum, sum(i.quantity_factor*t2.quantity) AS quantity, COUNT(*) count_of_transactions, t2.operday, (t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children FROM items i LEFT JOIN nesting_data ndp ON i.iid=ndp.iid LEFT JOIN nesting_data nd ON nd.pid=ndp.iid LEFT JOIN transactions t2 ON t2.iid = nd.iid LEFT JOIN items ai ON ai.iid = t2.alias_id LEFT JOIN transactions ct ON ct.tid = t2.ctid LEFT JOIN items ti ON ti.iid = ct.iid WHERE i.user_id = 1 AND t2.user_id = 1 AND ndp.iid = ndp.pid AND t2.operday = 20121227 AND i.pid = (SELECT iid FROM items WHERE user_id = 1 AND type & 1 = 1) AND t2.is_displayed = 1 GROUP BY i.name, i.iid, i.pid ORDER BY ndp.level, sum DESC, operday ASC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t2	ref	Index 2,Index 4,Index 7,Index 10	Index 2	4	const	1	Using where; Using temporary; Using filesort	
+1	PRIMARY	ai	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.alias_id	1		
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	4	budget_prod.t2.iid	4	Using where; Using index	
+1	PRIMARY	ndp	ref	Index 1,Index 2	Index 1	8	budget_prod.nd.pid,budget_prod.nd.pid	1	Using where	
+1	PRIMARY	i	eq_ref	PRIMARY,Index 2,user_id	PRIMARY	4	budget_prod.ndp.iid	1	Using where	
+1	PRIMARY	ct	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.ctid	1		
+1	PRIMARY	ti	eq_ref	PRIMARY	PRIMARY	4	budget_prod.ct.iid	1		
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: string
+INFO: 41.007 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 'Расходы'
+OPTIONS: $.limit(1) $.default[default]
+QUERY:
+SELECT name FROM items WHERE user_id = 1 AND type & 1 = 1
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	items	ref	user_id	user_id	2	const	1794	Using where	
+
+
+TYPE: table
+INFO: 5.001 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT t.tid,g.name,g.gid FROM transactions_in_groups tig LEFT JOIN transactions t ON tig.tid = t.tid LEFT JOIN groups g ON tig.gid = g.gid WHERE t.operday >= 20121227 AND t.operday <= 20121227
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+TYPE: int
+INFO: 5 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 20121226
+OPTIONS: $.limit(1) $.default(0)
+QUERY:
+SELECT operday FROM operdays ORDER BY operday DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	operdays	index		PRIMARY	4		1	Using index	
+
+
+TYPE: table
+INFO: 15.002 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT i.name, t2.tid, t2.ctid, t2.type, i.iid, ai.name AS extraname, ti.name AS tiname, i.pid, sum(t2.amount) AS sum, sum(i.quantity_factor*t2.quantity) AS quantity, COUNT(*) count_of_transactions, t2.operday, (t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children FROM items i LEFT JOIN nesting_data ndp ON i.iid=ndp.iid LEFT JOIN nesting_data nd ON nd.pid=ndp.iid LEFT JOIN transactions t2 ON t2.iid = nd.iid LEFT JOIN items ai ON ai.iid = t2.alias_id LEFT JOIN transactions ct ON ct.tid = t2.ctid LEFT JOIN items ti ON ti.iid = ct.iid WHERE i.user_id = 1 AND t2.user_id = 1 AND ndp.iid = ndp.pid AND t2.operday = 20121227 AND i.pid = (SELECT iid FROM items WHERE user_id = 1 AND type & 2 = 2) AND t2.is_displayed = 1 GROUP BY i.name, i.iid, i.pid ORDER BY ndp.level, sum DESC, operday ASC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t2	ref	Index 2,Index 4,Index 7,Index 10	Index 2	4	const	1	Using where; Using temporary; Using filesort	
+1	PRIMARY	ai	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.alias_id	1		
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	4	budget_prod.t2.iid	4	Using where; Using index	
+1	PRIMARY	ndp	ref	Index 1,Index 2	Index 1	8	budget_prod.nd.pid,budget_prod.nd.pid	1	Using where	
+1	PRIMARY	i	eq_ref	PRIMARY,Index 2,user_id	PRIMARY	4	budget_prod.ndp.iid	1	Using where	
+1	PRIMARY	ct	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.ctid	1		
+1	PRIMARY	ti	eq_ref	PRIMARY	PRIMARY	4	budget_prod.ct.iid	1		
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: string
+INFO: 41.004 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 'Доходы'
+OPTIONS: $.limit(1) $.default[default]
+QUERY:
+SELECT name FROM items WHERE user_id = 1 AND type & 2 = 2
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	items	ref	user_id	user_id	2	const	1794	Using where	
+
+
+TYPE: table
+INFO: 4.001 ms/0 KB/4 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT t.tid,g.name,g.gid FROM transactions_in_groups tig LEFT JOIN transactions t ON tig.tid = t.tid LEFT JOIN groups g ON tig.gid = g.gid WHERE t.operday >= 20121227 AND t.operday <= 20121227
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+
+
+==================================================
+TIME: 2012-12-27 23:33:07, METHOD: GET, URL: http://localhost/?rand17
+LIMITS: Max queries count: 1, Max query rows: 1, Max query time: 1 ms
+Connections: 5
+
+table		10		[114.994 ms/8 KB/52 blocks]
+string		2		[80.01 ms/4 KB/0 blocks]
+int		2		[6.03 ms/8 KB/4 blocks]
+hash		1		[10.973 ms/0 KB/4 blocks]
+--------------------------------------------------
+TOTAL		15		[212.007 ms/20 KB/60 blocks] [queries limit exceeded]
+
+TYPE: table
+INFO: 5.001 ms/0 KB/36 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS group_id, name, description, rights, is_published, is_default FROM auser WHERE auser_type_id = 1 ORDER BY name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	ref	auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3	auser_type_id	1	const	1	Using where	
+
+
+TYPE: table
+INFO: 3.001 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT asession_id AS session_id, auser_id AS user_id, auid AS uid, sid, dt_access, dt_logon, dt_logout FROM asession WHERE auid = '127.0.0.1:NULL=aae2effaa54ca70b213c54a488331264' ORDER BY dt_access DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	asession	ref	ix_asession_1	ix_asession_1	194	const	1	Using where	
+
+
+TYPE: table
+INFO: 1.001 ms/0 KB/4 blocks [time limit exceeded]
+ROWS: 1 [rows limit exceeded]
+QUERY:
+SELECT auser_id AS id, auser_id AS user_id, name, email, description, rights, passwd, new_passwd, dt_register, dt_logon, dt_logout, connections_limit, event_type FROM auser WHERE is_published = 1 AND auser_type_id = 0 AND auser_id != 0 AND auser_id = 1 ORDER BY dt_logon DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	auser	const	PRIMARY,auser_type_id,ix_auser_0,ix_auser_2,ix_auser_3	PRIMARY	4	const	1		
+
+
+TYPE: table
+INFO: 4.002 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT auser_to_auser.parent_id AS group_id, auser_to_auser.auser_id, auser.name AS name, auser.rights, auser.is_default, auser_to_auser.rights AS user_rights FROM auser_to_auser, auser WHERE auser_to_auser.parent_id = auser.auser_id AND auser_to_auser.auser_id IN (1) AND auser.auser_type_id = 1 ORDER BY auser.name
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+TYPE: table
+INFO: 61.008 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 13 [rows limit exceeded]
+QUERY:
+SELECT IFNULL(nd.type,1) AS type,SUBSTRING(t.operday,1,6) ym,SUM(t.amount) sum FROM transactions t LEFT JOIN nesting_data nd ON nd.iid = t.iid WHERE t.is_displayed = 1 AND t.user_id = 1 AND t.operday >= 20120701 AND t.operday <= 20130131 AND (nd.type & 1 = 1 OR nd.type & 2 = 2) AND nd.iid = nd.pid GROUP BY ym,nd.type
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	t	ALL	Index 2,Index 4,Index 7,Index 10				7734	Using where; Using temporary; Using filesort	
+1	SIMPLE	nd	ref	Index 1,Index 2	Index 1	8	budget_prod.t.iid,budget_prod.t.iid	1	Using where	
+
+
+TYPE: hash
+INFO: 10.973 ms/0 KB/4 blocks [time limit exceeded]
+ROWS: 5 [rows limit exceeded]
+OPTIONS: $.type[table]
+QUERY:
+SELECT WEEK(t.tdate, 3) w, BIT_OR(POW(2,(IF(DAYOFWEEK(t.tdate)=1,8,DAYOFWEEK(t.tdate))-1))) AS weekdays, MIN(t.tdate) mindate, MAX(t.tdate) maxdate, SUM(t.amount) sum FROM transactions t JOIN nesting_data nd ON nd.iid = t.iid LEFT JOIN items i ON nd.pid = i.iid WHERE t.is_displayed = 1 AND t.user_id = 1 AND t.operday >= 20121126 AND t.operday <= 20130106 AND nd.pid = (SELECT iid FROM items WHERE type & 1 = 1 AND user_id = 1) GROUP BY w
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t	range	Index 2,Index 4,Index 7,Index 10	Index 2	4		235	Using where; Using temporary; Using filesort	
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	8	budget_prod.t.iid,const	1	Using where; Using index	
+1	PRIMARY	i	const	PRIMARY	PRIMARY	4	const	1	Using index	
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: table
+INFO: 2.975 ms/0 KB/4 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT DISTINCT i.name, i.iid, np.level FROM nesting_data n LEFT JOIN items i ON i.iid = n.pid LEFT JOIN nesting_data np ON i.iid = np.iid WHERE n.user_id = 1 AND i.user_id = 1 AND n.iid = 0 ORDER BY np.level
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	n	ref	Index 1,Index 2,user_id	Index 1	4	const	1	Using where; Using temporary; Using filesort	
+1	SIMPLE	i	eq_ref	PRIMARY,user_id	PRIMARY	4	budget_prod.n.pid	1	Using where	
+1	SIMPLE	np	ref	Index 1	Index 1	4	budget_prod.i.iid	4		
+
+
+TYPE: int
+INFO: 3.002 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 20121226
+OPTIONS: $.limit(1) $.default(0)
+QUERY:
+SELECT operday FROM operdays ORDER BY operday DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	operdays	index		PRIMARY	4		1	Using index	
+
+
+TYPE: table
+INFO: 12.003 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT i.name, t2.tid, t2.ctid, t2.type, i.iid, ai.name AS extraname, ti.name AS tiname, i.pid, sum(t2.amount) AS sum, sum(i.quantity_factor*t2.quantity) AS quantity, COUNT(*) count_of_transactions, t2.operday, (t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children FROM items i LEFT JOIN nesting_data ndp ON i.iid=ndp.iid LEFT JOIN nesting_data nd ON nd.pid=ndp.iid LEFT JOIN transactions t2 ON t2.iid = nd.iid LEFT JOIN items ai ON ai.iid = t2.alias_id LEFT JOIN transactions ct ON ct.tid = t2.ctid LEFT JOIN items ti ON ti.iid = ct.iid WHERE i.user_id = 1 AND t2.user_id = 1 AND ndp.iid = ndp.pid AND t2.operday = 20121227 AND i.pid = (SELECT iid FROM items WHERE user_id = 1 AND type & 1 = 1) AND t2.is_displayed = 1 GROUP BY i.name, i.iid, i.pid ORDER BY ndp.level, sum DESC, operday ASC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t2	ref	Index 2,Index 4,Index 7,Index 10	Index 2	4	const	1	Using where; Using temporary; Using filesort	
+1	PRIMARY	ai	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.alias_id	1		
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	4	budget_prod.t2.iid	4	Using where; Using index	
+1	PRIMARY	ndp	ref	Index 1,Index 2	Index 1	8	budget_prod.nd.pid,budget_prod.nd.pid	1	Using where	
+1	PRIMARY	i	eq_ref	PRIMARY,Index 2,user_id	PRIMARY	4	budget_prod.ndp.iid	1	Using where	
+1	PRIMARY	ct	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.ctid	1		
+1	PRIMARY	ti	eq_ref	PRIMARY	PRIMARY	4	budget_prod.ct.iid	1		
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: string
+INFO: 39.006 ms/0 KB/0 blocks [time limit exceeded]
+RESULT: 'Расходы'
+OPTIONS: $.limit(1) $.default[default]
+QUERY:
+SELECT name FROM items WHERE user_id = 1 AND type & 1 = 1
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	items	ref	user_id	user_id	2	const	1794	Using where	
+
+
+TYPE: table
+INFO: 6 ms/4 KB/4 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT t.tid,g.name,g.gid FROM transactions_in_groups tig LEFT JOIN transactions t ON tig.tid = t.tid LEFT JOIN groups g ON tig.gid = g.gid WHERE t.operday >= 20121227 AND t.operday <= 20121227
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+TYPE: int
+INFO: 3.028 ms/8 KB/4 blocks [time limit exceeded]
+RESULT: 20121226
+OPTIONS: $.limit(1) $.default(0)
+QUERY:
+SELECT operday FROM operdays ORDER BY operday DESC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	operdays	index		PRIMARY	4		1	Using index	
+
+
+TYPE: table
+INFO: 15.975 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT i.name, t2.tid, t2.ctid, t2.type, i.iid, ai.name AS extraname, ti.name AS tiname, i.pid, sum(t2.amount) AS sum, sum(i.quantity_factor*t2.quantity) AS quantity, COUNT(*) count_of_transactions, t2.operday, (t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children FROM items i LEFT JOIN nesting_data ndp ON i.iid=ndp.iid LEFT JOIN nesting_data nd ON nd.pid=ndp.iid LEFT JOIN transactions t2 ON t2.iid = nd.iid LEFT JOIN items ai ON ai.iid = t2.alias_id LEFT JOIN transactions ct ON ct.tid = t2.ctid LEFT JOIN items ti ON ti.iid = ct.iid WHERE i.user_id = 1 AND t2.user_id = 1 AND ndp.iid = ndp.pid AND t2.operday = 20121227 AND i.pid = (SELECT iid FROM items WHERE user_id = 1 AND type & 2 = 2) AND t2.is_displayed = 1 GROUP BY i.name, i.iid, i.pid ORDER BY ndp.level, sum DESC, operday ASC
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	PRIMARY	t2	ref	Index 2,Index 4,Index 7,Index 10	Index 2	4	const	1	Using where; Using temporary; Using filesort	
+1	PRIMARY	ai	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.alias_id	1		
+1	PRIMARY	nd	ref	Index 1,Index 2	Index 1	4	budget_prod.t2.iid	4	Using where; Using index	
+1	PRIMARY	ndp	ref	Index 1,Index 2	Index 1	8	budget_prod.nd.pid,budget_prod.nd.pid	1	Using where	
+1	PRIMARY	i	eq_ref	PRIMARY,Index 2,user_id	PRIMARY	4	budget_prod.ndp.iid	1	Using where	
+1	PRIMARY	ct	eq_ref	PRIMARY	PRIMARY	4	budget_prod.t2.ctid	1		
+1	PRIMARY	ti	eq_ref	PRIMARY	PRIMARY	4	budget_prod.ct.iid	1		
+2	SUBQUERY	items	ALL	user_id				1858	Using where	
+
+
+TYPE: string
+INFO: 41.004 ms/4 KB/0 blocks [time limit exceeded]
+RESULT: 'Доходы'
+OPTIONS: $.limit(1) $.default[default]
+QUERY:
+SELECT name FROM items WHERE user_id = 1 AND type & 2 = 2
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE	items	ref	user_id	user_id	2	const	1794	Using where	
+
+
+TYPE: table
+INFO: 4.028 ms/0 KB/0 blocks [time limit exceeded]
+ROWS: 0
+QUERY:
+SELECT t.tid,g.name,g.gid FROM transactions_in_groups tig LEFT JOIN transactions t ON tig.tid = t.tid LEFT JOIN groups g ON tig.gid = g.gid WHERE t.operday >= 20121227 AND t.operday <= 20121227
+EXPLAIN:
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra	
+1	SIMPLE								Impossible WHERE noticed after reading const tables	
+
+
+
+

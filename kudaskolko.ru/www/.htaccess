@@ -1,0 +1,9 @@
+# Подключение Parser-а для всех .html-страниц 
+AddHandler parsed-html html 
+Action parsed-html /cgi-bin/parser3.cgi
+
+# Запрет на доступ к .p-файлам. Основной: auto.p 
+<Files ~ "\.p$"> 
+  Order allow,deny 
+  Deny from all 
+</Files> 
