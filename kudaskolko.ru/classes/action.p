@@ -198,9 +198,9 @@ $sDate[^dtf:format[%e %h %Y;$tTransaction.tdate;$dtf:rr-locale]]
 	<input type="hidden" name="ctid" value="^tTransaction.ctid.int(0)" />
 }
 <div>
-<input type="text" name="quantity" value="$tTransaction.quantity" size="4"/> шт. на сумму 
-<input type="text" name="amount" value="$tTransaction.amount" size="10" id="IDTransactionAmount"/> рублей 
-<input type="text" name="transactionDate" value="$sDate" size="15" id="IDTransactionDate" date="$sDate"/>
+<input type="text" name="quantity" value="$tTransaction.quantity" oldValue="$tTransaction.quantity" size="4"/> шт. на сумму 
+<input type="text" name="amount"value="$tTransaction.amount" oldValue="$tTransaction.amount" size="10" id="IDTransactionAmount"/> рублей 
+<input type="text" name="transactionDate" value="$sDate" size="15" id="IDTransactionDate" date="$sDate" oldValue="$sDate"/>
 
 
 ^if(def $tTransaction.name){^@$tTransaction.name}
@@ -645,13 +645,14 @@ $value(^if((def $tValues.countOfEntries && $tValues.countOfEntries > 1)
 	|| 
 	($tValues.type & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME) ){0}{1})
 # <input type="hidden" id="IDCreateAlias" name="createAlias" value="$value"/>
+
 <h2>Переименовать ^if(def $tValues.countOfEntries && $tValues.countOfEntries > 1){
 	<span class="operamini"><input type="checkbox" id="IDCreateAlias" name="createAlias" value="$value" ^if($value){checked="checked"}><label for="IDCreateAlias">все записи с таким именем</label></span>
 	<span class="notoperamini" id="IDCreateAliasSpan">только эту запись</span>}
 </h2>
 # <h1 class="categoryName"><span>$sCurrentName</span></h1>
 <div class="controls">
-<input type="text" name="newCategoryName" size="50" id="IDNewCategoryName" value="$tValues.name"/> <input type="submit" value="Переименовать"/>
+<input type="text" name="newCategoryName" size="50" id="IDNewCategoryName" value="$tValues.name" oldValue="$tValues.name"/> <input type="submit" value="Переименовать"/>
 # <div><input type="hidden" id="IDCreateAlias"  name="createAlias" value="1">
 # <label for="IDCreateAlias">Переименовать все записи с таким именем</label></div>
 

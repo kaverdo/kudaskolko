@@ -602,20 +602,40 @@ a.day {
 .active #howto2 {
   display: block !important; }
 
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none; }
+
 #transactions {
+  /*height: 15em;*/
+  -webkit-transition: height 0.15s ease-in-out;
+  -moz-transition: height 0.15s ease-in-out;
+  -o-transition: height 0.15s ease-in-out;
+  transition: height 0.15s ease-in-out;
+  /*	&:hover{
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
+    height: 5em;
+  }*/
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   font-size: 120%;
   color: #333;
-  overflow: hidden;
+  overflow: auto;
   width: 100%;
+  min-height: 2.5em;
   margin-right: 1em;
   padding: 0.5em;
   border: 1px solid #DDD;
   border-radius: 6px;
   /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 1px 0px #EEE;*/
-  box-shadow: inset 0px 0px 2px #DDD; }
+  box-shadow: inset 0px 0px 2px #DDD;
+  outline: none; }
   #transactions:hover, .active #transactions {
     border-color: #999; }
   #transactions:focus {
@@ -623,6 +643,8 @@ a.day {
     border-color: #9ebd2e;
     /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $Green;*/
     box-shadow: inset 0px 0px 3px #cce17e; }
+    #transactions:focus::-webkit-input-placeholder {
+      color: #EEE; }
   #transactions::-webkit-input-placeholder {
     color: #999; }
   #transactions:-moz-placeholder {
@@ -686,8 +708,9 @@ a.day {
     #controls input[type="submit"]:disabled {
       opacity: 0.5;
       background: #e8f6b7 !important;
-      cursor: default !important;
-      border-color: #9ebd2e !important; }
+      cursor: auto !important;
+      border-color: #9ebd2e !important;
+      box-shadow: none !important; }
     #controls input[type="submit"]:hover, #controls input[type="submit"]:active, #controls input[type="submit"]:focus {
       /*background-color:$DarkGreen;*/
       box-shadow: inset 0px 1px 0px 0px #cce17e;
@@ -701,7 +724,7 @@ a.day {
     #controls input[type="submit"].preview {
       /*font-size: 100%;*/
       background: #EEE;
-      color: #333;
+      /*color:#333;*/
       border-color: #CCC;
       /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #CCC;*/
       box-shadow: inset 0px 1px 0px 0px #EEE; }
@@ -820,7 +843,9 @@ a.day {
     .action input[type="submit"]:disabled {
       opacity: 0.5;
       /*background: $LightGreen !important;*/
-      cursor: default !important; }
+      cursor: default !important;
+      background-color: #cce17e !important;
+      border-color: #9ebd2e !important; }
 
 #actionRename input[type="text"],
 #actionMove input[type="text"] {

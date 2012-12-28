@@ -1,5 +1,4 @@
 @auto[]
-
 $MAIN:CLASS_PATH[sql]
 $dtNow[^date::now[]]
 ^use[../classes/dbo.p]
@@ -19,7 +18,7 @@ $dtNow[^date::now[]]
 $hPage[^hash::create[]]
 # $hPage.sTitle[Расходы]
 $oSql[^MySqlComp::create[$SQL.connect-string;
-	$.bDebug(1)
+	$.bDebug($IS_LOCAL && 1)
 	$.sCacheDir[/../data/sql_cache]
 	^rem{ *** описание всех опций вы можете посмотреть в Sql.p перед конструктором create *** }
 ]]
@@ -58,25 +57,26 @@ $transaction:oCalendar[$oCalendar]
 
 @postprocess[sBody][oSqlLog]
 $result[$sBody]
-^if($oSql is "Sql"){
-	^use[../classes/sql/SqlLog.p]
-	$oSqlLog[^SqlLog::create[$oSql]]
-	^oSqlLog.log[
-		$.iQueryTimeLimit(1)
-		$.iQueriesLimit(1)
-		$.iQueryRowsLimit(1)
+^if($IS_LOCAL){
+	^if($oSql is "Sql"){
+		^use[../classes/sql/SqlLog.p]
+		$oSqlLog[^SqlLog::create[$oSql]]
+		^oSqlLog.log[
+			$.iQueryTimeLimit(1)
+			$.iQueriesLimit(1)
+			$.iQueryRowsLimit(1)
 #		$.bExpandExceededQueriesToLog(1)
-		^if("debug" eq "debug" && def $form:mode && ^form:tables.mode.locate[field;debug]){
-			^rem{ *** если обратились с ?mode=debug то получаем и сохраняем информацию обо всех sql запросах на странице *** }
-			$.sFile[/../data/sql.txt]
-			$.bAll(1)
-		}{
-			^rem{ *** а по умолчанию в другой лог-файл пишем только информацию о проблемных страницах *** }
-			$.sFile[/../data/sqlnew.log]
-		}
-	]
+			^if("debug" eq "debug" && def $form:mode && ^form:tables.mode.locate[field;debug]){
+				^rem{ *** если обратились с ?mode=debug то получаем и сохраняем информацию обо всех sql запросах на странице *** }
+				$.sFile[/../data/sql.txt]
+				$.bAll(1)
+			}{
+				^rem{ *** а по умолчанию в другой лог-файл пишем только информацию о проблемных страницах *** }
+				$.sFile[/../data/sqlnew.log]
+			}
+		]
+	}
 }
-
 
 
 @makeHTML[sTitle;sBody]
@@ -100,7 +100,7 @@ $result[$sBody]
 </head><body^if($isOperaMiniBrowser){ class="operamini"}>^test[]
 <div class="header">
 # ^oCalendar.isNotToday[]
-^if(def $request:query){
+^if(def $form:fields){
 	<a href="/" class="home"><u>Куда сколько</u></a>
 }{
 	<span class="home">Куда сколько</span>
@@ -111,8 +111,12 @@ $result[$sBody]
 }
 </div>
 <div class="body">$sBody</div>
+^if(!$IS_LOCAL){^counter[]}
 </body>
 </html>
+
+@counter[]
+<!-- Yandex.Metrika counter --><script type="text/javascript">^(function ^(d, w, c^) ^{ ^(w^[c^] = w^[c^] || [^]^).push^(function^(^) ^{ try ^{ w.yaCounter19035334 = new Ya.Metrika^(^{id:19035334, clickmap:true, trackLinks:true, ut:"noindex"^}^)^; ^} catch^(e^) ^{ ^} ^}^)^; var n = d.getElementsByTagName^("script"^)^[0^], s = d.createElement^("script"^), f = function ^(^) ^{ n.parentNode.insertBefore^(s, n^); ^}; s.type = "text/javascript"^; s.async = true; s.src = ^(d.location.protocol == "https:" ? "https:" : "http:"^) + "//mc.yandex.ru/metrika/watch.js"^; if ^(w.opera == "^[object Opera^]"^) ^{ d.addEventListener^("DOMContentLoaded", f, false^); ^} else ^{ f^(^)^; ^} ^}^)^(document, window, "yandex_metrika_callbacks"^)^;</script><noscript><div><img src="//mc.yandex.ru/watch/19035334?ut=noindex" style="position:absolute^; left:-9999px^;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
 
 
 @test[]

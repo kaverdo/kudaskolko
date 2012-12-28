@@ -43,6 +43,14 @@ $lrMargin: 0.5em;
 $tbMargin: 0.2em;
 
 
+@mixin transition($transition...) {
+	-webkit-transition: $transition;
+	-moz-transition: $transition;
+	-o-transition: $transition;
+	transition: $transition;
+}
+
+
 body{
 	margin:0;//2em;
 	padding:0;
@@ -897,23 +905,41 @@ tr:nth-child(2) td
 	}
 }
 
+input:focus,
+textarea:focus,
+select:focus,
+button:focus{
+	outline: none;
+}
+
 #transactions
 {
+	/*height: 15em;*/
+	@include transition(height 0.15s ease-in-out);
+
+/*	&:hover{
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;
+  -o-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+  height: 5em;
+}*/
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-size: 120%;
 	color: #333;
-	overflow: hidden;
+	overflow: auto;
 	width: 100%;
 	//max-width: 800px;
+	min-height: 2.5em;
 	margin-right: 1em;
 	padding: 0.5em;
 	border: 1px solid #DDD;
 	border-radius: 6px;
 	/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 1px 0px #EEE;*/
 	box-shadow: inset 0px 0px 2px #DDD;
-
+	outline: none;
 	
 	&:hover,
 	.active &{
@@ -925,6 +951,11 @@ tr:nth-child(2) td
 		border-color: $DarkGreen;
 		/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $Green;*/
 		box-shadow: inset  0px 0px 3px $Green;
+
+		&::-webkit-input-placeholder{
+			color: #EEE;
+		}
+
 	}
 
 	&::-webkit-input-placeholder{
@@ -1011,12 +1042,13 @@ tr:nth-child(2) td
 		&:disabled{
 			opacity: 0.5;
 			background: $LightGreen !important;
-			cursor: default !important;
+			cursor: auto !important;
 			border-color: $DarkGreen !important;
+			box-shadow: none !important;
 		}
 		&:hover,&:active,&:focus {
 			/*background-color:$DarkGreen;*/
-			box-shadow:inset 0px 1px 0px 0px $Green;
+			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
 		}
 
@@ -1040,7 +1072,7 @@ tr:nth-child(2) td
 		&.preview{
 			/*font-size: 100%;*/
 			background: #EEE;
-			color:#333;
+			/*color:#333;*/
 			border-color: #CCC;
 			/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #CCC;*/
 			box-shadow:inset 0px 1px 0px 0px #EEE;
@@ -1190,6 +1222,8 @@ tr:nth-child(2) td
 			opacity: 0.5;
 			/*background: $LightGreen !important;*/
 			cursor: default !important;
+			background-color:$Green !important;
+			border-color: $DarkGreen !important;
 		}
 	}
 }

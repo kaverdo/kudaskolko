@@ -172,21 +172,31 @@ $(function() {
 			});
 	});
 
+function setRowsHeight(textarea, rows){
+	// textarea.animate({
+	// 	height: (rows * 1.2 + 1.2) + 'em'
+	// }, 800 );
+	// textarea.attr("rows",rows);
+	// var height = (rows * 1.2 + 1.2) + 'em'
+	textarea.css('height', (rows * 1.2 + 1.3) + 'em');
+}
+
 function setRows(textarea, isEmpty, isFocus){
 	if(textarea.length <= 0)
 		return;
 	if(isEmpty && !isFocus){
-		textarea.attr("rows","1");
+		setRowsHeight(textarea, 1);
 	} else {
 		var newLineCount = textarea.val().split("\n").length;
-		if(newLineCount <= 4) {
-			textarea.attr("rows","5");
+		if(newLineCount <= 3) {
+			setRowsHeight(textarea, 5);
 		}
-		else if(newLineCount > 4 && newLineCount <= 9) {
-			textarea.attr("rows","10");
+		else if(newLineCount > 3 && newLineCount <= 7) {
+			setRowsHeight(textarea, 10);
 		}
-		else if(newLineCount > 9) {
-			textarea.attr("rows","15");
+		else if(newLineCount > 7) {
+			setRowsHeight(textarea, 15);
+			textarea.css('overflow','auto');
 		}
 	}
 
@@ -227,6 +237,40 @@ var doubleHover = function(selector, hoverClass) {
 	});
 }
 
+
+function isEmptyNotChanged(input) {
+	var inputVal = input.val();
+	var isEmpty = inputVal == '';
+	var isNotModified = inputVal == input.attr('oldValue');
+	if(isEmpty || isNotModified)
+		return true;
+	else
+		return false;
+}
+
+function enableDisableControl2(control,isDisabled) {
+	if(isDisabled)
+		control.attr('disabled','disabled');
+	else
+		control.removeAttr('disabled');
+}
+
+function enableDisableControl(input,control,originValue) {
+	var inputVal = input.val();
+	var isEmpty = inputVal == '';
+	var isNotModified = inputVal == originValue;
+	if(isEmpty || isNotModified)
+		control.attr('disabled','disabled');
+	else
+		control.removeAttr('disabled');
+}
+
+function enableDisableControlAll(input,control,originValue) {
+	enableDisableControl(input,control,originValue);
+	input.keyup(function(){
+		enableDisableControl(input,control,originValue);
+	});
+}
 
 
 $(document).ready(function(){
@@ -319,8 +363,14 @@ $(document).ready(function(){
 		showHideControls($("#transactions"));
 	},100);
 
+	/* скрытие пустой формы, если кликают в другие места*/
 	$(document).click(function(e){
-		if(!$(e.target).is('#ta-container, #ta-container *')) {
+
+		if(!$(e.target).is('#ta-container, #ta-container *')
+			/* только если форма активна */
+			&& $("#ta-container").hasClass('active')
+			/* только если подсказка свернута */
+			&& !$('#howto2').hasClass('expanded')) {
 
 			if($("#transactions").val() == $("#operday").val() + '\n'){
 				$("#transactions").val('');
@@ -342,6 +392,7 @@ $(document).ready(function(){
 		setTimeout(function(){ 
 			showHideControls($("#transactions"));
 		}, 0);
+
 		// showHideControlsAll($("#transactions"), $("#transactions").val() == '', true);
 
 		// без нулевого таймаута или без явного указания, Хром выставляет курсор в место, 
@@ -351,7 +402,7 @@ $(document).ready(function(){
 			if($("#transactions").val() == '' && $("#operday").length > 0){
 				$("#transactions").val($("#operday").val() + '\n');
 			}
-		}, 0);
+		}, 50);
 	});
 
 
@@ -374,6 +425,56 @@ $(document).ready(function(){
 		}
 	});
 
+
+	// if($("#IDNewCategory").val()=='')
+	// 	$("#actionMove input[type='submit']").attr('disabled','disabled');
+
+	// $("#IDNewCategory").keyup(function(){
+	// 	var isEmpty = $(this).val() != '';
+	// 	if(isEmpty)
+	// 		$("#actionMove input[type='submit']").removeAttr('disabled');
+	// 	else
+	// 		$("#actionMove input[type='submit']").attr('disabled','disabled');
+	// });
+
+	enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"),'');
+
+	enableDisableControlAll($('#IDNewCategoryName'),
+		$("#actionRename input[type='submit']"),
+		$('#IDNewCategoryName').attr('oldValue'));
+
+	enableDisableControlAll($('#IDNewCategoryName'),
+		$("#actionRename input[type='submit']"),
+		$('#IDNewCategoryName').attr('oldValue'));
+
+
+// enableDisableControl2($('#actionEditTransactionDetails input[type="submit"]'),
+// 	isEmptyNotChanged($("#actionEditTransactionDetails input[name='transactionDate']")) &&
+// isEmptyNotChanged($("#actionEditTransactionDetails input[name='quantity']")) &&
+// isEmptyNotChanged($("#actionEditTransactionDetails input[name='amount']"))
+// 	)
+
+// 	$("#actionEditTransactionDetails input[name='transactionDate']").keyup(function(){
+// 		enableDisableControl2($('#actionEditTransactionDetails input[type="submit"]'),
+// 			isEmptyNotChanged($("#actionEditTransactionDetails input[name='transactionDate']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='quantity']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='amount']"))
+// 			)
+// 	});
+// 	$("#actionEditTransactionDetails input[name='quantity']").keyup(function(){
+// 		enableDisableControl2($('#actionEditTransactionDetails input[type="submit"]'),
+// 			isEmptyNotChanged($("#actionEditTransactionDetails input[name='transactionDate']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='quantity']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='amount']"))
+// 			)
+// 	});
+// 	$("#actionEditTransactionDetails input[name='amount']").keyup(function(){
+// 		enableDisableControl2($('#actionEditTransactionDetails input[type="submit"]'),
+// 			isEmptyNotChanged($("#actionEditTransactionDetails input[name='transactionDate']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='quantity']")) &&
+// 		isEmptyNotChanged($("#actionEditTransactionDetails input[name='amount']"))
+// 			)
+// 	});
 
 	// $('#datepicker').datepicker();
 
