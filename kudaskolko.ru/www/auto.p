@@ -1,6 +1,67 @@
 @auto[]
 $MAIN:CLASS_PATH[sql]
 $dtNow[^date::now[]]
+# ^use[../classes/dbo.p]
+# ^use[../classes/common/dtf.p]
+# ^use[../classes/import.p]
+# #^use[config.p]
+# ^use[../classes/update.p]
+# ^use[../classes/utils.p]
+# ^use[../classes/calendar.p]
+# ^use[../classes/action.p]
+# # ^use[remains.p]
+# ^use[../classes/transaction.p]
+# ^use[../classes/transactionlist.p]
+# ^use[../classes/sql/MySqlComp.p]
+# ^use[../classes/common/array.p]
+# ^use[../classes/auth2.p]
+$hPage[^hash::create[]]
+# $hPage.sTitle[Расходы]
+# $oSql[^MySqlComp::create[$SQL.connect-string;
+# 	$.bDebug($IS_LOCAL && 1)
+# 	$.sCacheDir[/../data/sql_cache]
+# 	^rem{ *** описание всех опций вы можете посмотреть в Sql.p перед конструктором create *** }
+# ]]
+$oSql[]
+# $oAuth[^auth2::init[$cookie:CLASS;$form:fields;$.csql[$oSql]]]
+$oAuth[]
+# ^if(def $form:[auth.logout] || (def $form:[auth.logon] && $oAuth.is_logon)){
+# 	^rem{ *** при logon/logout делаем external redirect на себя *** }
+# 	$response:location[http://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
+# }
+# $USERID($oAuth.user.id)
+$USERID[]
+# $oCalendar[^calendar::create[$.USERID($USERID)]]
+$oCalendar[]
+# $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
+$oTransactions[]
+# $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
+$oAction[]
+$MONEY[
+	$.SERVER_HOST[http://$env:SERVER_NAME]
+]
+$isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
+ 	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
+
+
+
+# $dbo:oSql[$oSql]
+# $dbo:USERID($USERID)
+# $update:oSql[$oSql]
+# $import:oSql[$oSql]
+# $calendar:oSql[$oSql]
+# $action:oSql[$oSql]
+# $transactionlist:oSql[$oSql]
+# $transactionlist:oCalendar[$oCalendar]
+# # $remains:oCalendar[$oCalendar]
+# $transaction:oCalendar[$oCalendar]
+
+# $dbo:data.USERID($USERID)
+# $action:data.USERID($USERID)
+# $calendar:data.USERID($USERID)
+# $transactionlist:data.USERID($USERID)
+
+@initObjects[]
 ^use[../classes/dbo.p]
 ^use[../classes/common/dtf.p]
 ^use[../classes/import.p]
@@ -15,8 +76,7 @@ $dtNow[^date::now[]]
 ^use[../classes/sql/MySqlComp.p]
 ^use[../classes/common/array.p]
 ^use[../classes/auth2.p]
-$hPage[^hash::create[]]
-# $hPage.sTitle[Расходы]
+
 $oSql[^MySqlComp::create[$SQL.connect-string;
 	$.bDebug($IS_LOCAL && 1)
 	$.sCacheDir[/../data/sql_cache]
@@ -31,13 +91,6 @@ $USERID($oAuth.user.id)
 $oCalendar[^calendar::create[$.USERID($USERID)]]
 $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
 $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
-$MONEY[
-	$.SERVER_HOST[http://$env:SERVER_NAME]
-]
-$isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
- 	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
-
-
 
 $dbo:oSql[$oSql]
 $dbo:USERID($USERID)
@@ -49,11 +102,6 @@ $transactionlist:oSql[$oSql]
 $transactionlist:oCalendar[$oCalendar]
 # $remains:oCalendar[$oCalendar]
 $transaction:oCalendar[$oCalendar]
-
-# $dbo:data.USERID($USERID)
-# $action:data.USERID($USERID)
-# $calendar:data.USERID($USERID)
-# $transactionlist:data.USERID($USERID)
 
 @postprocess[sBody][oSqlLog]
 $result[$sBody]
@@ -92,12 +140,13 @@ $result[$sBody]
 	<script type="text/javascript" src="/j/jquery-ui-1.8.22.custom.min.js"></script>
 # 	<script type="text/javascript" src="/j/jquery.highlight-3.js"></script>
 	<script type="text/javascript" src="/j/jquery.cookie.js"></script>
-	<script type="text/javascript" src="/j/jquery.autorgrowinput.js"></script>
+# 	<script type="text/javascript" src="/j/jquery.autorgrowinput.js"></script>
 	<script type="text/javascript" src="/j/j.js"> </script>
 }
 #<script type="text/javascript" src="http://averkov.ru/j/jquery.js"></script>
 #<script type="text/javascript" src="http://averkov.ru/j/jquery.cookie.js"></script>
 </head><body^if($isOperaMiniBrowser){ class="operamini"}>^test[]
+# <div id="container">
 <div class="header">
 # ^oCalendar.isNotToday[]
 ^if(def $form:fields){
@@ -111,6 +160,7 @@ $result[$sBody]
 }
 </div>
 <div class="body">$sBody</div>
+# </div>
 ^if(!$IS_LOCAL){^counter[]}
 </body>
 </html>
@@ -125,8 +175,32 @@ $result[$sBody]
 # ^u:getFuzzyString[Сок апельсиновый]<br/>
 # ^u:getFuzzyString[Сок апельсиновый Valio при eoi овагр pqok гуагр feuhgu gghbdtn]<br/>
 
-
 @mainLauncher[]
+# ^u:p[^form:anonymous.int(0)]
+^if(^form:anonymous.int(0)){
+	^anonymousLauncher[]
+}{
+	^namedLauncher[]
+}
+
+^rem{
+	используется для упрощения ajax-запросов, не требующих работы с бд и авторизации
+}
+@anonymousLauncher[]
+^switch[$form:action]{
+	^case[out]{
+		^use[../classes/transaction.p]
+		^transaction:processMoneyOut[
+			$.sData[$form:transactions]
+			$.isPreview(def $form:preview)
+			$.sReturnURL[$MONEY.SERVER_HOST]
+		]
+	}
+}
+
+
+@namedLauncher[]
+^initObjects[]
 #^connect[$SQL.connect-string]{
 ^oSql.server{
 

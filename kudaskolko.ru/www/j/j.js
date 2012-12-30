@@ -1,6 +1,6 @@
 $(function() {
 		function split( val ) {
-			return val.split( /\n/ );
+			return val.trim().split( /\n/ );
 		}
 		function extractLast( term ) {
 			return split( term ).pop();
@@ -181,6 +181,7 @@ function setRowsHeight(textarea, rows){
 	textarea.css('height', (rows * 1.2 + 1.3) + 'em');
 }
 
+
 function setRows(textarea, isEmpty, isFocus){
 	if(textarea.length <= 0)
 		return;
@@ -203,7 +204,7 @@ function setRows(textarea, isEmpty, isFocus){
 }
 
 function showHideControls(textarea){
-	showHideControlsAll(textarea, textarea.val() == '', textarea.is(":focus"));
+	showHideControlsAll(textarea, textarea.val().trim() == '', textarea.is(":focus"));
 }
 
 function showHideControlsAll(textarea, isEmpty, isFocus){
@@ -211,18 +212,19 @@ function showHideControlsAll(textarea, isEmpty, isFocus){
 	// var isFocus = textarea.is(":focus");
 
 	if(isEmpty){
-		$("#controls input").attr('disabled',true);
+		$("#controls input").attr("disabled",true);
 		if(!isFocus){
-			$('#ta-container').addClass("inactive");
-			$('#ta-container').removeClass("active");
+			$("#ta-container").addClass("inactive");
+			$("#ta-container").removeClass("active");
 		} else {
-			$('#ta-container').addClass("active");
-			$('#ta-container').removeClass("inactive");
+			$("#ta-container").addClass("active");
+			$("#ta-container").removeClass("inactive");
 		}
 	} else {
-		$('#ta-container').addClass("active");
-		$('#ta-container').removeClass("inactive");
-		$("#controls input").attr('disabled',false);
+		$("#ta-container").addClass("active");
+		$("#ta-container").removeClass("inactive");
+		// $("#controls input").attr("disabled",false);
+		// $("#controls .submit").attr("disabled",false);
 	}
 	setRows(textarea, isEmpty, isFocus);
 
@@ -249,10 +251,7 @@ function isEmptyNotChanged(input) {
 }
 
 function enableDisableControl2(control,isDisabled) {
-	if(isDisabled)
-		control.attr('disabled','disabled');
-	else
-		control.removeAttr('disabled');
+	control.attr("disabled",isDisabled);
 }
 
 function enableDisableControl(input,control,originValue) {
@@ -260,9 +259,9 @@ function enableDisableControl(input,control,originValue) {
 	var isEmpty = inputVal == '';
 	var isNotModified = inputVal == originValue;
 	if(isEmpty || isNotModified)
-		control.attr('disabled','disabled');
+		control.attr("disabled","disabled");
 	else
-		control.removeAttr('disabled');
+		control.removeAttr("disabled");
 }
 
 function enableDisableControlAll(input,control,originValue) {
@@ -272,6 +271,31 @@ function enableDisableControlAll(input,control,originValue) {
 	});
 }
 
+function ajaxPreview(){
+	var value = $("#transactions").val().trim();
+	if(value == '') {
+		$("#IDAjaxPreview").addClass("hidden");
+		$("#IDAjaxPreview .dataContainer").html("");
+		return;
+	}
+
+	$.ajax({
+		type: "GET",
+		url: "/?action=out&preview=1&ajax=1&anonymous=1",
+		datatype: "html",
+		cache: true,
+		data: {transactions: value}
+	}).done(function( html ) {
+		$("#IDAjaxPreview .dataContainer").html(html);
+		$("#IDAjaxPreview").removeClass("hidden");
+		$("#controls .preview").attr("disabled",true);
+		if($("#IDAjaxPreview .dataContainer .grid").hasClass("hasError")){
+			$("#controls .submit").attr("disabled",true);
+			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
+		}
+	});
+
+}
 
 $(document).ready(function(){
 	// setTimeout(function(){
@@ -285,7 +309,8 @@ $(document).ready(function(){
     
     
 // };
-
+	
+	// $("#IDUseLivePreview").button();
 
     $(function() {
     	$( "#IDTransactionDate" ).datepicker({
@@ -349,7 +374,7 @@ $(document).ready(function(){
   // 	opacity: 1
   // }, 800 );
 
-	if($('#ta-container').hasClass('activated')){
+	if($("#ta-container").hasClass('activated')){
 		$('#transactions').focus();
 	}
 	// },100);
@@ -357,11 +382,13 @@ $(document).ready(function(){
 
 	/* Делаем по таймауту, потому что Опера при нажатии кнопки "Назад"
 		может не успеть считать значение из поля,
-		в результате при непустом поле не будут показаны контролы
+		в результате при непустом поле не будут показаны контролы&transactions=Vodka%20133
 	 */
 	setTimeout(function(){
 		showHideControls($("#transactions"));
 	},100);
+
+
 
 	/* скрытие пустой формы, если кликают в другие места*/
 	$(document).click(function(e){
@@ -405,36 +432,121 @@ $(document).ready(function(){
 		}, 50);
 	});
 
+	$("#controls .preview").click(function(event){
+		event.preventDefault();
+		// var value = $("#transactions").val();
+		// // if(value == '')
+		// // 	return;
+		// $.ajax({
+		// 	type: "GET",
+		// 	url: "/?action=out&preview=1&ajax=1",
+		// 	datatype: "html",
+		// 	cache: true,
+		// 	data: {transactions: value}
+		// }).done(function( html ) {
+		// 	$("#IDAjaxPreview").html(html);
+		// });
 
-	$("#transactions").keyup(function(){
-		var isEmpty = $(this).val() != '';
-		if(isEmpty)
-			$("#controls input").removeAttr('disabled');
-		else
-			$("#controls input").attr('disabled','disabled');
+		ajaxPreview();
+		// return false;
+	});
 
+	// $("#transactions").change( function() {
+	// 	ajaxPreview();
+	// // 	var value = $(this).val();
+	// // 	// if(value == '')
+	// // 	// 	return;
+	// // 	$.ajax({
+	// // 		type: "GET",
+	// // 		url: "/?action=out&preview=1&ajax=1",
+	// // 		datatype: "html",
+	// // 		cache: true,
+	// // 		data: {transactions: value}
+	// // 	}).done(function( html ) {
+	// // 		$("#IDAjaxPreview").html(html);
+	// // 	});
+
+	// });
+
+	// $("#transactions").keypress(function(event){
+	// 	var keyCode = (event.which ? event.which : event.keyCode);
+	// 	var timer = setTimeout(function() {
+	// 		ajaxPreview();
+	// 	}, 5000);
+
+	// 	if (keyCode == 13 &&
+	// 		$(this).val().trim() != "" &&
+	// 		// $(this).val().substr(-1) == "\n"
+	// 		$(this).val().substr(-1) != " "
+	// 		){
+	// 		clearTimeout(timer);
+	// 		timer = 0;
+	// 		// alert('"'+$(this).val().trim()+'"');
+	// 		// alert('"'+($(this).val().substr(-1)=="\n"?"Y":"N")+'"');
+	// 		// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
+	// 		ajaxPreview();
+
+
+	// 	}
+	// });
+
+	$("#transactions").keyup(function(event){
+		var isEmpty = $(this).val().trim() == '';
+		$("#controls input").attr("disabled",isEmpty);
+		if(isEmpty) {
+			ajaxPreview();
+		}
 		setRows($("#transactions"),isEmpty,true);
+		var keyCode = (event.which ? event.which : event.keyCode);  
+		if (keyCode == 13 &&
+			!isEmpty &&
+			// $(this).val().trim() != "" &&
+			// $(this).val().substr(-1) == "\n"
+			$(this).val().substr(-1) != " "
+			){
+			// alert('"'+$(this).val().trim()+'"');
+			// alert('"'+($(this).val().substr(-1)=="\n"?"Y":"N")+'"');
+			// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
+			ajaxPreview();
+		}
 
 	});
 
 
 	$("#transactions").keydown(function(event){
-		var keyCode = (event.which ? event.which : event.keyCode);          
+		var keyCode = (event.which ? event.which : event.keyCode);   
 		if (keyCode === 10 || keyCode == 13 && event.ctrlKey) {
 			$("#formTransactions").submit();
 		}
+		// else if (keyCode == 13){
+		// 	// alert('"'+$(this).val().trim()+'"');
+		// 	alert('"'+$(this).val().substr(-1)+'"');
+		// 	// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
+		// 	ajaxPreview();
+		// }
 	});
 
+	$("#transactions").bind("input", function(){
+		if($(this).val().trim()){
+			$("#controls .preview").attr("disabled",false);
+		}
+	});
+
+	$("#transactions").bind('paste', function(e) {
+		setTimeout(function() {
+			ajaxPreview();
+		}, 10);
+	});
 
 	// if($("#IDNewCategory").val()=='')
-	// 	$("#actionMove input[type='submit']").attr('disabled','disabled');
+	// 	$("#actionMove input[type='submit']").attr("disabled","disabled");
 
 	// $("#IDNewCategory").keyup(function(){
 	// 	var isEmpty = $(this).val() != '';
 	// 	if(isEmpty)
-	// 		$("#actionMove input[type='submit']").removeAttr('disabled');
+	// 		$("#actionMove input[type='submit']").removeAttr("disabled");
 	// 	else
-	// 		$("#actionMove input[type='submit']").attr('disabled','disabled');
+	// 		$("#actionMove input[type='submit']").attr("disabled","disabled");
 	// });
 
 	enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"),'');
@@ -480,10 +592,10 @@ $(document).ready(function(){
 
 	$("#formTransactions").submit(function(){
 		setTimeout(function(){
-			$("input.submit").attr('disabled',true);
+			$("input.submit").attr("disabled",true);
 		}, 0);
 		setTimeout(function(){
-			$("input.submit").attr('disabled',false);
+			$("input.submit").attr("disabled",false);
 		}, 1000);
 
 	});
@@ -533,15 +645,15 @@ $(document).ready(function(){
 		}
 	});
 
-	$("#howto2 a").click(function(e){
+	$("#howto2 span, #howto2 span i").click(function(event){
 		event.preventDefault();
 
 		$("#howto2").toggleClass("expanded");
 		if($("#howto2").hasClass("expanded")){
-			$("#howto2 a").text("Скрыть описание");
+			// $("#howto2 span").text("Скрыть описание");
 			$("#howto2 pre").show();
 		} else {
-			$("#howto2 a").text("Показать временное описание синтаксиса");
+			// $("#howto2 span").text("?");
 			$("#howto2 pre").hide();
 		}
 

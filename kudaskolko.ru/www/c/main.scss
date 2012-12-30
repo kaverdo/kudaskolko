@@ -57,10 +57,24 @@ body{
 	color: #111;
 	background: #FFF;
 	font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
+	/*margin:0 5% 0 5%;*/
+	/*margin:0em 2em 0em 2em;*/
 }
+
+/*#container{
+		width: 100%;
+	margin-left: auto ;
+ 	margin-right: auto ;
+ 	max-width: 1000px;
+}
+*/
 .body{
-	margin:1em 2em 2em 2em;
+	/*margin:1em 15% 2em 15%;*/
 	/*float:left;*/
+
+	margin:1em 2em 3em 2em;
+
+	/*margin-top: 1em;*/
 }
 .header{
 	/*background: $LightGreen;//#444;*/
@@ -122,7 +136,7 @@ body{
 		clear:both;
 	}*/
 }
-input,textarea{
+input,textarea,button{
 	font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
 }
 
@@ -790,23 +804,42 @@ tr:nth-child(2) td
 }
 
 .grid.preview{
+	#IDAjaxPreview &{
+		font-size: 110%;
+	}
+	h2{
+		font-size: 100%;
+	}
+
 	margin:0 0 1em -0.5em;
 	td.name{
 		max-width: 600px;
 	}
 	tr td{
 		border-color: transparent;
-		padding: 0.3em 0.5em;
+		padding: 0.1em 0.5em;
 	}
-	tr:hover{
+/*	tr:hover{
 		td{
 			background: $Green;
 		}
-	}
+	}*/
 
+	tr.spacer td {
+		padding-top:0.5em;
+	}
+	tr.date td{
+		/*background: $DarkGreen;*/
+		span {
+			opacity: 1;
+			font-style: italic;
+			/*font-size: 120%;*/
+			/*color: #FFF !important;*/
+		}
+	}
 	tr.date td,
 	tr.chequeheader td{
-		padding-top: 1em;
+		padding-top: 0.5em !important;
 	}
 
 	tr.chequefooter td {
@@ -824,14 +857,21 @@ tr:nth-child(2) td
 	}
 
 	tr.chequefooter.last td{
-		padding-bottom: 1em;
+		padding-bottom: 0.5em;
 		font-weight: bold;
 		/*border-top: solid 1px $DarkGreen;*/
 		color: $SuperDarkGreen;
 	}
 
 	tr.error td{
-		background: #E33526;//#E32636;
+		background-color: #E33526;//#E32636;
+		color: #FFF;
+	}
+
+	.errorDescription{
+		font-size: 90%;
+		font-style: italic;
+		color: #DDD !important;
 	}
 
 	.value{
@@ -889,7 +929,7 @@ tr:nth-child(2) td
 #ta-container{
 	/*overflow: hidden;*/
 	width: 100%;
-	max-width: 700px;
+	/*max-width: 700px;*/
 	/*clip: both;*/
 	margin-bottom: 1em;
 
@@ -897,11 +937,84 @@ tr:nth-child(2) td
 		padding-bottom: 1em;
 	}
 
+	#IDAjaxPreview,.form{
+		float:left;
+		/*overflow: auto;*/
+		
+	}
+	.form{
+		width: 100%;
+		max-width: 700px;
+		margin-right: 1em;
+		margin-bottom: 2em;
+	}
+
+
+}
+
+	#IDAjaxPreview{
+		.active &{
+			display: block !important;
+		}
+		.inactive &{
+			display: none !important;
+		}
+		/*overflow: hidden;*/
+		background-color: #F5F5DC;
+		border-radius: 6px;
+		/*border-radius: 0px 0px 6px 6px;*/
+		box-shadow: 0px 0px 5px 1px $LightGreen;
+		border: solid 1px $Green;
+		/*padding: 0.5em;*/
+
+		.grid.preview{
+			margin-left: 0;
+		}
+
+	}
+
+.hidden{
+	visibility: hidden;
 }
 
 #howto2{
+
+	margin-top:-2em;
 	.active &{
 		display: block !important;
+	}
+
+
+
+	span{
+		/*border-bottom: dashed 1px $LinkBorder;*/
+		color: #000;
+		cursor: pointer;
+		border-radius: 15px;
+		display: block;
+		height:30px;
+		width:30px;
+		font-size: 15px;
+		/*font-size: 15px;*/
+		background: $LightGreen;
+		line-height: 30px;
+		text-align: center;
+		&:before{
+			content: "?";
+		}
+		&:hover{
+			background-color: $Green;
+		}
+	}
+	&.expanded{
+		span{
+			/*content: "" !important;*/
+			&:before{
+				content: "\00D7";
+			}
+			background-color: $DarkGreen;
+			font-size: 30px;
+		}
 	}
 }
 
@@ -1027,7 +1140,13 @@ button:focus{
 		display: none;
 	}
 
-	input[type="submit"]{
+	input[type="submit"],button{
+
+		.shortcut {
+			font-size: 70%;
+			color: $DarkGreen;
+		}
+		font-weight:normal;
 		cursor:pointer;
 		box-shadow:inset 0px 1px 0px 0px $LightGreen;
 		background-color:$Green;
@@ -1037,7 +1156,8 @@ button:focus{
 		display:inline-block;
 		color: #000;
 		margin: 0 0 0 1em;
-		padding: 0.3em 1em;
+		padding: 0.3em 1em;// 0.2em 1em;
+		/*line-height: 90%;*/
 
 		&:disabled{
 			opacity: 0.5;
@@ -1047,34 +1167,26 @@ button:focus{
 			box-shadow: none !important;
 		}
 		&:hover,&:active,&:focus {
-			/*background-color:$DarkGreen;*/
 			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
+			.shortcut {
+				color: $LightGreen;
+			}
 		}
 
-
-/*		&:disabled{
-			opacity: 0.5;
-			background: $LightGreen !important;
-			cursor: default !important;
-		}*/
-
 		&.submit{
-
-			/*border-color:$DarkGreen;*/
-			/*background: $Green;*/
-			/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $DarkGreen;*/
-
+			/*content: "Ctrl + Enter";*/
+			&:after{
+				content: "Ctrl + Enter";
+				display: block;
+			}
 			&:hover, &:focus, &:active {
 				background:$DarkGreen;
 			}
 		}
 		&.preview{
-			/*font-size: 100%;*/
 			background: #EEE;
-			/*color:#333;*/
 			border-color: #CCC;
-			/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #CCC;*/
 			box-shadow:inset 0px 1px 0px 0px #EEE;
 			&:hover, &:focus, &:active {
 				background: #DDD;

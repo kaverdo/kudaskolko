@@ -16,11 +16,22 @@ body {
   padding: 0;
   color: #111;
   background: #FFF;
-  font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif; }
+  font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
+  /*margin:0 5% 0 5%;*/
+  /*margin:0em 2em 0em 2em;*/ }
 
+/*#container{
+		width: 100%;
+	margin-left: auto ;
+ 	margin-right: auto ;
+ 	max-width: 1000px;
+}
+*/
 .body {
-  margin: 1em 2em 2em 2em;
-  /*float:left;*/ }
+  /*margin:1em 15% 2em 15%;*/
+  /*float:left;*/
+  margin: 1em 2em 3em 2em;
+  /*margin-top: 1em;*/ }
 
 .header {
   /*background: $LightGreen;//#444;*/
@@ -71,7 +82,7 @@ body {
     			border-bottom-color: $LinkBorderHover;
     		}*/ }
 
-input, textarea {
+input, textarea, button {
   font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif; }
 
 body .operamini {
@@ -529,17 +540,33 @@ a.day {
         background-position: 0.5em 0.8em; }
 
 .grid.preview {
-  margin: 0 0 1em -0.5em; }
+  margin: 0 0 1em -0.5em;
+  /*	tr:hover{
+  		td{
+  			background: $Green;
+  		}
+  	}*/ }
+  #IDAjaxPreview .grid.preview {
+    font-size: 110%; }
+  .grid.preview h2 {
+    font-size: 100%; }
   .grid.preview td.name {
     max-width: 600px; }
   .grid.preview tr td {
     border-color: transparent;
-    padding: 0.3em 0.5em; }
-  .grid.preview tr:hover td {
-    background: #cce17e; }
+    padding: 0.1em 0.5em; }
+  .grid.preview tr.spacer td {
+    padding-top: 0.5em; }
+  .grid.preview tr.date td {
+    /*background: $DarkGreen;*/ }
+    .grid.preview tr.date td span {
+      opacity: 1;
+      font-style: italic;
+      /*font-size: 120%;*/
+      /*color: #FFF !important;*/ }
   .grid.preview tr.date td,
   .grid.preview tr.chequeheader td {
-    padding-top: 1em; }
+    padding-top: 0.5em !important; }
   .grid.preview tr.chequefooter td {
     color: #9ebd2e;
     /*		&.name{
@@ -550,12 +577,17 @@ a.day {
   .grid.preview tr.chequepos {
     background-color: #e8f6b7; }
   .grid.preview tr.chequefooter.last td {
-    padding-bottom: 1em;
+    padding-bottom: 0.5em;
     font-weight: bold;
     /*border-top: solid 1px $DarkGreen;*/
     color: #6e8320; }
   .grid.preview tr.error td {
-    background: #E33526; }
+    background-color: #E33526;
+    color: #FFF; }
+  .grid.preview .errorDescription {
+    font-size: 90%;
+    font-style: italic;
+    color: #DDD !important; }
   .grid.preview .value .wodisc {
     font-size: 80%;
     color: #af321d;
@@ -593,14 +625,65 @@ a.day {
 #ta-container {
   /*overflow: hidden;*/
   width: 100%;
-  max-width: 700px;
+  /*max-width: 700px;*/
   /*clip: both;*/
   margin-bottom: 1em; }
   #ta-container.active {
     padding-bottom: 1em; }
+  #ta-container #IDAjaxPreview, #ta-container .form {
+    float: left;
+    /*overflow: auto;*/ }
+  #ta-container .form {
+    width: 100%;
+    max-width: 700px;
+    margin-right: 1em;
+    margin-bottom: 2em; }
 
-.active #howto2 {
-  display: block !important; }
+#IDAjaxPreview {
+  /*overflow: hidden;*/
+  background-color: #F5F5DC;
+  border-radius: 6px;
+  /*border-radius: 0px 0px 6px 6px;*/
+  box-shadow: 0px 0px 5px 1px #e8f6b7;
+  border: solid 1px #cce17e;
+  /*padding: 0.5em;*/ }
+  .active #IDAjaxPreview {
+    display: block !important; }
+  .inactive #IDAjaxPreview {
+    display: none !important; }
+  #IDAjaxPreview .grid.preview {
+    margin-left: 0; }
+
+.hidden {
+  visibility: hidden; }
+
+#howto2 {
+  margin-top: -2em; }
+  .active #howto2 {
+    display: block !important; }
+  #howto2 span {
+    /*border-bottom: dashed 1px $LinkBorder;*/
+    color: #000;
+    cursor: pointer;
+    border-radius: 15px;
+    display: block;
+    height: 30px;
+    width: 30px;
+    font-size: 15px;
+    /*font-size: 15px;*/
+    background: #e8f6b7;
+    line-height: 30px;
+    text-align: center; }
+    #howto2 span:before {
+      content: "?"; }
+    #howto2 span:hover {
+      background-color: #cce17e; }
+  #howto2.expanded span {
+    /*content: "" !important;*/
+    background-color: #9ebd2e;
+    font-size: 30px; }
+    #howto2.expanded span:before {
+      content: "\00D7"; }
 
 input:focus,
 textarea:focus,
@@ -689,7 +772,8 @@ button:focus {
     display: block; }
   .inactive #controls {
     display: none; }
-  #controls input[type="submit"] {
+  #controls input[type="submit"], #controls button {
+    font-weight: normal;
     cursor: pointer;
     box-shadow: inset 0px 1px 0px 0px #e8f6b7;
     background-color: #cce17e;
@@ -700,35 +784,33 @@ button:focus {
     color: #000;
     margin: 0 0 0 1em;
     padding: 0.3em 1em;
-    /*		&:disabled{
-    			opacity: 0.5;
-    			background: $LightGreen !important;
-    			cursor: default !important;
-    		}*/ }
-    #controls input[type="submit"]:disabled {
+    /*line-height: 90%;*/ }
+    #controls input[type="submit"] .shortcut, #controls button .shortcut {
+      font-size: 70%;
+      color: #9ebd2e; }
+    #controls input[type="submit"]:disabled, #controls button:disabled {
       opacity: 0.5;
       background: #e8f6b7 !important;
       cursor: auto !important;
       border-color: #9ebd2e !important;
       box-shadow: none !important; }
-    #controls input[type="submit"]:hover, #controls input[type="submit"]:active, #controls input[type="submit"]:focus {
-      /*background-color:$DarkGreen;*/
+    #controls input[type="submit"]:hover, #controls input[type="submit"]:active, #controls input[type="submit"]:focus, #controls button:hover, #controls button:active, #controls button:focus {
       box-shadow: inset 0px 1px 0px 0px #cce17e;
       border-color: #6e8320; }
-    #controls input[type="submit"].submit {
-      /*border-color:$DarkGreen;*/
-      /*background: $Green;*/
-      /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $DarkGreen;*/ }
-      #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active {
+      #controls input[type="submit"]:hover .shortcut, #controls input[type="submit"]:active .shortcut, #controls input[type="submit"]:focus .shortcut, #controls button:hover .shortcut, #controls button:active .shortcut, #controls button:focus .shortcut {
+        color: #e8f6b7; }
+    #controls input[type="submit"].submit, #controls button.submit {
+      /*content: "Ctrl + Enter";*/ }
+      #controls input[type="submit"].submit:after, #controls button.submit:after {
+        content: "Ctrl + Enter";
+        display: block; }
+      #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active, #controls button.submit:hover, #controls button.submit:focus, #controls button.submit:active {
         background: #9ebd2e; }
-    #controls input[type="submit"].preview {
-      /*font-size: 100%;*/
+    #controls input[type="submit"].preview, #controls button.preview {
       background: #EEE;
-      /*color:#333;*/
       border-color: #CCC;
-      /*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #CCC;*/
       box-shadow: inset 0px 1px 0px 0px #EEE; }
-      #controls input[type="submit"].preview:hover, #controls input[type="submit"].preview:focus, #controls input[type="submit"].preview:active {
+      #controls input[type="submit"].preview:hover, #controls input[type="submit"].preview:focus, #controls input[type="submit"].preview:active, #controls button.preview:hover, #controls button.preview:focus, #controls button.preview:active {
         background: #DDD;
         border-color: #999; }
 

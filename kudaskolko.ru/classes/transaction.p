@@ -115,11 +115,11 @@ $hNotValid[^hash::create[]]
 	}
 	^if(def $v.isCheque){
 		^if($v.dPositionSum == 0){
-			$hNotValid.[$k][Чек без позиций]
+			$hNotValid.[$k][чек без позиций]
 		}
 	}{
 		^if(!def $v.dAmount){
-			$hNotValid.[$k][Позиция без суммы]
+			$hNotValid.[$k][позиция без суммы]
 		}
 	}
 }
@@ -130,7 +130,7 @@ $hTransactions[^hash::create[$hTransactions]]
 $hNotValid[^hash::create[$hNotValid]]
 $l[^hash::create[]]
 
-<table class="grid preview" cellpadding="0" cellspacing="0">
+<table class="grid preview ^if($hNotValid){hasError}" cellpadding="0" cellspacing="0">
 
 # <tr style="background:#DDD">
 # <td></td>
@@ -174,10 +174,14 @@ $l.dInitialPositionSum(0)
 			</tr>}
 			<tr class="chequefooter last">
 					<td class="name">Итого по чеку</td>
-					<td class="value"></td>
+					<td></td>
 					<td class="value">$l.dPositionSum</td>
 			</tr>
-
+			<tr class="spacer">
+					<td></td>
+					<td></td>
+					<td></td>
+			</tr>
 		}
 
 		$l.isResultOfSubTransactionsOpen(false)
@@ -201,10 +205,15 @@ $l.dInitialPositionSum(0)
 	}
 	^if(^hNotValid.contains[$k]){
 		<tr class="error">
-		<td class="name">$v.sName<br/>$hNotValid.$k</td>
+		<td class="name">^if(def $v.sName){$v.sName}{^@$v.sChequeName} <span class="errorDescription">$hNotValid.$k</span></td>
 		<td class="quantity"></td>
 		<td class="value"></td>
 		</tr>
+# 		<tr class="errorDescription">
+# 		<td class="name">$hNotValid.$k</td>
+# 		<td class="quantity"></td>
+# 		<td class="value"></td>
+# 		</tr>
 	}{
 		^if($v.isCheque && def $v.sChequeName && $l.sCurrentCheque ne $v.sChequeName){
 			$l.sCurrentCheque[$v.sChequeName]
@@ -254,8 +263,13 @@ $l.dInitialPositionSum(0)
 	</tr>}
 	<tr class="chequefooter last">
 			<td class="name">Итого по чеку</td>
-			<td class="value"></td>
+			<td></td>
 			<td class="value">$l.dPositionSum</td>
+	</tr>
+	<tr class="spacer">
+			<td></td>
+			<td></td>
+			<td></td>
 	</tr>
 }
 </table>
@@ -270,11 +284,16 @@ $hParams[^hash::create[$hParams]]
 
 	$hNotValid[^hash::create[^checkTransactions[$hTransactions]]]
 	^if(^hNotValid._count[] > 0 || $hParams.isPreview){
-		^MAIN:makeHTML[Предпросмотр;
-		<h1>Предварительный просмотр</h1>
-		^previewTransaction[$hTransactions;$hNotValid]
-		^htmlMoneyOutForm[$hParams.sData]
-		]
+
+		^if(^form:ajax.int(0)){
+			^previewTransaction[$hTransactions;$hNotValid]
+		}{
+			^MAIN:makeHTML[Предпросмотр;
+			<h1>Предварительный просмотр</h1>
+			^previewTransaction[$hTransactions;$hNotValid]
+			^htmlMoneyOutForm[$hParams.sData]
+			]
+		}
 	}{
 		^processTransactions[$hTransactions]
 		^dbo:rebuildNestingData[]
@@ -284,7 +303,7 @@ $hParams[^hash::create[$hParams]]
 
 @howTo[]
 <div id="howto2" style="display:none">
-<a href="">Показать временное описание синтаксиса</a>
+<span></span>
 <pre style="display:none">^taint[as-is][
 1. Основной синтаксис простой:
 
@@ -328,21 +347,26 @@ $hParams[^hash::create[$hParams]]
 
 # <idnput type="hidden" name="preview" id="preview" value="0"/>
 <div id="ta-container" class="active^if(!def $request:query && !def $env:HTTP_REFERER){ activated}">
+<div class="form">
 <form method="post" action="/" id="formTransactions">
 <input type="hidden" name="action" value="out"/>
 ^if(!^oCalendar.isToday[]){
 <input type="hidden" name="operday" id="operday" value="^oCalendar.printCurrentDate[]"/>
 }
 <textarea name="transactions" id="transactions" placeholder="Записать расходы и доходы..." cols="50" rows="10">^if(def $sData){^untaint[as-is]{$sData}}</textarea>
-^howTo[]
+
 <div id="controls">
 # name="preview"
 <input type="submit" class="preview" name="preview" value="Предпросмотр"/>
 <input type="submit" class="submit" value="Записать расходы и доходы"/>
+# <input type="submit" class="preview" name="preview" value="Предпросмотр (Enter)"/>
+# <input type="submit" class="submit" value="Сохранить (Ctrl + Enter)"/>
+# <button class="preview">Предпросмотр <span class="shortcut">Enter</span></button>
+# <button class="submit">Сохранить записи <span class="shortcut">Ctrl + Enter</span></button>
 #<span id="preview-container"><input type="checkbox" name="preview" value="1" id="preview" />
 #<label for="preview">Предварительный просмотр</label></span>
 #<input type="submit" value="Потратить"/><input type="checkbox" name="preview" value="1" id="preview" /><label for="preview">Предварительный просмотр</label>
-</div>
+</div>^howTo[]
 </form>
 # </div>
 
@@ -409,6 +433,14 @@ $hParams[^hash::create[$hParams]]
 # Наименование сумма
 # Наименование сумма / количество 
 # </div>
+</div>
+<div id="IDAjaxPreview" class="hidden">
+# 	<div class="input">
+# 	<input name="useLivePreview" id="IDUseLivePreview" type="checkbox" value="1" checked="checked"/>
+# 	<label for="IDUseLivePreview">«Живой» предпросмотр</label>
+# 	</div>
+	<div class="dataContainer"></div>
+</div>
 
 </div>
 

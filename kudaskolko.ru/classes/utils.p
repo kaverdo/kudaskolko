@@ -1,6 +1,9 @@
 @CLASS
 u
 
+@USE
+common/dtf.p
+
 @capitalizeString[sString]
 $result[^sString.left(1)]
 $result[^result.upper[]]

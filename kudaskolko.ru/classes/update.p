@@ -4,7 +4,7 @@ update
 @USE
 utils.p
 dbo.p
-dtf.p
+common/dtf.p
 
 @update[]
 $tExist[^oSql.table{
