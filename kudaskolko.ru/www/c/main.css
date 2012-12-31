@@ -636,8 +636,10 @@ a.day {
   #ta-container .form {
     width: 100%;
     max-width: 700px;
-    margin-right: 1em;
-    margin-bottom: 2em; }
+    margin-right: 1em; }
+    #ta-container .form #controls {
+      /*margin-bottom: 1em;*/
+      /*overflow: hidden;*/ }
 
 #IDAjaxPreview {
   /*overflow: hidden;*/
@@ -658,7 +660,8 @@ a.day {
   visibility: hidden; }
 
 #howto2 {
-  margin-top: -2em; }
+  margin-top: -2.5em;
+  margin-bottom: 2em; }
   .active #howto2 {
     display: block !important; }
   #howto2 span {

@@ -946,7 +946,10 @@ tr:nth-child(2) td
 		width: 100%;
 		max-width: 700px;
 		margin-right: 1em;
-		margin-bottom: 2em;
+		#controls{
+			/*margin-bottom: 1em;*/
+			/*overflow: hidden;*/
+		}
 	}
 
 
@@ -979,12 +982,11 @@ tr:nth-child(2) td
 
 #howto2{
 
-	margin-top:-2em;
+	margin-top:-2.5em;
+	margin-bottom: 2em;
 	.active &{
 		display: block !important;
 	}
-
-
 
 	span{
 		/*border-bottom: dashed 1px $LinkBorder;*/
