@@ -322,10 +322,15 @@ $isSubItem(false)
 			AND
 		}
 		(
-		(i.name like "$sInput%" OR i.name like "% $sInput%")
+		(i.name like "$sInput%" OR i.name like "% $sInput%"
+			OR i.name like "%-$sInput%"
+			)
 		^if($sChangedInput ne $sInput){
 			OR
-			(i.name like "$sChangedInput%" OR i.name like "% $sChangedInput%")
+			(i.name like "$sChangedInput%" 
+				OR i.name like "% $sChangedInput%"
+				OR i.name like "%-$sChangedInput%"
+				)
 		}
 		)
 		GROUP BY i.iid

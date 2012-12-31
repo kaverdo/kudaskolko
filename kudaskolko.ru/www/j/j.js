@@ -1,3 +1,5 @@
+var transactionValueComplete = '';
+
 $(function() {
 		function split( val ) {
 			return val.trim().split( /\n/ );
@@ -26,29 +28,26 @@ $(function() {
 				// 		availableTags, extractLast( request.term ) ) );
 				// },
 
-				// source: function( request, response ) {
-				// 	var term = request.term;
-				// 	// if ( term in cache ) {
-				// 	// 	response( cache[ term ] );
-				// 	// 	return;
-				// 	// }
-
-				// 	lastXhr = $.getJSON( "/?action=json", request, function( data, status, xhr ) {
-				// 		cache[ term ] = data;
-				// 		if ( xhr === lastXhr ) {
-				// 			// response( data );
-				// 	response( $.ui.autocomplete.filter(
-				// 		data, extractLast( request.term ) ) );
-				// 		}
-				// 	});
-				// },
-
 				source: function( request, response ) {
-					$.getJSON( "/?action=json", {
-						term: extractLast( request.term )
-					}, response );
-
+					var term = extractLast( request.term );
+					if ( term in cache ) {
+						response( cache[ term ] );
+						return;
+					}
+					$.getJSON( "/?action=json",
+						{ term: term},
+						function( data, status, xhr ) {
+							cache[ term ] = data;
+							response( data );
+						});
 				},
+
+				// source: function( request, response ) {
+				// 	$.getJSON( "/?action=json", {
+				// 		term: extractLast( request.term )
+				// 	}, response );
+
+				// },
 				focus: function() {
 					// prevent value inserted on focus
 					return false;
@@ -271,20 +270,31 @@ function enableDisableControlAll(input,control,originValue) {
 	});
 }
 
+var transactionsValue = '';
+
 function ajaxPreview(){
 	var value = $("#transactions").val().trim();
 	if(value == '') {
+		transactionsValue = '';
 		$("#IDAjaxPreview").addClass("hidden");
 		$("#IDAjaxPreview .dataContainer").html("");
 		return;
 	}
-
+	if(value == transactionsValue){
+		$("#controls .preview").attr("disabled",true);
+		return;
+	}
+	transactionsValue = value;
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		url: "/?action=out&preview=1&ajax=1&anonymous=1",
 		datatype: "html",
 		cache: true,
 		data: {transactions: value}
+		// ,beforeSend: function(){
+		// 	$("#IDAjaxPreview").removeClass("hidden");
+		// 	$("#IDAjaxPreview .dataContainer").html("..."); 
+		// }
 	}).done(function( html ) {
 		$("#IDAjaxPreview .dataContainer").html(html);
 		$("#IDAjaxPreview").removeClass("hidden");
@@ -293,6 +303,9 @@ function ajaxPreview(){
 			$("#controls .submit").attr("disabled",true);
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
 		}
+	}).fail(function(jqXHR, textStatus) {
+		$("#IDAjaxPreview .dataContainer").html("Ошибка подключения к серверу, попробуйте повторить ("+textStatus+")");
+		$("#IDAjaxPreview").removeClass("hidden");
 	});
 
 }
