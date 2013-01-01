@@ -162,11 +162,11 @@ $l.dInitialPositionSum(0)
 	^if($v.isEmpty){
 		^if($l.isOpenCheque){
 			^if($l.dPositionSum != $l.dInitialPositionSum){
-			<tr class="chequefooter first">
-					<td>Подитог</td>
-					<td></td>
-					<td class="value">$l.dInitialPositionSum</td>
-			</tr>
+# 			<tr class="chequefooter first">
+# 					<td>Подитог</td>
+# 					<td></td>
+# 					<td class="value">$l.dInitialPositionSum</td>
+# 			</tr>
 			<tr class="chequefooter">
 					<td class="name">Скидка</td>
 					<td></td>
@@ -221,13 +221,14 @@ $l.dInitialPositionSum(0)
 			$l.isOpenCheque(true)
 			$l.dInitialPositionSum($v.dPositionSum)
 			<tr class="chequeheader">
-			<td class="name"><h2><span>@</span>$l.sCurrentCheque</h2></td>
+			<td class="name"><h2><span>^@</span>$l.sCurrentCheque</h2></td>
 			<td></td>
 			<td class="value">
 # 			<h2>$v.dChequeAmount</h2>
 			</td></tr>
 		}{
-			<tr class="^if($l.isOpenCheque){chequepos} ^if($v.isResultOfSubTransactions){ resultofsubtransactions }">
+			<tr 
+			class="^if($v.iType & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE){charge} ^if($v.iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){income} ^if($l.isOpenCheque){chequepos} ^if($v.isResultOfSubTransactions){ resultofsubtransactions }">
 			<td class="name">^if($v.isSubTransaction && $l.isResultOfSubTransactionsOpen){&minus^; }$v.sName
 # 			^if(^v.sName.pos[^(] > 0){
 # 				^v.sName.mid(0;^v.sName.pos[^(])
@@ -256,6 +257,11 @@ $l.dInitialPositionSum(0)
 }
 ^if($l.isOpenCheque){
 	^if($l.dPositionSum != $l.dInitialPositionSum){
+# 	<tr class="chequefooter first">
+# 			<td>Подитог</td>
+# 			<td></td>
+# 			<td class="value">$l.dInitialPositionSum</td>
+# 	</tr>
 	<tr class="chequefooter">
 			<td class="name">Скидка</td>
 			<td></td>
@@ -482,7 +488,9 @@ $l[^hash::create[]]
 		^if(def $v.sQuantityFactor){
 			$.quantity_factor[$v.sQuantityFactor]
 		}
-
+		^if($v.iType){
+			$.type($v.iType)
+		}
 		]]
 
 		$l.hTransaction[^dbo:createTransaction[
@@ -492,7 +500,7 @@ $l[^hash::create[]]
 			}
 			$.operday[$v.dtTransDate]
 			$.tdate[$v.dtTransDate]
-			$.type($dbo:TYPES.CHARGE)
+# 			$.type($v.iType)
 			$.amount($v.dAmount)
 			$.quantity($v.dQuantity)
 			$.user_id(1)
@@ -504,26 +512,21 @@ $l[^hash::create[]]
 }
 
 
-
-
 @parseTransactionList[sTransactions]
 # returns hash of transactions
 $hResult[^hash::create[]]
 $aTransactions[^array::new[]]
-#create operday
-#$hOperday[^dbo:createOperday[]]
 $tTransactions[^sTransactions.match[
 
 # ^^\s*((?:(позавчера|вчера|сегодня|(?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?))\s*)|(.*?))^$][gmxi]]
 ^^[ \t]*((?:(
 	(?>(?:(?:прошл(?:ое|ый|ая)\s+)?(?>воскресенье|понедельник|вторник))|позавчера|вчера|сегодня)
 	|
-
-	(?:(?:(?:[12][0-9]|3[01]|0?[123456789])\s*)
+	(?:(?:(?:[12][0-9]|3[012]|0?[123456789])\s*)
 	(?>января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
 	(?:\s*\d\d\d\d)?)
 	|
-	(?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)
+	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)
 	)
 	\s*)|
 
@@ -560,7 +563,18 @@ $tTransaction[^sTransaction.match[
 
 (?:(-)\s*)? # 1 isSubTransaction
 
- ((?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)\s+)? # 1.5 sDate
+#  ((?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)\s+)? # 1.5 sDate
+
+(?:(
+	(?>(?:(?:прошл(?:ое|ый|ая)\s+)?(?>воскресенье|понедельник|вторник))|позавчера|вчера|сегодня)
+	|
+	(?:(?:(?:[12][0-9]|3[012]|0?[123456789])\s*)
+	(?>января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
+	(?:\s*\d\d\d\d)?)
+	|
+	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)
+)\s+)? # 1.5 sDate
+
 # (q)? # 1.5 sDate
 (?:(@)\s*)? # 1.6 isCheque1
 (.+?) # 2 sName
@@ -581,7 +595,7 @@ $tTransaction[^sTransaction.match[
 
 # (?: ([\d\.,]+)\s*[\\/]|([\d\.,]+)\s*[\*])
 
-	([\d\.,]+) # 5 sAmount || sPrice
+	(?:([-\+])?([\d\.,]+)) # 4.5 type 5 sAmount || sPrice
 
 	(?:
 		\s*
@@ -621,6 +635,7 @@ $hStr[
 	$.sName(1)
 	$.dChequeAmount(1)
 	$.isCheque(1)
+	$.type(1)
 	$.sAmount(1)
 	$.sAmountOrPrice(1)
 	$.dQuantity(1)
@@ -657,7 +672,14 @@ $hResult.sAmount[$h.sAmount]
 	}
 
 	$hResult.dAmountWithoutDisc($hResult.dAmount)
-
+	^if(def $h.type){
+		^if($h.type eq '+'){
+			$hResult.iType($dbo:TYPES.INCOME)
+		}
+		^if($h.type eq '-'){
+			$hResult.iType($dbo:TYPES.CHARGE)
+		}
+	}
 }
 $hResult.isSubTransaction(def $h.isSubTransaction && def $hResult.dAmount)
 ^if((!def $hResult.sAmount && def $h.isCheque) || def $h.isCheque1){

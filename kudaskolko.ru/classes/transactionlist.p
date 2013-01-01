@@ -264,21 +264,26 @@ $hasCollapsedItems(false)
 }
 # ^u:p[^if($hasCollapsedItems){t}{f}]
 ^hTransactions.foreach[k;v]{
-
 	^if($k == 0){
 		<tr class="$hTransactions.0.no_entries">
 			<td class="name">
-			<h2>$v.name 
-			<span>$v.date</span>
-# 	^if(def $hTransactions.0.expandLink && !^form:detailed.int(0) && !def $hTransactions.1.no_entries){
-		^if(^form:expanded.int(0) == 1){
+			<h2>^if(^form:expanded.int(0) == 1){
 			<a class="expander" href="/$hTransactions.0.expandLink" title="Свернуть все обратно">&minus^;</a>
 		}{
 			^if($hasCollapsedItems){
 				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1" title="Развернуть категории">+</a>
 			}
 
-		}
+		} $v.name <span>$v.date</span>
+# 	^if(def $hTransactions.0.expandLink && !^form:detailed.int(0) && !def $hTransactions.1.no_entries){
+# 		^if(^form:expanded.int(0) == 1){
+# 			<a class="expander" href="/$hTransactions.0.expandLink" title="Свернуть все обратно">&minus^;</a>
+# 		}{
+# 			^if($hasCollapsedItems){
+# 				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1" title="Развернуть категории">+</a>
+# 			}
+
+# 		}
 # 		}
 		</h2>
 			</td>
@@ -327,7 +332,7 @@ $hasCollapsedItems(false)
 				$.p[$v.tEntries.parent_id]
 				$.groupid[$form:groupid]
 				$.type[$hParams.type]
-				$.operday[$form:operday]
+				$.operday[^if(def $form:operday){$form:operday}{$v.tEntries.operday}]
 			]">
 			<span>$v.tEntries.parentname</span></a></span>]
 		}

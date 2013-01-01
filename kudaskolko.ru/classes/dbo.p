@@ -192,15 +192,22 @@ $hResult[^hash::create[]]
 #			IFNULL(ai.name,i.name) AS name,f
 #			IFNULL(ai.barcode,i.barcode) AS barcode,
 			NULLIF(i.iid,IFNULL(ai.iid,i.iid)) AS alias_id,
-			IFNULL(ai.type,i.type) AS type
+# 			IFNULL(ai.type,i.type) AS type
+			nd.type
 		FROM items i
 		LEFT JOIN items ai ON ai.iid = i.alias_id
+		LEFT JOIN nesting_data nd ON nd.iid = i.iid 
 		WHERE 
 		i.user_id = $USERID
 		AND i.name = '$hParams.name'
+		^if(^hParams.type.int(0)){
+			AND nd.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+		}
+		AND nd.iid = nd.pid
 		^if(def $hParams.barcode){
 			AND i.barcode = '$hParams.barcode'
 		}
+		ORDER BY nd.level, nd.type
 	}[$.limit(1)]]
 
 	^if(def $hParams.barcode && $hResult.tValues.iid == 0){
@@ -237,11 +244,13 @@ $hResult[^hash::create[]]
 			$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
 
 		$hResult.tValues[^table::create{iid	pid	alias_id	type
-$hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
+$hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int($dbo.TYPES.CHARGE)}]
 		}
 
 	}
 
+
+	^rem{ если ничего не нашли }
 	^if($hResult.tValues.iid == 0){
 		/* для перемещения категории в новую, которая должна быть между перемещаемой категорией и ее бывшей родительской*/
 		^if(^hParams.pid.int(0) == 0 && ^hParams.iid.int(0) != 0){
@@ -257,8 +266,11 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
 				SELECT IFNULL(i.alias_id,i.iid) FROM items i
 				LEFT JOIN nesting_data nd ON nd.iid = i.iid
 				WHERE 
-				i.user_id = $USERID AND
-				i.name IN ($sFuzzy)
+				i.user_id = $USERID
+				AND i.name IN ($sFuzzy)
+				^if(^hParams.type.int(0)){
+					AND nd.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+				}
 				ORDER BY nd.level DESC
 				}[$.default(0)$.limit(1)])
 			}
@@ -270,7 +282,7 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
 				FROM items 
 				WHERE 
 				user_id = $USERID AND
-				type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
+				type & ^hParams.type.int($dbo:TYPES.CHARGE) = ^hParams.type.int($dbo:TYPES.CHARGE)
 				}[$.default(0)$.limit(1)])
 			}
 
@@ -280,9 +292,10 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
 				^if(def $hParams.barcode){
 					barcode,
 				}
-				^if(^hParams.type.int(0) != 0){
-					type,
-				}
+# Это не тип для категории, а тип для родительской категории				
+# 				^if(^hParams.type.int(0) != 0){
+# 					type,
+# 				}
 				pid,
 				user_id
 			) values (
@@ -290,9 +303,9 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
 				^if(def $hParams.barcode){
 					'$hParams.barcode',
 				}
-				^if(^hParams.type.int(0) != 0){
-					^hParams.type.int(0),
-				}
+# 				^if(^hParams.type.int(0) != 0){
+# 					^hParams.type.int(0),
+# 				}
 				^hParams.pid.int(0),
 				$USERID
 			)}
@@ -308,7 +321,7 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int(0)}]
 #		}
 
 		$hResult.tValues[^table::create{iid	pid	alias_id	type
-$iLastInsert	^hParams.pid.int($iLastInsert)		^hParams.type.int(0)}]
+$iLastInsert	^hParams.pid.int($iLastInsert)		^hParams.type.int($dbo:TYPES.CHARGE)}]
 
 # </query>
 
@@ -551,11 +564,13 @@ LEFT JOIN nesting_data nd ON nd.iid = t.iid
 LEFT JOIN items i ON i.iid = nd.pid
 #LEFT JOIN nesting_data ndi ON ndi.iid = nd.pid
 WHERE 
-
-^if(^hParams.pid.int(0)){
-	nd.pid = ^hParams.pid.int(0)
-}{
-	i.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+	t.user_id = $USERID
+^if(!^hParams.ctid.int(0)){
+	^if(^hParams.pid.int(0)){
+		AND nd.pid = ^hParams.pid.int(0)
+	}{
+		AND i.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+	}
 }
 
 ^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0 && !^hParams.ctid.int(0)){
@@ -566,7 +581,6 @@ WHERE
 		AND t.operday <= ^hParams.endOperday.int(0)
 	}
 }
-	AND t.user_id = $USERID
 
 GROUP BY nd.pid
 
@@ -740,17 +754,30 @@ last_parent_nd.pid = last_parent_nd.iid
 	^if(^hParams.ctid.int(0)){
 	AND t2.ctid = ^hParams.ctid.int(0)
 	}
+
+
+# 	^if(^hParams.pid.int(0)){
+# 	AND (
+# 		nd.pid = ^hParams.pid.int(0)
+# # 		OR nd.iid = ^hParams.pid.int(0)
+# 		)
+# 	}{
+# 		^if(!^hParams.ctid.int(0)){
+# 			AND ndi.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+# 		}
+# 	}
+
+^if(!^hParams.ctid.int(0)){
 	^if(^hParams.pid.int(0)){
 	AND (
 		nd.pid = ^hParams.pid.int(0)
 # 		OR nd.iid = ^hParams.pid.int(0)
 		)
 	}{
-		^if(!^hParams.ctid.int(0)){
-			AND ndi.type & ^hParams.type.int(0) = ^hParams.type.int(0)
-		}
-	}
 
+	AND ndi.type & ^hParams.type.int(0) = ^hParams.type.int(0)
+	}
+}
 
 GROUP BY
 ##^if(def $hParams.detailed){
@@ -891,7 +918,8 @@ GROUP BY
 ORDER BY 
 ndp.level,
 sum DESC,
-operday ASC
+operday ASC,
+i.name
 }]
 
 @getParentItems[hParams]

@@ -1,41 +1,13 @@
 @auto[]
+$hStat[^hash::create[]]
 $MAIN:CLASS_PATH[sql]
 $dtNow[^date::now[]]
-# ^use[../classes/dbo.p]
-# ^use[../classes/common/dtf.p]
-# ^use[../classes/import.p]
-# #^use[config.p]
-# ^use[../classes/update.p]
-# ^use[../classes/utils.p]
-# ^use[../classes/calendar.p]
-# ^use[../classes/action.p]
-# # ^use[remains.p]
-# ^use[../classes/transaction.p]
-# ^use[../classes/transactionlist.p]
-# ^use[../classes/sql/MySqlComp.p]
-# ^use[../classes/common/array.p]
-# ^use[../classes/auth2.p]
 $hPage[^hash::create[]]
-# $hPage.sTitle[Расходы]
-# $oSql[^MySqlComp::create[$SQL.connect-string;
-# 	$.bDebug($IS_LOCAL && 1)
-# 	$.sCacheDir[/../data/sql_cache]
-# 	^rem{ *** описание всех опций вы можете посмотреть в Sql.p перед конструктором create *** }
-# ]]
 $oSql[]
-# $oAuth[^auth2::init[$cookie:CLASS;$form:fields;$.csql[$oSql]]]
 $oAuth[]
-# ^if(def $form:[auth.logout] || (def $form:[auth.logon] && $oAuth.is_logon)){
-# 	^rem{ *** при logon/logout делаем external redirect на себя *** }
-# 	$response:location[http://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
-# }
-# $USERID($oAuth.user.id)
 $USERID[]
-# $oCalendar[^calendar::create[$.USERID($USERID)]]
 $oCalendar[]
-# $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
 $oTransactions[]
-# $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
 $oAction[]
 $MONEY[
 	$.SERVER_HOST[http://$env:SERVER_NAME]
@@ -43,64 +15,51 @@ $MONEY[
 $isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
  	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
 
-
-
-# $dbo:oSql[$oSql]
-# $dbo:USERID($USERID)
-# $update:oSql[$oSql]
-# $import:oSql[$oSql]
-# $calendar:oSql[$oSql]
-# $action:oSql[$oSql]
-# $transactionlist:oSql[$oSql]
-# $transactionlist:oCalendar[$oCalendar]
-# # $remains:oCalendar[$oCalendar]
-# $transaction:oCalendar[$oCalendar]
-
-# $dbo:data.USERID($USERID)
-# $action:data.USERID($USERID)
-# $calendar:data.USERID($USERID)
-# $transactionlist:data.USERID($USERID)
-
-@initObjects[]
-^use[../classes/dbo.p]
-^use[../classes/common/dtf.p]
-^use[../classes/import.p]
-#^use[config.p]
-^use[../classes/update.p]
-^use[../classes/utils.p]
-^use[../classes/calendar.p]
-^use[../classes/action.p]
-# ^use[remains.p]
-^use[../classes/transaction.p]
-^use[../classes/transactionlist.p]
+@initAuthDBObjects[]
 ^use[../classes/sql/MySqlComp.p]
-^use[../classes/common/array.p]
 ^use[../classes/auth2.p]
-
 $oSql[^MySqlComp::create[$SQL.connect-string;
 	$.bDebug($IS_LOCAL && 1)
 	$.sCacheDir[/../data/sql_cache]
 	^rem{ *** описание всех опций вы можете посмотреть в Sql.p перед конструктором create *** }
 ]]
-$oAuth[^auth2::init[$cookie:CLASS;$form:fields;$.csql[$oSql]]]
+$oAuth[^auth2::init[$cookie:CLASS;$form:fields;
+$.csql[$oSql]
+	$.is_groups_disabled(1)
+	$.is_delay_groups(1)
+]]
 ^if(def $form:[auth.logout] || (def $form:[auth.logon] && $oAuth.is_logon)){
 	^rem{ *** при logon/logout делаем external redirect на себя *** }
 	$response:location[http://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
 }
 $USERID($oAuth.user.id)
+$dbo:oSql[$oSql]
+$dbo:USERID($USERID)
+
+
+@initObjects[]
+^use[../classes/dbo.p]
+^use[../classes/common/dtf.p]
+^use[../classes/import.p]
+^use[../classes/update.p]
+^use[../classes/utils.p]
+^use[../classes/calendar.p]
+^use[../classes/action.p]
+^use[../classes/transaction.p]
+^use[../classes/transactionlist.p]
+^use[../classes/common/array.p]
+
 $oCalendar[^calendar::create[$.USERID($USERID)]]
 $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
 $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
 
-$dbo:oSql[$oSql]
-$dbo:USERID($USERID)
+
 $update:oSql[$oSql]
 $import:oSql[$oSql]
 $calendar:oSql[$oSql]
 $action:oSql[$oSql]
 $transactionlist:oSql[$oSql]
 $transactionlist:oCalendar[$oCalendar]
-# $remains:oCalendar[$oCalendar]
 $transaction:oCalendar[$oCalendar]
 
 @postprocess[sBody][oSqlLog]
@@ -135,17 +94,18 @@ $result[$sBody]
 <link rel="stylesheet" type="text/css" href="/c/main.css">
 
 ^if(!$isOperaMiniBrowser){
+	<link rel="stylesheet" type="text/css" href="/c/plugins/pageguide.css">
 	<link rel="stylesheet" type="text/css" href="/c/custom-theme/jquery-ui-1.8.22.custom.css"/>
 	<script type="text/javascript" src="/j/jquery-1.7.2.min.js"></script>
+
 	<script type="text/javascript" src="/j/jquery-ui-1.8.22.custom.min.js"></script>
-# 	<script type="text/javascript" src="/j/jquery.highlight-3.js"></script>
 	<script type="text/javascript" src="/j/jquery.cookie.js"></script>
-# 	<script type="text/javascript" src="/j/jquery.autorgrowinput.js"></script>
-	<script type="text/javascript" src="/j/j.js"> </script>
+	<script type="text/javascript" src="/j/pageguide.min.js"></script>
+	<script type="text/javascript" src="/j/j.js"></script>
 }
-#<script type="text/javascript" src="http://averkov.ru/j/jquery.js"></script>
-#<script type="text/javascript" src="http://averkov.ru/j/jquery.cookie.js"></script>
-</head><body^if($isOperaMiniBrowser){ class="operamini"}>^test[]
+</head>
+
+<body class="^if($isOperaMiniBrowser){operamini} ^if($IS_LOCAL){beta}">^test[]
 # <div id="container">
 <div class="header">
 # ^oCalendar.isNotToday[]
@@ -176,15 +136,16 @@ $result[$sBody]
 # ^u:getFuzzyString[Сок апельсиновый Valio при eoi овагр pqok гуагр feuhgu gghbdtn]<br/>
 
 @mainLauncher[]
-# ^u:p[^form:anonymous.int(0)]
+^rusage[main]
 ^if(^form:anonymous.int(0)){
 	^anonymousLauncher[]
 }{
 	^namedLauncher[]
 }
+^rusage[main]
 
 ^rem{
-	используется для упрощения ajax-запросов, не требующих работы с бд и авторизации
+	используется для ускорения ajax-запросов, не требующих работы с бд и авторизации
 }
 @anonymousLauncher[]
 ^switch[$form:action]{
@@ -200,10 +161,8 @@ $result[$sBody]
 
 
 @namedLauncher[]
-^initObjects[]
-#^connect[$SQL.connect-string]{
+^initAuthDBObjects[]
 ^oSql.server{
-
 	^if(!$oAuth.is_logon){
 
 		^if(def $form:action && $form:action eq 'signup'){
@@ -228,6 +187,7 @@ $result[$sBody]
 		^if(def $form:action){
 			^processing[]
 		}{
+			^initObjects[]
 			^makeHTML[test][
 			<div id="top">
 				^transaction:htmlMoneyOutForm[]
@@ -353,6 +313,13 @@ $isSubItem(false)
 # }
 
 @processing[]
+^if($form:action eq json){
+	^use[../classes/dbo.p]
+}{
+
+	^initObjects[]
+}
+
 ^switch[$form:action]{
 	^case[out]{
 		^transaction:processMoneyOut[
@@ -362,7 +329,9 @@ $isSubItem(false)
 		]
 	}
 	^case[json]{
+		^rusage[returnCategories]
 		^returnCategories[]
+		^rusage[returnCategories]
 	}
 	^case[import_lenta]{
 		^if(def $form:importfile){
@@ -393,3 +362,38 @@ $isSubItem(false)
 # ^oTransactions.anotherWayToMakeTrees[]
 
 
+
+
+@rusage[comment][v;now;prefix;message;line;usec]
+^if($IS_LOCAL){
+	$v[$status:rusage]
+
+	^if(^hStat.contains[$comment]){
+		$hStat.[$comment].afterSec($v.tv_sec)
+		$hStat.[$comment].afterMSec($v.tv_usec)
+
+		$hStat.[$comment].totalSec(
+			$hStat.[$comment].afterSec - $hStat.[$comment].beforeSec
+			)
+		$hStat.[$comment].totalMSec(
+			$hStat.[$comment].afterMSec - $hStat.[$comment].beforeMSec
+			)
+
+		$now[^date::now[]]
+		$usec(^v.tv_usec.double[]) 
+		$prefix[[^now.sql-string[].^usec.format[%06.0f]]	$env:REMOTE_ADDR	$comment] 
+		$message[^eval(($hStat.[$comment].totalSec*1000000 + $hStat.[$comment].totalMSec)/1000)	$request:uri]
+		$line[$prefix	$message^#0A]
+		^line.save[append;../logs/rusage.log]
+
+	}{
+		^hStat.add[
+			$.[$comment][^hash::create[]]
+		]
+		$hStat.[$comment].beforeSec($v.tv_sec)
+		$hStat.[$comment].beforeMSec($v.tv_usec)
+	}
+
+}
+
+$result[] 

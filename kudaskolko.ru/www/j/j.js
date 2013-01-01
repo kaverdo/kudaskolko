@@ -203,7 +203,7 @@ function setRows(textarea, isEmpty, isFocus){
 }
 
 function showHideControls(textarea){
-	showHideControlsAll(textarea, textarea.val().trim() == '', textarea.is(":focus"));
+	showHideControlsAll(textarea, (textarea.val() == '' && textarea.val().trim() == ''), textarea.is(":focus"));
 }
 
 function showHideControlsAll(textarea, isEmpty, isFocus){
@@ -258,9 +258,9 @@ function enableDisableControl(input,control,originValue) {
 	var isEmpty = inputVal == '';
 	var isNotModified = inputVal == originValue;
 	if(isEmpty || isNotModified)
-		control.attr("disabled","disabled");
+		control.attr("disabled",true);
 	else
-		control.removeAttr("disabled");
+		control.attr("disabled",false);
 }
 
 function enableDisableControlAll(input,control,originValue) {
@@ -271,6 +271,7 @@ function enableDisableControlAll(input,control,originValue) {
 }
 
 var transactionsValue = '';
+var hasAjaxPreviewHTTPErorr = false;
 
 function ajaxPreview(){
 	var value = $("#transactions").val().trim();
@@ -280,7 +281,7 @@ function ajaxPreview(){
 		$("#IDAjaxPreview .dataContainer").html("");
 		return;
 	}
-	if(value == transactionsValue){
+	if(value == transactionsValue && !hasAjaxPreviewHTTPErorr){
 		$("#controls .preview").attr("disabled",true);
 		return;
 	}
@@ -296,6 +297,7 @@ function ajaxPreview(){
 		// 	$("#IDAjaxPreview .dataContainer").html("..."); 
 		// }
 	}).done(function( html ) {
+		hasAjaxPreviewHTTPErorr = false;
 		$("#IDAjaxPreview .dataContainer").html(html);
 		$("#IDAjaxPreview").removeClass("hidden");
 		$("#controls .preview").attr("disabled",true);
@@ -304,88 +306,39 @@ function ajaxPreview(){
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
 		}
 	}).fail(function(jqXHR, textStatus) {
+		hasAjaxPreviewHTTPErorr = true;
 		$("#IDAjaxPreview .dataContainer").html("Ошибка подключения к серверу, попробуйте повторить ("+textStatus+")");
 		$("#IDAjaxPreview").removeClass("hidden");
+		// $("#controls .preview").attr("disabled",false);
 	});
 
 }
 
 $(document).ready(function(){
-	// setTimeout(function(){
-
-// $.datepicker._gotoTodayOriginal = $.datepicker._gotoToday;
-// $.datepicker._gotoToday = function(id) {
-//     // now, optionally, call the original handler, making sure
-//     //  you use .apply() so the context reference will be correct
-//     $.datepicker._gotoTodayOriginal.apply(this, [id]);
-//     $.datepicker._selectDate.apply(this, [id]);
-    
-    
-// };
 	
-	// $("#IDUseLivePreview").button();
 
-    $(function() {
-    	$( "#IDTransactionDate" ).datepicker({
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            showButtonPanel: true,
-            autoSize: true,
-            firstDay: 1,
-            currentText: "Сегодня",
-            closeText: "Закрыть",
-            dateFormat: "d M yy",
-            nextText: "Следующий",
-            prevText: "Предыдущий",
-            dayNamesMin: ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
-			monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", 
-        	"Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
-			monthNamesShort: [ "января", "февраля", "марта", "апреля", "мая", "июня", "июля","августа", 
-        	"сентября", "октября", "ноября", "декабря" ]
-
-
-
-        });
-        // $( "#IDTransactionDate" ).datepicker( "option", "dateFormat", "d M yy" );
-        // $( "#IDTransactionDate" ).datepicker( "option", "autoSize", true );
-        // $( "#IDTransactionDate" ).datepicker( "option", "firstDay", 1 );
-        // $( "#IDTransactionDate" ).datepicker( "option", "dayNamesMin", 
-        // 	["вс", "пн", "вт", "ср", "чт", "пт", "сб" ] );
-        // $( "#IDTransactionDate" ).datepicker( "option", "monthNames", 
-        // 	[ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", 
-        // 	"Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ] );
-        // $( "#IDTransactionDate" ).datepicker( "option", "monthNamesShort", 
-        // 	[ "января", "февраля", "марта", "апреля", "мая", "июня", "июля","августа", 
-        // 	"сентября", "октября", "ноября", "декабря" ] );
-        $( "#IDTransactionDate" ).datepicker( "setDate", $( "#IDTransactionDate" ).attr("date") );
-    });
-
-
-	// $('#IDTransactionAmount').autoGrowInput({
-	//     comfortZone: 10,
-	//     minWidth: 50,
-	//     maxWidth: 2000
-	// });
-
-	// $('#IDNewCategory').autoGrowInput({
-	//     comfortZone: 50,
-	//     minWidth: 500,
-	//     maxWidth: 2000
-	// });
-
-    // $('.grid tr').each(function(){
-    //     var $row = $(this);
-    //     var height = $row.find('td.name .outer').height();
-    //     $row.find('td.value a').css('height', height);//.append('&nbsp;');  
-    // }); 
-
+$(function() {
+	$( "#IDTransactionDate" ).datepicker({
+		showOtherMonths: true,
+		selectOtherMonths: true,
+		showButtonPanel: true,
+		autoSize: true,
+		firstDay: 1,
+		currentText: "Сегодня",
+		closeText: "Закрыть",
+		dateFormat: "d M yy",
+		nextText: "Следующий",
+		prevText: "Предыдущий",
+		dayNamesMin: ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
+		monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", 
+		"Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
+		monthNamesShort: [ "января", "февраля", "марта", "апреля", "мая", "июня", "июля","августа", 
+		"сентября", "октября", "ноября", "декабря" ]
+	});
+	$( "#IDTransactionDate" ).datepicker( "setDate", $( "#IDTransactionDate" ).attr("date") );
+});
 
 	doubleHover('.grid .value a, .grid .actions a','hover');
-	// doubleHover('.grid a','hover');
-  // $(".bar").css('opacity','0');
-  //   $(".bar").animate({
-  // 	opacity: 1
-  // }, 800 );
 
 	if($("#ta-container").hasClass('activated')){
 		$('#transactions').focus();
@@ -401,12 +354,10 @@ $(document).ready(function(){
 		showHideControls($("#transactions"));
 	},100);
 
-
-
 	/* скрытие пустой формы, если кликают в другие места*/
 	$(document).click(function(e){
 
-		if(!$(e.target).is('#ta-container, #ta-container *')
+		if(!$(e.target).is('#ta-container .form *')
 			/* только если форма активна */
 			&& $("#ta-container").hasClass('active')
 			/* только если подсказка свернута */
@@ -428,6 +379,7 @@ $(document).ready(function(){
 
 
 	$("#transactions").focus(function(){
+
 		// без нулевого таймаута или без явного указания, Хром не понимает, что поле получило фокус
 		setTimeout(function(){ 
 			showHideControls($("#transactions"));
@@ -712,5 +664,8 @@ $(document).ready(function(){
 // 			$.cookie("jhideexamples", null);
 // }
 // 	});
+
+
+
 
 });

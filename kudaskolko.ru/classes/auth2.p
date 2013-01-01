@@ -4,6 +4,7 @@ auth2
 @USE
 common/Lib.p
 common/auth.p
+dbo.p
 
 @BASE
 auth
@@ -359,6 +360,7 @@ $is_show_form(1)
 			^logon[
 				$form:fields
 				$.[auth.logon][do]
+				$.[auth.persistent](1)
 			]
 # 			<p>Пользователь успешно зарегистрирован.</p>
 			$is_show_form(0)

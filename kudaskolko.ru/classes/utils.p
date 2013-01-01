@@ -189,10 +189,9 @@ $dtNow[^u:getJustDate[^date::now[]]]
 			}
 		}
 
-
 		^if(!def $result){
 			$t[^sDateTime.match[^^
-			(?:([12][0-9]|3[01]|0?[123456789])\s*)
+			(?:([12][0-9]|3[012]|0?[123456789])\s*)
 			(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
 			(?:\s*(\d\d\d\d))?^$][gx]]
 			^if(def $t){
@@ -232,7 +231,7 @@ $dtNow[^u:getJustDate[^date::now[]]]
 }
 
 @p[sString]
-^throw[debug;$sString]
+^throw[DEBUG;;$sString]
 
 @getUnitNameFromQuantity[sQuantity]
 $result[^sQuantity.match[^^(?:[\d\s,\.])*(?:(.*?)\s*)?^$][gm]{$match.1}]

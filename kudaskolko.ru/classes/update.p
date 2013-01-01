@@ -7,6 +7,8 @@ dbo.p
 common/dtf.p
 
 @update[]
+
+@update_[]
 $tExist[^oSql.table{
 SELECT iid, name FROM items WHERE name IN ('Доходы', 'Расходы') 
 OR type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE

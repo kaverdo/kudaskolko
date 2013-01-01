@@ -27,13 +27,13 @@ $ChargesTextColor: $DarkGreen;
 //6e8320
 
 /*#EBAE42;*/
-$ChargesBGColor:    CCE17E;
+$ChargesBGColor:    #CCE17E;
 /*CCE17E;*/
 //F1C16D;
 $ChargesBarColor:   $Green;
 
 $IncomesTextColor:  #D77E19;
-$IncomesBGColor:    F1C16D; 
+$IncomesBGColor:    #F1C16D; 
 $IncomesBarColor:   #F1C16D;
 
 
@@ -59,6 +59,10 @@ body{
 	font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
 	/*margin:0 5% 0 5%;*/
 	/*margin:0em 2em 0em 2em;*/
+}
+
+body.beta .home:after{
+	content: ' \03B2';
 }
 
 /*#container{
@@ -513,7 +517,7 @@ a.day{
 }
 
 .transactions{
-
+	overflow: visible;
 	#incomes,
 	#charges{
 		float: left;
@@ -571,6 +575,7 @@ a.day{
 			/*color: #CCC;*/
 			/*color: #CD5C5C;*/
 			font-size: 150%;
+			position: relative;
 		}
 		h2 span{
 			opacity: 0.5;
@@ -609,10 +614,16 @@ a.day{
 				color: $ChargesTextColor;
 			}
 		}
-			.expander{
-				color: #CCC !important;
-				border: none!important;
+		.expander{
+			color: #999 !important;
+			border: none!important;
+			position:absolute;
+			left:-0.75em;
+			padding: 0 0.1em;
+			&:hover{
+				color: #666 !important;
 			}
+		}
 		/*padding: 0.5em 1em 0.5em 0.5em;*/
 		vertical-align: top;
 
@@ -836,18 +847,31 @@ tr:nth-child(2) td
 			/*font-size: 120%;*/
 			/*color: #FFF !important;*/
 		}
+		border-top: solid 1px $Green;
+
 	}
+	tr.charge td.value{
+		/*color: $ChargesTextColor;*/
+		background: $ChargesBGColor;
+	}
+	tr.income td {
+		/*color: $IncomesTextColor;*/
+		background: transparent;
+		&.value{background: $IncomesBGColor;}
+	}
+
+	tr.date:first-child td{
+		border:none;
+	}
+
 	tr.date td,
 	tr.chequeheader td{
 		padding-top: 0.5em !important;
 	}
 
+
 	tr.chequefooter td {
 		color: $DarkGreen;
-
-/*		&.name{
-			color: $DarkGreen;
-		}*/
 	}
 
 	tr.chequefooter,
@@ -859,7 +883,6 @@ tr:nth-child(2) td
 	tr.chequefooter.last td{
 		padding-bottom: 0.5em;
 		font-weight: bold;
-		/*border-top: solid 1px $DarkGreen;*/
 		color: $SuperDarkGreen;
 	}
 
@@ -932,7 +955,9 @@ tr:nth-child(2) td
 	/*max-width: 700px;*/
 	/*clip: both;*/
 	margin-bottom: 1em;
-
+	padding-left: 1em;
+	margin-left: -1em;
+	/*overflow: none;*/
 	&.active{
 		padding-bottom: 1em;
 	}
@@ -943,9 +968,12 @@ tr:nth-child(2) td
 		
 	}
 	.form{
+
+	padding-left: 1em;
+	margin-left: -1em;
 		width: 100%;
 		max-width: 700px;
-		margin-right: 1em;
+		padding-right: 1em;
 		#controls{
 			/*margin-bottom: 1em;*/
 			/*overflow: hidden;*/
@@ -1144,10 +1172,6 @@ button:focus{
 
 	input[type="submit"],button{
 
-		.shortcut {
-			font-size: 70%;
-			color: $DarkGreen;
-		}
 		font-weight:normal;
 		cursor:pointer;
 		box-shadow:inset 0px 1px 0px 0px $LightGreen;
@@ -1163,25 +1187,17 @@ button:focus{
 
 		&:disabled{
 			opacity: 0.5;
-			background: $LightGreen !important;
+			background: #EEE !important;
 			cursor: auto !important;
-			border-color: $DarkGreen !important;
+			border-color: #DDD !important;
 			box-shadow: none !important;
 		}
 		&:hover,&:active,&:focus {
 			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
-			.shortcut {
-				color: $LightGreen;
-			}
 		}
 
 		&.submit{
-			/*content: "Ctrl + Enter";*/
-			&:after{
-				content: "Ctrl + Enter";
-				display: block;
-			}
 			&:hover, &:focus, &:active {
 				background:$DarkGreen;
 			}
