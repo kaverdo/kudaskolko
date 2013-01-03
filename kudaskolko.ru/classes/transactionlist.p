@@ -16,7 +16,8 @@ $USERID(^hParams.USERID.int(0))
 @printBreadScrumbs[]
 <ul class="breadscrumbs">
 $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
-^if(!$tParents && (^form:type.int(0) && !^form:pid.int(0))){
+^if(!$tParents && (^form:p.int(0) || ^form:ctid.int(0))){
+# && (^form:type.int(0) && !^form:pid.int(0))){
 <li><a href="^makeQueryString[
 				$.groupid[$form:groupid]
 				$.operday[$form:operday]
@@ -33,7 +34,7 @@ $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
 				$.operday[$form:operday]
 				^if($tParents.level != 0){
 					$.p[$tParents.iid]
-					$.type[$form:type]
+# 					$.type[$form:type]
 				}
 			]">$tParents.name</a></li>
 #^if(^tParents.line[] < (^tParents.count[]-1)){→}
@@ -42,23 +43,34 @@ $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
 </ul>
 
 
-@anotherWayToMakeTrees[]
+@anotherWayToMakeTrees[][locals]
 ^printBreadScrumbs[]
-
-^if(^form:p.int(0) == 0 && ^form:type.int(0) == 0){
+$iType(^form:type.int(0))
+^if(^form:p.int(0)){
+	$iType(^oSql.int{
+		SELECT type 
+		FROM nesting_data 
+		WHERE iid = ^form:p.int(0) AND iid = pid
+	}[$.limit(1)$.default(-1)])
+}{
 	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[]]
-# ^oCalendar.printDateRange[]]
 }
+# ^if(^form:p.int(0) == 0 && ^form:type.int(0) == 0){
+# 	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[]]
+# # ^oCalendar.printDateRange[]]
+# }
 
 <div class="transactions">
-^if(^form:type.int($dbo:TYPES.CHARGE) == $dbo:TYPES.CHARGE){
+# ^if(^form:type.int($dbo:TYPES.CHARGE) == $dbo:TYPES.CHARGE){
+^if($iType == 0 || $iType == $dbo:TYPES.CHARGE){
 <div id="charges">^printTransactionByType[
 	$.type[$dbo:TYPES.CHARGE]
 	$.title[Расходы]
 	$.title2[расходов]
 ]</div>
 }
-^if(^form:type.int($dbo:TYPES.INCOME) == $dbo:TYPES.INCOME){
+# ^if(^form:type.int($dbo:TYPES.INCOME) == $dbo:TYPES.INCOME){
+^if(($iType == 0 && !^form:ctid.int(0)) || $iType == $dbo:TYPES.INCOME){
 <div id="incomes">^printTransactionByType[
 	$.type[$dbo:TYPES.INCOME]
 	$.title[Доходы]
@@ -133,7 +145,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 					$.operday[$form:operday]
 					$.p[$form:p]
 # 					^if(^form:p.int(0)){
-						$.type[$hParams.type]
+# 						$.type[$hParams.type]
 # 					}
 				]]
 # 	}
@@ -163,7 +175,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 				$.groupid[$form:groupid]
 				$.operday[$form:operday]
 				$.p[$form:p]
-				$.type[$hParams.type]
+# 				$.type[$hParams.type]
 			]]
 }
 $h.iTotalSum(^dbo:getTotalOut[
@@ -271,7 +283,7 @@ $hasCollapsedItems(false)
 			<a class="expander" href="/$hTransactions.0.expandLink" title="Свернуть все обратно">&minus^;</a>
 		}{
 			^if($hasCollapsedItems){
-				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1" title="Развернуть категории">+</a>
+				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1^if(!^form:p.int(0)){&type=$hParams.type}" title="Развернуть категории">+</a>
 			}
 
 		} $v.name <span>$v.date</span>
@@ -299,7 +311,7 @@ $hasCollapsedItems(false)
  		^if($v.tEntries.has_children || $v.tEntries.count_of_transactions > 1){
 			$_sLink[^makeQueryString[
 				$.p[$v.tEntries.iid]
-				$.type[$hParams.type]
+# 				$.type[$hParams.type]
 				$.groupid[$form:groupid]
 				$.operday[$form:operday]
 			]]
@@ -321,7 +333,7 @@ $hasCollapsedItems(false)
 
 			$sDate[<a class="dt" href="^makeQueryString[
 				$.p[$form:p]
-				$.type[$hParams.type]
+# 				$.type[$hParams.type]
 				$.operday[$v.tEntries.operday]
 			]"><span>^u:formatOperday[$v.tEntries.operday]</span></a>]
 
@@ -331,7 +343,7 @@ $hasCollapsedItems(false)
 			<a href="^makeQueryString[
 				$.p[$v.tEntries.parent_id]
 				$.groupid[$form:groupid]
-				$.type[$hParams.type]
+# 				$.type[$hParams.type]
 				$.operday[^if(def $form:operday){$form:operday}{$v.tEntries.operday}]
 			]">
 			<span>$v.tEntries.parentname</span></a></span>]
@@ -339,7 +351,7 @@ $hasCollapsedItems(false)
 		^if(def $v.tiname && !^form:ctid.int(0)){
 			$sDate[^if(def $sDate){$sDate }<span class="cheque"><a href="^makeQueryString[
 				$.ctid[$v.ctid]
-				$.type[$hParams.type]
+# 				$.type[$hParams.type]
 				$.operday[$form:operday]
 			]"><span>$v.tiname</span></a>
 			</span>]
@@ -355,7 +367,7 @@ $hasCollapsedItems(false)
 					<a href="$sLink"><span>$v.name</span></a>
 				}{
 					<div class="outer">
-					<span>$v.name</span>^if($v.isRest && !^form:expanded.int(0)){ <a class="expander" href="/$hTransactions.0.expandLink&expanded=1" title="Развернуть категории">+</a>}
+					<span>$v.name</span>^if($v.isRest && !^form:expanded.int(0)){ <a class="expander_plain" href="/$hTransactions.0.expandLink&expanded=1^if(!^form:p.int(0)){&type=$hParams.type}" title="Развернуть категории">+</a>}
 					$sDate
 					</div>
 				}
@@ -420,29 +432,9 @@ $sUrl[^makeQueryString[
 	$.ctid[$form:ctid]
 ]]
 
-#  <div>
 <a href="$sUrl" class="$sClass">$sValue</a>
 
-# <a href="$sUrl">Изменить</a>
-# <a href="$sUrl">↑ Переместить</a>
 
-^rem{
-
-^if($tEntries.has_children == 0 && $tEntries.count_of_transactions == 1){
-Транзакция:
-<a href="/?action=edit_transaction&transaction=$tEntries.tid&operday=$form:operday&itemid=$tEntries.iid&level=$form:level&parentid=$form:p">Изменить</a>
-#<a href="/?action=split_transaction&transaction=$tEntries.tid&operday=$form:operday&itemid=$tEntries.iid">Уточнить^if($tEntries.type & $dbo:TYPES.NEED_CLARIFICATION){!!!}</a>
-#<a href="/?action=delete_transaction&transaction=$tEntries.tid&operday=$form:operday&itemid=$tEntries.iid">X</a>
-}
-Категория
-#<a href="/?action=move_category&operday=$form:operday&itemid=$tEntries.iid" title="Переместить в надкатегорию">↑</a>
-<a href="/?action=edit_category&operday=$form:operday&itemid=$tEntries.iid&level=$form:level&parentid=$form:p" title="Переименовать">Изменить</a>
-# Переименовать категорию
-# Изменить расход (возле поля с названием категории - [ ] изменить для всех расходов)
-# Расклеить на несколько подрасходов
-# Уточнить расход (для разного) - позволяет задать категорию
-}
-#  </div>
 
 
 @getTransferDescription[]

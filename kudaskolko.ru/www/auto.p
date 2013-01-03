@@ -28,7 +28,9 @@ $.csql[$oSql]
 	$.is_groups_disabled(1)
 	$.is_delay_groups(1)
 ]]
-^if(def $form:[auth.logout] || (def $form:[auth.logon] && $oAuth.is_logon)){
+^if(def $form:[auth.logout] || (def $form:[auth.logon] && $oAuth.is_logon) 
+
+	|| (def $form:action && $form:action eq signup && $oAuth.is_logon)){
 	^rem{ *** при logon/logout делаем external redirect на себя *** }
 	$response:location[http://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
 }
@@ -293,7 +295,7 @@ $isSubItem(false)
 				)
 		}
 		)
-		GROUP BY i.iid
+		GROUP BY i.name
 		ORDER BY
 		i.type DESC,
 		ABS(STRCMP(i.name,"$sInput")),
@@ -396,4 +398,47 @@ $isSubItem(false)
 
 }
 
-$result[] 
+$result[]
+
+
+
+@log[sLogData][locals]
+^if($IS_LOCAL){
+$message[$sLogData]
+
+
+$now[^date::now[]]
+$prefix[[^now.sql-string[]]]
+# $message[]
+# $message[^if(def $exception.file){${exception.file}:${exception.source}^(${exception.lineno}:$exception.colno^): }{${exception.source}}]
+# $message[${message}${exception.comment}^if(def $exception.type){ ^($exception.type^)}]
+# # ^if($stack){
+# # 	$message[$message^stack.menu{
+# # 	at ${stack.file}:$stack.name^(${stack.lineno}:$stack.colno^)}]
+# # }
+# $message[$message
+# ^$env^:REMOTE_ADDR^[$env:REMOTE_ADDR^]]
+# $message[$message
+# ^$env^:HTTP_USER_AGENT^[$env:HTTP_USER_AGENT^]]
+# $message[$message
+# ^$request^:uri^[$request:uri^]]
+# ^if(def $env:HTTP_REFERER){
+# 	$message[$message
+# ^$env^:HTTP_REFERER^[$env:HTTP_REFERER^]]
+# }
+# ^if($form:fields){
+# 	$message[$message^form:fields.foreach[k;v]{
+# ^$form:$k^[$v^]}]
+# }
+# ^if($cookie:fields){
+# 	$message[$message^cookie:fields.foreach[k;v]{
+# ^$cookie:$k^[^if($v is string){$v}{^if($v is hash){^v.foreach[k2;v2]{$k2=$v2}[,]}}^]}]
+# }
+
+$line[$prefix $message
+----------------------------------------------------------------------------
+]
+#^#0A]
+^line.save[append;../logs/parser_${now.year}^now.month.format[%02d].log]
+
+}

@@ -134,7 +134,7 @@ $result[^date::create($date.year;$date.month;$date.day)]
 
 
 @getLastDay[date]
-$result[^date::create($date.year;$date.month;^date:last-day($date.year;$date.month))]
+$result[^date::create(^getFullYear($date.year);$date.month;^date:last-day(^getFullYear($date.year);$date.month))]
 
 @getFirstDay[date]
 $result[^date::create($date.year;$date.month;1)]
@@ -160,13 +160,13 @@ $dtNow[^u:getJustDate[^date::now[]]]
 # 				^u:p[$sDateTime]
 # 		$t[^sDateTime.match[(?:(\d\d)\.(\d\d)(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
 # 		$t[^sDateTime.match[(?:(\d\d)\.((?:0?[123456789]|[12][0-9]|3[01]))(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
-		$t[^sDateTime.match[(?:([12][0-9]|3[01]|0?[123456789])\.(1[012]|0?[123456789])(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
+		$t[^sDateTime.match[(?:([12][0-9]|3[012]|0?[123456789])\.(1[012]|0?[123456789])(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
 		^if(def $t.1 && def $t.2){
 			^if(def $t.4 & def $t.5){
-				$result[^date::create(^if(def $t.3){$t.3}{$dtNow.year};$t.2;$t.1;$t.4;$t.5)]
+				$result[^date::create(^if(def $t.3){^getFullYear($t.3)}{$dtNow.year};$t.2;$t.1;$t.4;$t.5)]
 # 		^u:p[$t.2]	
 			}{
-				$result[^date::create(^if(def $t.3){$t.3}{$dtNow.year};$t.2;$t.1)]
+				$result[^date::create(^if(def $t.3){^getFullYear($t.3)}{$dtNow.year};$t.2;$t.1)]
 			}
 		}
 # 		{
@@ -185,7 +185,7 @@ $dtNow[^u:getJustDate[^date::now[]]]
 		^if(!def $result){
 			$t[^sDateTime.match[^^(\d\d\d\d)(\d\d)(\d\d)^$][g]]
 			^if(def $t){
-				$result[^date::create($t.1;$t.2;$t.3)]
+				$result[^date::create(^getFullYear($t.1);$t.2;$t.3)]
 			}
 		}
 
@@ -193,7 +193,7 @@ $dtNow[^u:getJustDate[^date::now[]]]
 			$t[^sDateTime.match[^^
 			(?:([12][0-9]|3[012]|0?[123456789])\s*)
 			(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
-			(?:\s*(\d\d\d\d))?^$][gx]]
+			(?:\s*(\d\d(?:\d\d)?))?^$][gx]]
 			^if(def $t){
 				$m(
 				^switch[$t.2]{
@@ -212,7 +212,7 @@ $dtNow[^u:getJustDate[^date::now[]]]
 					^case[DEFAULT]{^throw[invalid date;invalid date $sDateTime]}
 				})
 
-				$result[^date::create(^if(def $t.3){$t.3}{$dtNow.year};$m;$t.1)]
+				$result[^date::create(^if(def $t.3){^getFullYear($t.3)}{$dtNow.year};$m;$t.1)]
 			}
 		}
 
@@ -229,6 +229,19 @@ $dtNow[^u:getJustDate[^date::now[]]]
 #  		^if(def $result){^u:p[12345]}
 	}
 }
+
+@getFullYear[iYear_][iYear]
+$iYear($iYear_)
+^if($iYear < 100){
+	^if($iYear < 38){
+		^iYear.inc(2000)
+	}{
+		^if($iYear > 70){
+			^iYear.inc(1900)
+		}
+	}
+}
+$result(^min(^max($iYear;1971);2037))
 
 @p[sString]
 ^throw[DEBUG;;$sString]

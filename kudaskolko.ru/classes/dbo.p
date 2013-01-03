@@ -142,7 +142,7 @@ $hParams[^hash::create[$hParams]]
 			}
 	}
 }
-
+^rem{DEPRECATED}
 @changeTransactionCategory[hParams][hItem]
 $hParams[^hash::create[$hParams]]
 
@@ -179,18 +179,14 @@ $result[^hash::create[$hItem]]
 $hParams[^hash::create[$hParams]]
 
 $hResult[^hash::create[]]
-#не сохранять весовые ШК
-# ^if(def $hParams.barcode && ^hParams.barcode.left(1) eq '2'){
-	$hParams.barcode[]
-# }
+
 ^if(def $hParams.name){
 # <query>
 	$hResult.tValues[^oSql.table{
-		SELECT
+		SELECT^if($dbo:second){=}
 			IFNULL(ai.iid,i.iid) AS iid,
 			IFNULL(ai.pid,i.pid) AS pid,
-#			IFNULL(ai.name,i.name) AS name,f
-#			IFNULL(ai.barcode,i.barcode) AS barcode,
+#			IFNULL(ai.name,i.name) AS name,
 			NULLIF(i.iid,IFNULL(ai.iid,i.iid)) AS alias_id,
 # 			IFNULL(ai.type,i.type) AS type
 			nd.type
@@ -204,51 +200,8 @@ $hResult[^hash::create[]]
 			AND nd.type & ^hParams.type.int(0) = ^hParams.type.int(0)
 		}
 		AND nd.iid = nd.pid
-		^if(def $hParams.barcode){
-			AND i.barcode = '$hParams.barcode'
-		}
 		ORDER BY nd.level, nd.type
 	}[$.limit(1)]]
-
-	^if(def $hParams.barcode && $hResult.tValues.iid == 0){
-		$hResult.tValues[^oSql.table{
-			SELECT
-				IFNULL(ai.iid,i.iid) AS iid,
-				IFNULL(ai.pid,i.pid) AS pid,
-#				IFNULL(ai.name,i.name) AS name,
-#				IFNULL(ai.barcode,i.barcode) AS barcode,
-				NULLIF(i.iid,IFNULL(ai.iid,i.iid)) AS alias_id,
-				IFNULL(ai.type,i.type) AS type
-			FROM items i
-			LEFT JOIN items ai ON ai.iid = i.alias_id
-			WHERE user_id = $USERID AND
-			(i.name = '$hParams.name'
-			OR i.barcode = '$hParams.barcode')
-		}[$.limit(1)]]
-
-		^if($hResult.tValues.iid != 0){
-
-			^oSql.void{
-				INSERT INTO items (
-					name,
-					barcode,
-					alias_id,
-					user_id
-				) values (
-					'$hParams.name',
-					'$hParams.barcode',
-					$hResult.tValues.iid,
-					$USERID
-				)}
-
-			$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
-
-		$hResult.tValues[^table::create{iid	pid	alias_id	type
-$hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int($dbo.TYPES.CHARGE)}]
-		}
-
-	}
-
 
 	^rem{ если ничего не нашли }
 	^if($hResult.tValues.iid == 0){
@@ -289,49 +242,100 @@ $hResult.tValues.iid	$hResult.tValues.pid	$iLastInsert	^hParams.type.int($dbo.TY
 		^oSql.void{
 			INSERT INTO items (
 				name,
-				^if(def $hParams.barcode){
-					barcode,
-				}
-# Это не тип для категории, а тип для родительской категории				
-# 				^if(^hParams.type.int(0) != 0){
-# 					type,
-# 				}
 				pid,
 				user_id
 			) values (
 				'$hParams.name',
-				^if(def $hParams.barcode){
-					'$hParams.barcode',
-				}
-# 				^if(^hParams.type.int(0) != 0){
-# 					^hParams.type.int(0),
-# 				}
 				^hParams.pid.int(0),
 				$USERID
 			)}
 
 		$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
 
-#		^if(^hParams.pid.int(0) == 0){
-#			^oSql.void{
-#				UPDATE items
-#				SET pid = $iLastInsert
-#				WHERE iid = $iLastInsert
-#			}
-#		}
-
 		$hResult.tValues[^table::create{iid	pid	alias_id	type
-$iLastInsert	^hParams.pid.int($iLastInsert)		^hParams.type.int($dbo:TYPES.CHARGE)}]
+$iLastInsert	^hParams.pid.int(0)		^hParams.type.int($dbo:TYPES.CHARGE)}]
+
+	^rebuildNestingDataLocal[
+		$.iid($hResult.tValues.iid)
+		$.pid($hResult.tValues.pid)
+	]
 
 # </query>
 
 	}
-#	^rebuildNestingData[]		
 }{
 	$hResult.isError(true)
 }
 $result[^hash::create[$hResult]]
 
+@deleteTransaction[hParams][locals]
+$hParams[^hash::create[$hParams]]
+^if(^hParams.isDeleteEmptyCategories.int(0)){
+
+# удаление опустошенной категории	
+# 	$tItemData[^oSql.int{
+# 		SELECT iid,alias_id FROM transactions WHERE tid = ^hParams.tid.int(0)
+# 	}]
+
+# 	^dbo:rebuildNestingDataLocal[
+# 		$.iid()
+# 	]
+}
+
+^oSql.void{
+	DELETE FROM transactions 
+	WHERE 
+		tid = ^hParams.tid.int(0)
+		AND user_id = $USERID
+}
+
+
+@deleteItem[hParams]
+$hParams[^hash::create[$hParams]]
+^if(^hParams.iid.int(0)){
+
+	^oSql.void{
+		DELETE FROM items 
+		WHERE iid = ^hParams.iid.int(0)
+		AND user_id = $USERID
+	}
+
+	^rebuildNestingDataLocal[$.iid(^hParams.iid.int(0))]
+}
+
+@rebuildNestingDataLocal[hParams]
+$hParams[^hash::create[$hParams]]
+^oSql.void{
+	DELETE FROM nesting_data
+	WHERE iid = $hParams.iid AND user_id = $USERID
+}
+^if(^hParams.pid.int(0)){
+	^oSql.void{
+		INSERT INTO nesting_data (iid, pid, type, user_id, level)
+		SELECT 
+			$hParams.iid,
+			$hParams.iid,
+			type,
+			user_id,
+			level + 1
+		FROM nesting_data
+		WHERE 
+			iid = $hParams.pid 
+			AND iid=pid 
+			AND user_id = $USERID
+	}
+	^oSql.void{
+		INSERT INTO nesting_data (iid, pid, type, user_id, level)
+		SELECT 
+			$hParams.iid,
+			pid,
+			type,
+			user_id,
+			level + 1
+		FROM nesting_data
+		WHERE iid = $hParams.pid AND user_id = $USERID
+	}
+}
 
 @createGroup[hParams]
 $hParams[^hash::create[$hParams]]
@@ -688,7 +692,9 @@ LEFT JOIN nesting_data transaction_for_last_parent_nd ON transaction_for_last_pa
 LEFT JOIN nesting_data last_parent_nd ON last_parent_nd.iid = transaction_for_last_parent_nd.pid 
 LEFT JOIN items last_parent ON last_parent.iid = last_parent_nd.iid
 	^if((^hParams.pid.int(0) || ^hParams.type.int(0)) && !^hParams.ctid.int(0)){
-	 AND last_parent_nd.pid <> nd.pid
+# если раскомментировать, то при разворачивании
+# категории у ее прямых детей не будет отображатьсяназвание родительскй категории
+#	 AND last_parent_nd.pid <> nd.pid
 	}
 WHERE 
 t2.user_id = $USERID AND

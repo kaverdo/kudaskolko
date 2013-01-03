@@ -302,7 +302,7 @@ $hParams[^hash::create[$hParams]]
 		}
 	}{
 		^processTransactions[$hTransactions]
-		^dbo:rebuildNestingData[]
+# 		^dbo:rebuildNestingData[]
 		$response:location[$hParams.sReturnURL]
 	}
 }
@@ -353,6 +353,24 @@ $hParams[^hash::create[$hParams]]
 
 # <idnput type="hidden" name="preview" id="preview" value="0"/>
 <div id="ta-container" class="active^if(!def $request:query && !def $env:HTTP_REFERER){ activated}">
+
+# <div class="hint" id="examples">
+# <ul>
+
+# 	<li>Сумма, количество, цена
+# 	<div>Водка 123</div>
+# 	</li>
+# 	<li>Чеки и скидки
+# 	<div>@чек 1234
+# 15 134</div>
+# 	</li>
+# # 	<li><a href="" query="@чек 1234^#0D^#0A15 134">Сумма, количество, цена</a></li>
+# 	<li>Указание даты</li>
+# 	<li>Чеки и скидки</li>
+# 	<li>Вычитание записей</li>
+# 	<li>Явное указание типа записи</li>
+# </ul>
+# </div>
 <div class="form">
 <form method="post" action="/" id="formTransactions">
 <input type="hidden" name="action" value="out"/>
@@ -492,7 +510,6 @@ $l[^hash::create[]]
 			$.type($v.iType)
 		}
 		]]
-
 		$l.hTransaction[^dbo:createTransaction[
 			$.iid[$l.hItem.tValues.iid]
 			^if(def $l.hBaseTransaction){
@@ -519,38 +536,40 @@ $aTransactions[^array::new[]]
 $tTransactions[^sTransactions.match[
 
 # ^^\s*((?:(позавчера|вчера|сегодня|(?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?))\s*)|(.*?))^$][gmxi]]
-^^[ \t]*((?:(
+^^[ \t]*(\x23)?((?:(
 	(?>(?:(?:прошл(?:ое|ый|ая)\s+)?(?>воскресенье|понедельник|вторник))|позавчера|вчера|сегодня)
 	|
 	(?:(?:(?:[12][0-9]|3[012]|0?[123456789])\s*)
 	(?>января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
-	(?:\s*\d\d\d\d)?)
+	(?:\s*\d\d(?:\d\d)?)?)
 	|
-	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)
+# 	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d(?:\d\d)?)?)
+	(?:(?:[12][0-9]|3[012]|0?[123456789])\.(?:0?[123456789]|1[012])(?:\.\d\d(?:\d\d)?)?)
 	)
-	\s*)|
+ 	\s*)|
 
 	(.*?))^$][gmxi]]
-
-$transDate[^date::now[]]
+# $transDate[^date::now[]]
 
 $oBaseTransaction[]
 $dtTransDate[^date::now[]]
 $hTransaction[^hash::create[]]
 ^tTransactions.menu{
-^if(!def $tTransactions.1){
+^if(!def $tTransactions.2 && !def $tTransactions.1){
 	$hTransaction.isEmpty(true)
 }{
-	^if(def $tTransactions.2){
-		$dtTransDate[^u:stringToDate[$tTransactions.2]]
+	^if(def $tTransactions.3){
+		$dtTransDate[^u:stringToDate[$tTransactions.3]]
 		$hTransaction.isEmpty(true)
 	}{
 		$hTransaction.dtTransDate[$dtTransDate]
-		^hTransaction.add[^parseTransaction[$tTransactions.1]]
+		^hTransaction.add[^parseTransaction[$tTransactions.2]]
 	}
 }
-^aTransactions.add[^hash::create[$hTransaction]]
-$hTransaction[^hash::create[]]
+^if(!def $tTransactions.1){
+	^aTransactions.add[^hash::create[$hTransaction]]
+	$hTransaction[^hash::create[]]
+}
 }
 
 $result[^aTransactions.getHash[]]
@@ -572,7 +591,7 @@ $tTransaction[^sTransaction.match[
 	(?>января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
 	(?:\s*\d\d\d\d)?)
 	|
-	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?)
+	(?:(?:[12][0-9]|3[012]|0?[123456789])\.(?:0?[123456789]|1[012])(?:\.\d\d(?:\d\d)?)?)
 )\s+)? # 1.5 sDate
 
 # (q)? # 1.5 sDate

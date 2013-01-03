@@ -329,6 +329,8 @@ $(function() {
 		dateFormat: "d M yy",
 		nextText: "Следующий",
 		prevText: "Предыдущий",
+		minDate: new Date(1971, 1 - 1, 1),
+		maxDate: new Date(2037, 12 - 1, 31),
 		dayNamesMin: ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
 		monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", 
 		"Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
@@ -623,15 +625,30 @@ $(function() {
 		}
 
 	});
+var transactionBeforeExample = '';
+var isExamplesUsed = false;
+ $("#examples ul li").click(function(event){
+ 	if(!isExamplesUsed && $("#transactions").val() != ''){
+ 		transactionBeforeExample = $("#transactions").val();
+ 		isExamplesUsed = true;
+ 		$("#howto2").append("<span>Вернуть содержимое</span>");
+ 		$("#howto2 span")
+ 		.click(function(event){
+ 			$("#transactions").val(transactionBeforeExample);
+ 			ajaxPreview();
+ 			isExamplesUsed = false;
+ 			$(this).remove();
+ 		});
+ 	}
+		event.preventDefault();
+		$("#transactions").val("# пример\n"+
+			$(this).children("div").text());
+		$("#transactions").focus();
 
-
-//  $("#examples .listofexamples a").click(function(event){
-// 		event.preventDefault();
-// 		$("#idJQRY").val($(this).attr("query"));
-// 		$("#idJPRJTS").val($(this).attr("project"));
-// 		 $("#examples .listofexamples a").removeClass("active");
-// 		$(this).addClass("active");
-// 	});
+		ajaxPreview();
+		 $("#examples ul li").removeClass("active");
+		$(this).addClass("active");
+	});
 
 //  $("#browser a").click(function(event){
 // 		event.preventDefault();

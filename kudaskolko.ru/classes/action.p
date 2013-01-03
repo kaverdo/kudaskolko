@@ -1,17 +1,21 @@
 @CLASS
 action
 
+
 @USE
 utils.p
 dbo.p
 common/dtf.p
 
+@OPTIONS
+locals
+
 @auto[]
 $data[^hash::create[]]
 
 @create[hParams]
-$hPage[$hParams.hPage]
-$USERID(^hParams.USERID.int(0))
+$self.hPage[$hParams.hPage]
+$self.USERID(^hParams.USERID.int(0))
 
 @action[sAction]
 ^makeHTML[;
@@ -23,47 +27,18 @@ $USERID(^hParams.USERID.int(0))
 	^case[rename_category]{
 		^renameCategory[]
 	}
-	^case[change_transaction_category]{
-		^changeTransactionCategory[]
-	}
 	^case[change_transaction_details]{
 		^changeTransactionDetails[]
-	}
-	^case[change_transaction_date]{
-		^changeTransactionDate[]
-	}
-	^case[split_transaction]{
-		^splitTransaction[]
 	}
 	^case[delete_transaction]{
 		^deleteTransaction[]
 	}
-	^case[edit_category]{
-		^moveCategory[]
-		<hr/>
-		^renameCategory[]
-	}
 	^case[edit]{
 		^if(^form:t.int(0)){
-# 			^makeHTML[;
-^editTransactionTEMP[]
-# <hr/><hr/>
-# 			^editTransactionTEMP[]]
+			^editTransaction[]
 		}{
-# 			^makeHTML[;^editCategoryTEMP[]]
-			^editCategoryTEMP[]
+			^editCategory[]
 		}
-	}
-	^case[edit_transaction]{
-		^changeTransactionDetails[]
-		<hr/>
-		^changeTransactionDate[]
-		<hr/>
-		^changeTransactionCategory[]
-		<hr/>
-		^splitTransaction[]
-		<hr/>
-		^deleteTransaction[]
 	}
 	^case[DEFAULT]{
 		Неизвестная операция $sAction
@@ -72,64 +47,19 @@ $USERID(^hParams.USERID.int(0))
 
 ]
 
-@editTransactionTEMP[]
+@editTransaction[]
 <div class="actions">
 ^moveCategory[]
 ^renameCategory[]
 ^changeTransactionDetails[]
-
-# <hr/>
-# ^changeTransactionDate[]
-# <hr/>
-# ^changeTransactionCategory[]
-# <hr/>
 ^deleteTransaction[]
 </div>
-@editCategoryTEMP[]
+
+@editCategory[]
 <div class="actions">
-# $hPage.sTitle[Редактирование категории]
 ^moveCategory[]
 ^renameCategory[]
-# <hr/>
-# ^renameCategory[]
 </div>
-
-@editTransaction[]
-^if(^form:submit.int(0)){
-
-}{
-	$tTransaction[^oSql.table{
-SELECT t.amount, t.quantity, t.iid, i.name
-	FROM transactions t
-	LEFT JOIN items i ON i.iid = t.iid
-	WHERE t.tid = ^form:t.int(0)
-	}]
-
-^if(def $tTransaction){
-	$iCountOfSameCategory(^oSql.int{
-		SELECT COUNT(*)
-		FROM transactions
-		WHERE iid = $tTransaction.iid
-		})
-
-	$hPage.sTitle[e]
-	<form action="/" method="get">
-^printGoBackFields[
-	$.action[change_transaction_details]
-	$.transaction[^form:t.int(0)]
-	$.i[$form:i]
-]
-	<h1>$tTransaction.name</h1>
-	Сумма * количество для транзакции<br/>
-	<input type="text" name="amount" value="$tTransaction.amount" /> * 
-	<input type="text" name="quantity" value="$tTransaction.quantity" />
-	<input type="submit" value="Изменить"/>
-	</form>
-}{
-	Транзакция не найдена
-}
-}
-
 
 @changeTransactionDetails[]
 ^rem{
@@ -149,7 +79,7 @@ SELECT t.amount, t.quantity, t.iid, i.name
 			quantity = ^u:stringToDouble[$form:quantity],
 			tdate = '^d.sql-string[]',
 			operday = ^u:getOperdayByDate[$d]
-		WHERE tid = ^form:t.int(0)
+		WHERE tid = ^form:t.int(0) AND user_id = $self.USERID
 	}
 	^if(^form:ctid.int(0)){
 	 	^oSql.void{
@@ -158,8 +88,10 @@ SELECT t.amount, t.quantity, t.iid, i.name
 	 			tdate = '^d.sql-string[]',
 				operday = ^u:getOperdayByDate[$d]
 	 		WHERE
-	 			ctid = ^form:ctid.int(0)
-	 			OR tid = ^form:ctid.int(0)
+	 			user_id = $self.USERID
+	 			AND
+	 			(ctid = ^form:ctid.int(0)
+	 			OR tid = ^form:ctid.int(0))
 	 	}
  	}
 #	^u:p[^goBack[]]
@@ -181,6 +113,7 @@ SELECT t.amount, t.quantity, i.name, t.tdate, t.ctid
 	LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 	LEFT JOIN items i ON i.iid = cheque.iid
 	WHERE t.tid = ^form:t.int(0)
+	AND t.user_id = $self.USERID
 
 	}]
 ^if(def $tTransaction){
@@ -221,202 +154,14 @@ $sDate[^dtf:format[%e %h %Y;$tTransaction.tdate;$dtf:rr-locale]]
 }
 
 
-
-@changeTransactionDate[][d]
-
-^if(def $form:date){
-$d[^date::create[$form:date]]
-# ^u:p[^d.sql-string[]]
- 	^oSql.void{
- 		UPDATE transactions
- 		SET tdate = '^d.sql-string[]',
- 		operday = ^u:getOperdayByDate[$d]
- 		WHERE
- 		^if(^form:ctid.int(0)){
- 			ctid = ^form:ctid.int(0)
- 			OR tid = ^form:ctid.int(0)
-		}{
-			tid = ^form:t.int(0)
-		}
- 
-#  		WHERE tid = ^form:t.int(0)
- 	}
-
-#	^u:p[^goBack[]]
-$response:location[^goBack[$.operday[^u:getOperdayByDate[$d]]]]
-#$iLevel(^oSql.int{SELECT level from nesting_data WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#$iParent(^oSql.int{SELECT pid from items WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#	$response:location[^goBack[$.parentid[$iParent]$.level[$iLevel]]]
-
-
-}{
-$tTransaction[^oSql.table{
-SELECT t.tdate, t.ctid,i.name
-	FROM transactions t
-	LEFT JOIN transactions cheque ON cheque.tid = t.ctid
-	LEFT JOIN items i ON i.iid = cheque.iid
-	WHERE t.tid = ^form:t.int(0)
-	}]
-^if(def $tTransaction){
-	<form action="/" method="get">
-^printGoBackFields[
-	$.action[change_transaction_date]
-	$.t[^form:t.int(0)]
-	$.i[$form:i]
-
-# 	$.ctid[$form:ctid]
-]
-	<h1></h1>
-	Дата транзакции<br/>
-	<input type="text" name="date" value="^tTransaction.tdate.left(10)" /><input type="submit" value="Изменить"/>
-	^if(^tTransaction.ctid.int(0)){
-		<br/>
-	<input type="hidden" name="ctid" value="^tTransaction.ctid.int(0)" />
-# 	<input type="checkbox" name="forall" value="1" id="IDForAll"/><label for="IDForAll">изменить для всех позиций чека @ $tTransaction.name</label>
-будут изменены все позиции чека @ $tTransaction.name от ^dtf:format[%e %h%W;$tTransaction.tdate;$dtf:rr-locale]</label>
-	<br/>}
-	
-	</form>
-}{
-	Транзакция не найдена
-}
-}
-
-@changeTransactionCategory[]
-^rem{
-изменить только эту (просто поменять iid и перепроверить дубликаты)
-изменить все транзакции с таким iid и создать алиас, сослаться на него в транзакциях
- (затем перепроверить дубликаты для всех транзакций с таким alias_id)
-
-}
-^if(def $form:path){
-	
-	$hItem[^dbo:changeTransactionCategory[
-		$.name[$form:path]
-		$.iid(^form:i.int(0))
-		$.tid(^form:t.int(0))
-		$.isForAll(^form:forall.int(0))
-	]]
-	
-$response:location[$MAIN:MONEY.SERVER_HOST/]
-#$iLevel(^oSql.int{SELECT level from nesting_data WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#$iParent(^oSql.int{SELECT pid from items WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#	$response:location[^goBack[$.parentid[$iParent]$.level[$iLevel]]]
-
-
-}{
-	<form action="/" method="get">
-^printGoBackFields[
-	$.action[change_transaction_category]
-	$.t[^form:t.int(0)]
-	$.i[$form:i]
-]
-
-	Новая категория для транзакции<br/>
-	<input type="text" name="path" value="^getPath(^form:i.int(0))" />
-	<input type="checkbox" name="forall" value="1" id="forallID" /><label for="forallID">Применить для всех транзакций и создать алиас</label>
-	<input type="submit" value="Изменить"/>
-	</form>
-}
-
-
-
-@splitTransaction[]
-^rem{
-1. Создать транзакции из предоставленного списка с базовой текущей
-2. Пометить текущую как чековую, скрыть, убрать признак "Требует уточнения",
-увеличить сумму в соответствии с суммой дочерних транзакций
-если сумма транзакции больше, то обновить су
-сумма_базовой
-сумма_дочерних
-
-сумма_базовой = сумма_дочерних -> скрываем
-сумма_базовой < сумма_дочерних -> приравниваем сумму базовой к сумме дочерних и скрываем
-
-сумма базовой > суммы дочерних -> уменьшаем сумму базовой на сумму дочерних и оставляем ее открытой
-}
-
-^if(def $form:name){
-	
-	$tBaseTransaction[^oSql.table{
-	SELECT
-	amount,
-	operday,
-	tdate,
-	account_id_from,
-	account_id_to,
-	user_id,
-	type
-	FROM transactions
-	WHERE tid = ^form:transaction.int(0)
-	}]
-	
-	$dBaseAmount(^oSql.double{SELECT amount FROM transactions WHERE tid = ^form:transaction.int(0)})
-	$dChildrenAmount(^form:amount.double(0))
-	$hItem[^dbo:createItem[
-		$.name[$form:name]
-	]]
-	$hTransaction[^dbo:createTransaction[
-		$.iid($hItem.tValues.iid)
-		$.ctid(^form:transaction.int(0))
-		$.amount(^form:amount.double(0))
-		$.operday($tBaseTransaction.operday)
-		$.tdate[$tBaseTransaction.tdate]
-		$.account_id_from($tBaseTransaction.account_id_from)
-		$.account_id_to($tBaseTransaction.account_id_to)
-		$.user_id($tBaseTransaction.user_id)
-		$.type($tBaseTransaction.type & ($dbo:TYPES.CHARGE | $dbo:TYPES.INCOME))
-	]]
-	$tBaseTransaction.type = ^eval($tBaseTransaction.type & ($dbo:TYPES.CHARGE | $dbo:TYPES.INCOME)))
-	^oSql.void{
-	UPDATE transactions
-	SET
-	^if($dBaseAmount > $dChildrenAmount && ($dBaseAmount - $dChildrenAmount) >= 1.00){
-		amount = ^eval($dBaseAmount - $dChildrenAmount)
-	}{
-		amount = $dChildrenAmount,
-		is_displayed = 0,
-		type = type | !$dbo:TYPES.NEED_CLARIFICATION | $dbo:TYPES.CHEQUE
-	}
-	WHERE tid = ^form:transaction.int(0)
-	}
-	
-#$response:location[$MONEY.SERVER_HOST/?operday=$form:operday]
-#$iLevel(^oSql.int{SELECT level from nesting_data WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#$iParent(^oSql.int{SELECT pid from items WHERE iid = $iItemID}[$.limit(1)$.default(0)])
-#	$response:location[^goBack[$.parentid[$iParent]$.level[$iLevel]]]
-
-
-}{
-	<form action="/" method="get">
-^printGoBackFields[
-	$.action[split_transaction]
-	$.transaction[^form:transaction.int(0)]
-	$.itemid[$form:itemid]
-		$.operday[$form:operday]
-]
-
-	Разбить транзакцию<br/>
-	<input type="text" name="name" value="" />
-	<input type="text" name="amount" value="" />
-#	<input type="checkbox" name="forall" value="1" id="forallID" />
-#	<label for="forallID">Применить для всех транзакций и создать алиас</label>
-	<input type="submit" value="Разбить"/>
-	</form>
-}
-
-
 @deleteTransaction[]
 
 ^if(def $form:delete_confirmed){
-
-	^oSql.void{
-	DELETE FROM transactions 
-	WHERE 
-	tid = ^form:t.int(0)
-	AND user_id = $USERID
-	}
-^dbo:rebuildNestingData[]
+	^dbo:deleteTransaction[
+		$.tid(^form:t.int(0))
+		$.isDeleteEmptyCategories(1)
+# 		$.isDeleteSubCategories(0)
+	]
 	$response:location[^goBack[]]
 }{
 
@@ -438,51 +183,7 @@ $response:location[$MAIN:MONEY.SERVER_HOST/]
 </div>	
 }
 
-@getGoBackFields[]
-$result[
-$.p[$form:p]
-$.operday[$form:operday]
-	$.type[$form:type]
-	$.expanded[$form:expanded]
-	$.detailed[$form:detailed]
-	$.ctid[$form:ctid]
-# $.level[$form:level]
-]
-
-
-
-@makeQueryString[hUrlParts][sResult;hUrlParts;k;v]
-$hUrlParts[^hash::create[$hUrlParts]]
-$sResult[^hUrlParts.foreach[k;v]{^if(def $v){$k=$v}{^if($k eq operday){$k=$oCalendar.data.currentOperday}}}[&]]
-^if(def $sResult){
-	$result[?$sResult]
-}{
-	$result[]	
-}
-
-@goBack[hFields][k;v;hResult;sResult]
-$hResult[^getGoBackFields[]]
-# $hInput[^hash::create[$hFields]]
-^hResult.add[^hash::create[$hFields]]
-# $sResult[^hResult.foreach[k;v]{$k=$v}[&]]
-$sResult[^makeQueryString[$hResult]]
-^if(def $sResult){
-	$result[$MAIN:MONEY.SERVER_HOST/$sResult]
-}{
-	$result[$MAIN:MONEY.SERVER_HOST/]
-}
-
-@printGoBackFields[hFields][k;v;hResult;hInput]
-$hResult[^getGoBackFields[]]
-$hInput[^hash::create[$hFields]]
-^hResult.add[$hInput]
-^hResult.foreach[k;v]{
-	^if(def $v){
-		<input type="hidden" name="$k" value="$v"/>
-	}
-}
-
-@renameCategory[][tValues]
+@renameCategory[]
 # в первой версии будет простое техническое переименование 
 # с запретом на совпадение с существующими категориями и без алиасов
 
@@ -503,7 +204,7 @@ $tValues[^oSql.table{
 		LEFT JOIN items i ON t.iid = i.iid
 		WHERE 
 			t.iid = ^form:i.int(0)
-			AND t.user_id = $USERID
+			AND t.user_id = $self.USERID
 		GROUP BY t.iid
 }{
 		SELECT 
@@ -513,12 +214,12 @@ $tValues[^oSql.table{
 		FROM items i
 		WHERE 
 			i.iid = ^form:i.int(0)
-			AND i.user_id = $USERID
+			AND i.user_id = $self.USERID
 }
 }[$.limit(1)]]
 
 # $sCurrentName[^string:sql{SELECT i.name FROM items i WHERE i.iid = ^form:i.int(0)}[$.limit[1]]]
-$hPage.sTitle[$tValues.name]
+$self.hPage.sTitle[$tValues.name]
 ^if(def $form:newCategoryName && ^form:newCategoryName.trim[] ne ""){
 ^rem{
 	
@@ -554,7 +255,7 @@ $hPage.sTitle[$tValues.name]
 				LEFT JOIN nesting_data siblings ON siblings.pid = parents.iid
 				LEFT JOIN items i ON siblings.iid = i.iid					
 			WHERE 
-				current.user_id = $USERID AND
+				current.user_id = $self.USERID AND
 				# где текущая категория
 				current.iid = ^form:i.int(0) AND
 				# Искомое название
@@ -583,19 +284,19 @@ $hPage.sTitle[$tValues.name]
 					SET ^rem{alias_id = iid,}
 					iid = $newNameID
 					WHERE iid = ^form:i.int(0)
-					AND user_id = $USERID
+					AND user_id = $self.USERID
 				}
 			}{
 				^oSql.void{
 					UPDATE transactions
 					SET iid = $newNameID
 					WHERE tid = ^form:t.int(0)
-					AND user_id = $USERID
+					AND user_id = $self.USERID
 				}
 			}
 
 # 	 			^oSql.void{
-# 	 			DELETE FROM items WHERE iid = ^form:i.int(0) AND user_id = $USERID
+# 	 			DELETE FROM items WHERE iid = ^form:i.int(0) AND user_id = $self.USERID
 # 	 			}
 			$iid($newNameID)
 		}{
@@ -604,7 +305,7 @@ $hPage.sTitle[$tValues.name]
 					UPDATE items 
 					SET name = '^u:capitalizeString[^form:newCategoryName.trim[]]' 
 					WHERE iid = ^form:i.int(0)
-					AND user_id = $USERID
+					AND user_id = $self.USERID
 				}
 			}{
 
@@ -616,13 +317,13 @@ $hPage.sTitle[$tValues.name]
 					UPDATE transactions
 					SET iid = $hItem.tValues.iid
 					WHERE tid = ^form:t.int(0)
-					AND user_id = $USERID
+					AND user_id = $self.USERID
 				}
 				$iid($hItem.tValues.iid)
 			}
 
+# 			^dbo:rebuildNestingData[]
 		}
-		^dbo:rebuildNestingData[]
 	}
 	$response:location[^goBack[$.i($iid)$.p($iid)]]
 
@@ -666,7 +367,7 @@ $value(^if((def $tValues.countOfEntries && $tValues.countOfEntries > 1)
 </div>
 }
 
-@printBreadScrumbs[iid][tParents]
+@printBreadScrumbs[iid]
 <ul class="breadscrumbs inaction">
 $tParents[^dbo:getParentItems[$.iid($iid)]]
 # ^if(!$tParents && (^form:type.int(0) && !^form:p.int(0))){
@@ -688,7 +389,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 				$.operday[$form:operday]
 				^if($tParents.level != 0){
 					$.p[$tParents.iid]
-					$.type[$form:type]
+# 					$.type[$form:type]
 				}
 # 				^if($tParents.iid == ^form:p.int(0)){
 					$.expanded[$form:expanded]
@@ -707,7 +408,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 				$.operday[$form:operday]
 				^if($tParents.level != 0){
 					$.p[$tParents.iid]
-					$.type[$form:type]
+# 					$.type[$form:type]
 				}
 # 				^if(!^form:p.int(0) || $tParents.iid == ^form:p.int(0)){
 					$.expanded[$form:expanded]
@@ -721,7 +422,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 
 
 
-@moveCategory[][iItemID;tParent]
+@moveCategory[]
 ^rem{
 	сделать запрет перемещения корневых категорий и категорий в свои подкатегории
 }
@@ -741,6 +442,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 		LEFT JOIN items parent ON parent.iid = current.pid
 		LEFT JOIN nesting_data parent_nd ON parent_nd.iid = parent.iid 
 		WHERE current.iid = ^form:i.int(0) AND parent_nd.iid = parent_nd.pid
+		AND current.user_id = $self.USERID
 	}]
 }
 	<div class="action" id="actionMove">
@@ -784,7 +486,7 @@ $iFinalItemID(0)
 		SELECT i.iid FROM items i
 		LEFT JOIN items i2 ON i2.name = i.name
 		WHERE
-		i.user_id = $USERID
+		i.user_id = $self.USERID
 		AND i.pid = $hItem.tValues.pid
 		AND i2.iid = ^form:i.int(0)
 		AND i.iid <> i2.iid
@@ -803,24 +505,26 @@ $iFinalItemID(0)
 		^oSql.void{
 			UPDATE transactions SET iid = $tExist.iid 
 			WHERE iid = ^form:i.int(0)
-			AND user_id = $USERID
+			AND user_id = $self.USERID
 		}
-		^oSql.void{
-			DELETE FROM items 
-			WHERE iid = ^form:i.int(0)
-			AND user_id = $USERID
-		}
+
+		^dbo:deleteItem[$.iid(^form:i.int(0))]
+
 	}{
-# 		^u:p[UPDATE items SET pid = $iFinalItemID WHERE iid = ^form:i.int(0)]
 		^oSql.void{
-			UPDATE items SET pid = $iFinalItemID 
+			UPDATE items SET pid = $iFinalItemID
 			WHERE iid = ^form:i.int(0)
-			AND user_id = $USERID
+			AND user_id = $self.USERID
 		}
+
+		^dbo:rebuildNestingDataLocal[
+			$.iid(^form:i.int(0))
+			$.pid($iFinalItemID)
+		]
+
 	}
 
-^dbo:rebuildNestingData[]
-^dbo:collapseChequeTransactions[$.iid(^form:i.int(0))]
+# ^dbo:collapseChequeTransactions[$.iid(^form:i.int(0))]
 
 
 $response:location[^goBack[
@@ -828,7 +532,7 @@ $response:location[^goBack[
 	^if(!^tParent.is_root.int(0)){
 
 		$.p[$tParent.parent_id]
-		$.type[$tParent.parent_type]
+# 		$.type[$tParent.parent_type]
 	}
 }
 
@@ -839,7 +543,7 @@ $response:location[^goBack[
 # 	<a href="^goBack[	$.type(^oSql.int{SELECT i.type 
 # 		FROM items i
 # 		LEFT JOIN nesting_data nd ON nd.pid = i.iid
-# 		WHERE nd.iid = $iFinalItemID AND i.type IS NOT NULL AND i.user_id = $USERID})]">перейти к новому  назад</a>
+# 		WHERE nd.iid = $iFinalItemID AND i.type IS NOT NULL AND i.user_id = $self.USERID})]">перейти к новому  назад</a>
 #	$response:location[^goBack[$.parentid[$hItem.tValues.iid]$.level[$iLevel]]]
 # <div class="back"><- <a href="">Расходы</a></div>
 # <div class=""><b>Чай зеленый</b> теперь в категории <a href="">Чай</a> -></div>
@@ -880,3 +584,46 @@ $response:location[^goBack[
 $tParents[^dbo:getParentItems[$.iid($iItemID)]]
 $result[^tParents.menu{$tParents.name}[/]]
 
+
+@getGoBackFields[]
+$result[
+$.p[$form:p]
+$.operday[$form:operday]
+	$.type[$form:type]
+	$.expanded[$form:expanded]
+	$.detailed[$form:detailed]
+	$.ctid[$form:ctid]
+]
+
+
+
+@makeQueryString[hUrlParts]
+$hUrlParts[^hash::create[$hUrlParts]]
+$sResult[^hUrlParts.foreach[k;v]{^if(def $v){$k=$v}{^if($k eq operday){$k=$oCalendar.data.currentOperday}}}[&]]
+^if(def $sResult){
+	$result[?$sResult]
+}{
+	$result[]	
+}
+
+@goBack[hFields]
+$hResult[^getGoBackFields[]]
+# $hInput[^hash::create[$hFields]]
+^hResult.add[^hash::create[$hFields]]
+# $sResult[^hResult.foreach[k;v]{$k=$v}[&]]
+$sResult[^makeQueryString[$hResult]]
+^if(def $sResult){
+	$result[$MAIN:MONEY.SERVER_HOST/$sResult]
+}{
+	$result[$MAIN:MONEY.SERVER_HOST/]
+}
+
+@printGoBackFields[hFields]
+$hResult[^getGoBackFields[]]
+$hInput[^hash::create[$hFields]]
+^hResult.add[$hInput]
+^hResult.foreach[k;v]{
+	^if(def $v){
+		<input type="hidden" name="$k" value="$v"/>
+	}
+}

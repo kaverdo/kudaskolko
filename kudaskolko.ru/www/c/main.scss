@@ -624,6 +624,15 @@ a.day{
 				color: #666 !important;
 			}
 		}
+
+		.expander_plain{
+			color: #999 !important;
+			border: none!important;
+			padding: 0 0.1em;
+			&:hover{
+				color: #666 !important;
+			}
+		}
 		/*padding: 0.5em 1em 0.5em 0.5em;*/
 		vertical-align: top;
 
@@ -962,11 +971,35 @@ tr:nth-child(2) td
 		padding-bottom: 1em;
 	}
 
-	#IDAjaxPreview,.form{
+	#IDAjaxPreview,.form,.hint{
 		float:left;
 		/*overflow: auto;*/
 		
 	}
+
+	#examples{
+		ul{
+			
+		}
+		li {
+			list-style-type: none;
+			cursor: pointer;
+			/*bac: $Link;*/
+
+			div{
+				display: none;
+			}
+			&:hover{
+				/*color: $LinkHover;*/
+				background-color: $LightGreen;
+			}
+			&.active{
+				background-color: $Green;
+			}
+		}
+
+	}
+
 	.form{
 
 	padding-left: 1em;

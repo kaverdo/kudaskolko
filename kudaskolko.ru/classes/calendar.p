@@ -68,15 +68,18 @@ i - iMountCount + 1
 1-7+1 =-6+1 = -5
 
 }
-
  	^if($i == 1){
  		$dFirstDate[^date::create($date)]
  	}
  	^if($i == $iMonthCount){
- 		$dLastDate[^u:getLastDay[$date]]
+		$dLastDate[^u:getLastDay[$date]]
  	}
  	$key[${date.year}^date.month.format[%02d]]
  	$hMonths.$key[$date]
+	^if($date.year == 2037 && $date.month == 12){
+		$dLastDate[^u:getLastDay[$date]]
+		^break[]
+	}
 }
 
 # $dFirstDate[^date::create($data.currentDate.year;$data.currentDate.month;1)]
@@ -87,7 +90,11 @@ i - iMountCount + 1
 # <br/>
 # # $sCurrentDate[^data.currentDate.sql-string[]]
 $hMonthsSum[^oSql.table{
-SELECT IFNULL(nd.type,^form:type.int(1)) AS type,SUBSTRING(t.operday,1,6) ym,SUM(t.amount) sum 
+SELECT 
+# IFNULL(nd.type,^form:type.int(1)) AS type,
+nd.type AS type,
+
+SUBSTRING(t.operday,1,6) ym,SUM(t.amount) sum 
 FROM transactions t
 # ^if($data.pid){
 	LEFT JOIN nesting_data nd ON nd.iid = t.iid
@@ -101,12 +108,12 @@ WHERE
 	^if($data.pid){
 		AND nd.pid = $data.pid
 	}{
-		^if(^form:type.int(0)){
-			AND nd.type & ^form:type.int(0) = ^form:type.int(0)
-		}{
+# 		^if(^form:type.int(0)){
+# 			AND nd.type & ^form:type.int(0) = ^form:type.int(0)
+# 		}{
  			AND (nd.type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE 
  				 OR nd.type & $dbo:TYPES.INCOME = $dbo:TYPES.INCOME)
-		}
+# 		}
 		AND nd.iid = nd.pid
 #		AND nd.pid IN ( SELECT iid FROM items WHERE type & 1 = 1 OR type & 2 = 2)
 	}
@@ -116,7 +123,7 @@ GROUP BY ym,nd.type
 ]
 $hMonthsSum[^hMonthsSum.hash{${hMonthsSum.type}${hMonthsSum.ym}}[$.type[hash]]]
 <div 
-class="months^if(!^form:p.int(0) && !^form:type.int(0)){ pm 
+class="months^if(!^form:p.int(0)){ pm 
 	^if(def $cookie:barstate){$cookie:barstate}{ m p}}">
 $hSums[
 	$.1[
@@ -310,7 +317,7 @@ $result[
 
 @getURI[][sResult]
 $sResult[]
-^if($data.pid){$sResult[&p=$data.pid&type=$form:type]}
+^if($data.pid){$sResult[&p=$data.pid]}
 $result[$sResult]
 
 @weekSelector[isDefault][isActive;nextDateIsCurrent]

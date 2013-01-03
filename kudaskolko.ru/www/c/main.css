@@ -442,6 +442,12 @@ a.day {
       padding: 0 0.1em; }
       .grid td .expander:hover {
         color: #666 !important; }
+    .grid td .expander_plain {
+      color: #999 !important;
+      border: none!important;
+      padding: 0 0.1em; }
+      .grid td .expander_plain:hover {
+        color: #666 !important; }
     .grid td .date {
       /*opacity: 0.3;*/
       /*			visibility: hidden;*/
@@ -651,9 +657,20 @@ a.day {
   /*overflow: none;*/ }
   #ta-container.active {
     padding-bottom: 1em; }
-  #ta-container #IDAjaxPreview, #ta-container .form {
+  #ta-container #IDAjaxPreview, #ta-container .form, #ta-container .hint {
     float: left;
     /*overflow: auto;*/ }
+  #ta-container #examples li {
+    list-style-type: none;
+    cursor: pointer;
+    /*bac: $Link;*/ }
+    #ta-container #examples li div {
+      display: none; }
+    #ta-container #examples li:hover {
+      /*color: $LinkHover;*/
+      background-color: #e8f6b7; }
+    #ta-container #examples li.active {
+      background-color: #cce17e; }
   #ta-container .form {
     padding-left: 1em;
     margin-left: -1em;
