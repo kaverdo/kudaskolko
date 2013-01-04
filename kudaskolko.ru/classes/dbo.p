@@ -183,7 +183,7 @@ $hResult[^hash::create[]]
 ^if(def $hParams.name){
 # <query>
 	$hResult.tValues[^oSql.table{
-		SELECT^if($dbo:second){=}
+		SELECT
 			IFNULL(ai.iid,i.iid) AS iid,
 			IFNULL(ai.pid,i.pid) AS pid,
 #			IFNULL(ai.name,i.name) AS name,
@@ -200,7 +200,7 @@ $hResult[^hash::create[]]
 			AND nd.type & ^hParams.type.int(0) = ^hParams.type.int(0)
 		}
 		AND nd.iid = nd.pid
-		ORDER BY nd.level, nd.type
+		ORDER BY nd.type,nd.level
 	}[$.limit(1)]]
 
 	^rem{ если ничего не нашли }
