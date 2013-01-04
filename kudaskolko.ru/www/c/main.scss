@@ -713,6 +713,7 @@ a.day{
 		&.quantity{
 			color: #6B6D55 ;
 			padding: 0.5em;
+			text-align: right;
 		}
 		&.value{
 			padding: 0;//0.5em 0.5em 0.5em 0.5em;
@@ -879,16 +880,24 @@ tr:nth-child(2) td
 	}
 
 
-	tr.chequefooter td {
-		color: $DarkGreen;
+	tr.chequefooter {
+		td {
+			color: $DarkGreen;
+		}
+		&.partial td{
+			color: $LinkHover;//#CFB535;
+			font-style:italic;
+		}
 	}
-
 	tr.chequefooter,
 	tr.chequeheader,
 	tr.chequepos{
 		background-color: $LightGreen;//#EAF5C1;//#EEF4D7;
-	}
 
+	}
+/*tr.chequefooter.last.partial td{
+	color: #836D20;
+}*/
 	tr.chequefooter.last td{
 		padding-bottom: 0.5em;
 		font-weight: bold;
@@ -979,7 +988,7 @@ tr:nth-child(2) td
 
 	#examples{
 		ul{
-			
+
 		}
 		li {
 			list-style-type: none;
@@ -987,7 +996,9 @@ tr:nth-child(2) td
 			/*bac: $Link;*/
 
 			div{
-				display: none;
+				/*display: none;*/
+				white-space: pre;
+				font-family: 'PT Mono', 'Consolas',  monospace;
 			}
 			&:hover{
 				/*color: $LinkHover;*/

@@ -141,9 +141,11 @@ $l.sCurrentDate[]
 $l.sDisplayDate[]
 $l.sCurrentCheque[]
 $l.isOpenCheque(false)
+$l.openChequeClass[]
 $l.isResultOfSubTransactionsOpen(false)
 $l.dPositionSum(0)
 $l.dInitialPositionSum(0)
+$l.dChequeAmount(0)
 ^hTransactions.foreach[k;v]{
 # 	^if($v.isResultOfSubTransactions){YES1}{NO1}|
 # 	^v.foreach[kk;vv]{
@@ -160,34 +162,14 @@ $l.dInitialPositionSum(0)
 	$l.isResultOfSubTransactionsOpen($v.isResultOfSubTransactions)
 }
 	^if($v.isEmpty){
-		^if($l.isOpenCheque){
-			^if($l.dPositionSum != $l.dInitialPositionSum){
-# 			<tr class="chequefooter first">
-# 					<td>Подитог</td>
-# 					<td></td>
-# 					<td class="value">$l.dInitialPositionSum</td>
-# 			</tr>
-			<tr class="chequefooter">
-					<td class="name">Скидка</td>
-					<td></td>
-					<td class="value">^eval($l.dPositionSum - $l.dInitialPositionSum)</td>
-			</tr>}
-			<tr class="chequefooter last">
-					<td class="name">Итого по чеку</td>
-					<td></td>
-					<td class="value">$l.dPositionSum</td>
-			</tr>
-			<tr class="spacer">
-					<td></td>
-					<td></td>
-					<td></td>
-			</tr>
-		}
+		^previewChequeFooter[]
 
 		$l.isResultOfSubTransactionsOpen(false)
 		$l.isOpenCheque(false)
+		$l.openChequeClass[]
 		$l.dPositionSum(0)
 		$l.dInitialPositionSum(0)
+		$l.dChequeAmount(0)
 		^if($l.sCurrentCheque ne ""){
 			$l.sCurrentCheque[]
 			$l.sChequeDate[]
@@ -219,8 +201,12 @@ $l.dInitialPositionSum(0)
 			$l.sCurrentCheque[$v.sChequeName]
 # 			$l.sChequeDate[^u:getDateRange[$v.dtTransDate]]
 			$l.isOpenCheque(true)
+			^if($v.dChequeAmount > 0 && $v.dPositionSum < $v.dChequeAmount){
+				$l.openChequeClass[partial]
+			}
 			$l.dInitialPositionSum($v.dPositionSum)
-			<tr class="chequeheader">
+			$l.dChequeAmount($v.dChequeAmount)
+			<tr class="chequeheader $l.openChequeClass">
 			<td class="name"><h2><span>^@</span>$l.sCurrentCheque</h2></td>
 			<td></td>
 			<td class="value">
@@ -228,7 +214,7 @@ $l.dInitialPositionSum(0)
 			</td></tr>
 		}{
 			<tr 
-			class="^if($v.iType & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE){charge} ^if($v.iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){income} ^if($l.isOpenCheque){chequepos} ^if($v.isResultOfSubTransactions){ resultofsubtransactions }">
+			class="^if($v.iType & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE){charge} ^if($v.iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){income} ^if($l.isOpenCheque){chequepos $l.openChequeClass} ^if($v.isResultOfSubTransactions){ resultofsubtransactions }">
 			<td class="name">^if($v.isSubTransaction && $l.isResultOfSubTransactionsOpen){&minus^; }$v.sName
 # 			^if(^v.sName.pos[^(] > 0){
 # 				^v.sName.mid(0;^v.sName.pos[^(])
@@ -255,31 +241,47 @@ $l.dInitialPositionSum(0)
 	}
 
 }
-^if($l.isOpenCheque){
-	^if($l.dPositionSum != $l.dInitialPositionSum){
+^previewChequeFooter[]
+
+</table>
+
+@previewChequeFooter[]
+^if($caller.l.isOpenCheque){
+	^if($caller.l.dPositionSum != $caller.l.dInitialPositionSum){
 # 	<tr class="chequefooter first">
 # 			<td>Подитог</td>
 # 			<td></td>
 # 			<td class="value">$l.dInitialPositionSum</td>
 # 	</tr>
-	<tr class="chequefooter">
+		<tr class="chequefooter $caller.l.openChequeClass">
 			<td class="name">Скидка</td>
 			<td></td>
-			<td class="value">^eval($l.dPositionSum - $l.dInitialPositionSum)</td>
-	</tr>}
+			<td class="value">^eval($caller.l.dInitialPositionSum -$caller.l.dPositionSum)</td>
+		</tr>
+}
+
+	^if($caller.l.dChequeAmount > 0 && $caller.l.dPositionSum < $caller.l.dChequeAmount){
+		<tr class="chequefooter $caller.l.openChequeClass">
+			<td class="name">Наценка</td>
+			<td></td>
+			<td class="value">^eval($caller.l.dChequeAmount - $caller.l.dPositionSum)</td>
+		</tr>
+	}
 	<tr class="chequefooter last">
-			<td class="name">Итого по чеку</td>
-			<td></td>
-			<td class="value">$l.dPositionSum</td>
+		<td class="name">Итого по чеку</td>
+		<td></td>
+		<td class="value">
+		^if($caller.l.dChequeAmount > 0 && $caller.l.dPositionSum < $caller.l.dChequeAmount){
+			$caller.l.dChequeAmount}{$caller.l.dPositionSum}
+			</td>
 	</tr>
+
 	<tr class="spacer">
-			<td></td>
-			<td></td>
-			<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
 	</tr>
 }
-</table>
-
 
 @processMoneyOut[hParams][hTransactions;hNotValid]
 $hParams[^hash::create[$hParams]]
@@ -529,7 +531,7 @@ $l[^hash::create[]]
 }
 
 
-@parseTransactionList[sTransactions]
+@parseTransactionList[sTransactions][locals]
 # returns hash of transactions
 $hResult[^hash::create[]]
 $aTransactions[^array::new[]]
@@ -554,6 +556,7 @@ $tTransactions[^sTransactions.match[
 $oBaseTransaction[]
 $dtTransDate[^date::now[]]
 $hTransaction[^hash::create[]]
+$patternParseTransactionPattern[^getParseTransactionPattern[]]
 ^tTransactions.menu{
 ^if(!def $tTransactions.2 && !def $tTransactions.1){
 	$hTransaction.isEmpty(true)
@@ -563,7 +566,8 @@ $hTransaction[^hash::create[]]
 		$hTransaction.isEmpty(true)
 	}{
 		$hTransaction.dtTransDate[$dtTransDate]
-		^hTransaction.add[^parseTransaction[$tTransactions.2]]
+
+		^hTransaction.add[^parseTransaction[$tTransactions.2;$patternParseTransactionPattern]]
 	}
 }
 ^if(!def $tTransactions.1){
@@ -574,10 +578,8 @@ $hTransaction[^hash::create[]]
 
 $result[^aTransactions.getHash[]]
 
-
-@parseTransaction[sTransaction][tTransaction;h;hResult;i]
-$hResult[^hash::create[]]
-$tTransaction[^sTransaction.match[
+@getParseTransactionPattern[]
+$result[^regex::create[
 ^^\s*
 
 (?:(-)\s*)? # 1 isSubTransaction
@@ -612,9 +614,9 @@ $tTransaction[^sTransaction.match[
 
 (?:\s+(?:(?:
 
-# (?: ([\d\.,]+)\s*[\\/]|([\d\.,]+)\s*[\*])
+# вариант Молоко 300*2, Молоко 200, Молоко 200/3
 
-	(?:([-\+])?([\d\.,]+)) # 4.5 type 5 sAmount || sPrice
+	(?:([-\+])?([\d\.,]+)) # 4.5 type 5 sAmount || sPrice || quantity
 
 	(?:
 		\s*
@@ -622,31 +624,32 @@ $tTransaction[^sTransaction.match[
 		\s*
 
 		(?:
-			([\d\.,]+)  # 7 dQuantity
-			(?:/([\d\.,]+))? # 8 dQuantityFactor
+			([\d\.,]+)  # 7 dQuantity || || sPrice || quantity
+#			(?:/([\d\.,]+))? # 8 dQuantityFactor
 			(?:\s*(\D+?))? # 9 sUnitName
 		)
 	\s*)?
+	|
+# вариант Молоко 2 по 300, 3 за 100
+	(?:
+		([\d\.,]+)  # 10 dQuantity2
+#			(?:/([\d\.,]+))? # 8 dQuantityFactor
+		(?:\s*(\D+?))? # 11 sUnitName2
+	)
+	\s*
+	(\x{043f}\x{043e}|\x{0437}\x{0430}) # 12 sAmountOrPrice2 (sAmount2)( по - price, за - amount)
+	\s*
+	(?:([-\+])?([\d\.,]+)) # 13 type2 14 sAmount3 || sPrice
+
 )\s*))?
 		^$][gmx]]
-#	([\d\.,/]+(?:\s*(?:\D+?))?)
 
-# $h[
+@parseTransaction[sTransaction;pattern][tTransaction;h;hResult;i]
+$hResult[^hash::create[]]
 
-# 	$.isSubTransaction[$tTransaction.1]
-# 	$.sDate[$tTransaction.2]
-# 	$.isCheque1[$tTransaction.3]
+$tTransaction[^sTransaction.match[$pattern]]
 
-# 	$.sName[$tTransaction.4]
-# 	$.dChequeAmount[$tTransaction.5]
-# 	$.isCheque[$tTransaction.6]
-# 	$.sAmount[$tTransaction.7]
-# 	$.sAmountOrPrice[$tTransaction.8]
-# 	$.dQuantity[$tTransaction.9]
-# 	$.dQuantityFactor[$tTransaction.10]
-# 	$.sUnitName[$tTransaction.11]
-# ]
-
+^rem{ последовательность ключей соответствует последовательности полей в шаблоне match }
 $hStr[
 	$.isSubTransaction(1)
 	$.sDate(1)
@@ -658,8 +661,14 @@ $hStr[
 	$.sAmount(1)
 	$.sAmountOrPrice(1)
 	$.dQuantity(1)
-	$.dQuantityFactor(1)
+#	$.dQuantityFactor(1)
 	$.sUnitName(1)
+	$.dQuantity2(1)
+# 	$.dQuantityFactor(1)
+	$.sUnitName2(1)
+	$.sAmountOrPrice2(1)
+	$.type2(1)
+	$.sAmountOrsPrice2(1)
 ]
 $h[^hash::create[]]
 $i(1)
@@ -676,7 +685,15 @@ $i(1)
 #   ^u:p[$h.isCheque1 ~ $tTransaction.2]
 
 $hResult.sName[^u:capitalizeString[$h.sName]]
-
+^if(def $h.sAmountOrPrice2){
+	$h.sUnitName[$h.sUnitName2]
+	$h.dQuantity[$h.dQuantity2]
+	$h.type[$h.type2]
+	$h.sAmount[$h.sAmountOrsPrice2]
+	^if($h.sAmountOrPrice2 eq 'по'){
+		$h.sAmountOrPrice[*]
+	}
+}
 
 $hResult.sUnitName[$h.sUnitName]
 $hResult.sAmount[$h.sAmount]

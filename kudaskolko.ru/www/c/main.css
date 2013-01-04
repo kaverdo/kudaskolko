@@ -504,7 +504,8 @@ a.day {
       margin: 0.2em; }
     .grid td.quantity {
       color: #6B6D55;
-      padding: 0.5em; }
+      padding: 0.5em;
+      text-align: right; }
     .grid td.value {
       padding: 0;
       text-align: right; }
@@ -562,7 +563,10 @@ a.day {
   		td{
   			background: $Green;
   		}
-  	}*/ }
+  	}*/
+  /*tr.chequefooter.last.partial td{
+  	color: #836D20;
+  }*/ }
   #IDAjaxPreview .grid.preview {
     font-size: 110%; }
   .grid.preview h2 {
@@ -597,6 +601,9 @@ a.day {
     padding-top: 0.5em !important; }
   .grid.preview tr.chequefooter td {
     color: #9ebd2e; }
+  .grid.preview tr.chequefooter.partial td {
+    color: #af321d;
+    font-style: italic; }
   .grid.preview tr.chequefooter,
   .grid.preview tr.chequeheader,
   .grid.preview tr.chequepos {
@@ -665,7 +672,9 @@ a.day {
     cursor: pointer;
     /*bac: $Link;*/ }
     #ta-container #examples li div {
-      display: none; }
+      /*display: none;*/
+      white-space: pre;
+      font-family: 'PT Mono', 'Consolas',  monospace; }
     #ta-container #examples li:hover {
       /*color: $LinkHover;*/
       background-color: #e8f6b7; }
