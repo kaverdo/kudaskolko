@@ -127,14 +127,16 @@ $result[$hNotValid]
 
 @previewTransaction[hTransactions;hNotValid]
 $hTransactions[^hash::create[$hTransactions]]
-$hNotValid[^hash::create[$hNotValid]]
+^if($hTransactions && !(^hTransactions._count[] == 1 && $hTransactions.0.isEmpty)){
 
-<table class="grid preview ^if($hNotValid){hasError}" cellpadding="0" cellspacing="0">
+	$hNotValid[^hash::create[$hNotValid]]
+	<table class="grid preview ^if($hNotValid){hasError}" cellpadding="0" cellspacing="0">
 
-$dtCurrentTransDate[]
-$iShopTransaction[]
+	$dtCurrentTransDate[]
+	$iShopTransaction[]
 
-^hTransactions.foreach[k;v]{
+	^hTransactions.foreach[k;v]{
+		
 # <hr/>	^v.foreach[kk;vv]{
 # 		^if(def $vv){
 # 			$kk = 
@@ -147,67 +149,69 @@ $iShopTransaction[]
 # 		}
 # 	}
 
-	^if($v.isEmpty || ($v.isCheque && def $iShopTransaction)){
-		^previewChequeFooter[]
-		$iShopTransaction[]
-		^if($v.isEmpty){
-			^continue[]
-		}
-	}{
-		$iShopTransaction[$v.iShopTransaction]
-	}
-	^if(def $v.dtTransDate && !(def $dtCurrentTransDate && $dtCurrentTransDate == $v.dtTransDate)){
-		$dtCurrentTransDate[$v.dtTransDate]
-		<tr class="date">
-		<td class="name"><h2><span>^u:getDateRange[$v.dtTransDate]</span></h2></td>
-		<td></td>
-		<td></td>
-		</tr>
-	}
-	^if(^hNotValid.contains[$k]){
-		<tr class="error">
-		<td class="name">^if(def $v.sName){$v.sName}{^@$v.sChequeName}
-		<span class="errorDescription">$hNotValid.$k</span></td>
-		<td class="quantity"></td>
-		<td class="value"></td>
-		</tr>
-	}{
-		^if($v.isCheque && def $v.sChequeName){
-			<tr class="chequeheader">
-			<td class="name"><h2><span>^@</span>$v.sChequeName</h2></td>
-			<td></td>
-			<td class="value">
-			</td></tr>
+		^if($v.isEmpty || ($v.isCheque && def $iShopTransaction)){
+			^previewChequeFooter[]
+			$iShopTransaction[]
+			^if($v.isEmpty){
+				^continue[]
+			}
 		}{
-			$sClassName[]
-			^if($v.iType & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE){
-				$sClassName[$sClassName charge]
-			} 
-			^if($v.iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){
-				$sClassName[$sClassName income]
-			} 
-			^if(def $iShopTransaction){
-				$sClassName[$sClassName chequepos]
-			}
-			^if($v.isResultOfSubTransactions){
-				$sClassName[$sClassName resultofsubtransactions]
-			}
-			<tr class="$sClassName">
-			<td class="name">^if($v.isSubTransaction){&minus^; }$v.sName</td>
-			<td class="quantity">^if($v.dQuantity != 1){^u:formatQuantity[$v.dQuantity]}</td>
-			<td class="value"><div class="wdisc">$v.dAmount
-			^if($v.dAmountWithoutDisc != $v.dAmount){
-				<div class="wodisc"><span>$v.dAmountWithoutDisc</span></div>
-				}</td>
-
+			$iShopTransaction[$v.iShopTransaction]
+		}
+		^if(def $v.dtTransDate && !(def $dtCurrentTransDate && $dtCurrentTransDate == $v.dtTransDate)){
+			$dtCurrentTransDate[$v.dtTransDate]
+			<tr class="date">
+			<td class="name"><h2><span>^u:getDateRange[$v.dtTransDate]</span></h2></td>
+			<td></td>
+			<td></td>
 			</tr>
 		}
+		^if(^hNotValid.contains[$k]){
+			<tr class="error">
+			<td class="name">^if(def $v.sName){$v.sName}{^@$v.sChequeName}
+			<span class="errorDescription">$hNotValid.$k</span></td>
+			<td class="quantity"></td>
+			<td class="value"></td>
+			</tr>
+		}{
+			^if($v.isCheque && def $v.sChequeName){
+				<tr class="chequeheader">
+				<td class="name"><h2><span>^@</span>$v.sChequeName</h2></td>
+				<td></td>
+				<td class="value">
+				</td></tr>
+			}{
+				$sClassName[]
+				^if($v.iType & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE){
+					$sClassName[$sClassName charge]
+				} 
+				^if($v.iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){
+					$sClassName[$sClassName income]
+				} 
+				^if(def $iShopTransaction){
+					$sClassName[$sClassName chequepos]
+				}
+				^if($v.isResultOfSubTransactions){
+					$sClassName[$sClassName resultofsubtransactions]
+				}
+				<tr class="$sClassName">
+				<td class="name">^if($v.isSubTransaction){&minus^; }$v.sName</td>
+				<td class="quantity">^if($v.dQuantity != 1){^u:formatQuantity[$v.dQuantity]}</td>
+				<td class="value"><div class="wdisc">$v.dAmount
+				^if($v.dAmountWithoutDisc != $v.dAmount){
+					<div class="wodisc"><span>$v.dAmountWithoutDisc</span></div>
+					}</td>
+
+				</tr>
+			}
+		}
+
 	}
+	^previewChequeFooter[]
 
+	</table>
+	
 }
-^previewChequeFooter[]
-
-</table>
 
 @previewChequeFooter[]
 ^if(def $caller.iShopTransaction){
@@ -512,10 +516,9 @@ $tTransactions[^sTransactions.match[
  	\s*)|
 
 	(.*?))^$][gmxi]]
-# $transDate[^date::now[]]
 
 $oBaseTransaction[]
-$dtTransDate[^date::now[]]
+$dtTransDate[^u:getJustDate[^date::now[]]]
 $hTransaction[^hash::create[]]
 $patternParseTransactionPattern[^getParseTransactionPattern[]]
 ^tTransactions.menu{
