@@ -96,13 +96,12 @@ $result[$sBody]
 <link rel="stylesheet" type="text/css" href="/c/main.css">
 
 ^if(!$isOperaMiniBrowser){
-	<link rel="stylesheet" type="text/css" href="/c/plugins/pageguide.css">
 	<link rel="stylesheet" type="text/css" href="/c/custom-theme/jquery-ui-1.8.22.custom.css"/>
-	<script type="text/javascript" src="/j/jquery-1.7.2.min.js"></script>
-
-	<script type="text/javascript" src="/j/jquery-ui-1.8.22.custom.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="/j/jquery-1.8.3.min.js"><\/script>')</script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+	<script>window.jQuery.ui || document.write('<script src="/j/jquery-ui-1.9.2.min.js"><\/script>')</script>
 	<script type="text/javascript" src="/j/jquery.cookie.js"></script>
-	<script type="text/javascript" src="/j/pageguide.min.js"></script>
 	<script type="text/javascript" src="/j/j.js"></script>
 }
 </head>
