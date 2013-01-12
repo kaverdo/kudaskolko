@@ -516,11 +516,12 @@ a.day {
         /*background-image: url('http://averkov.ru/t/color/1x1/'+$ChargesBGColor+'.gif');*/ }
       .grid td.value .date {
         visibility: hidden; }
-      .grid td.value a {
+      .grid td.value a, .grid td.value .a-replacer {
         padding: 0.5em 0;
         display: inline-block;
         height: 100%;
-        width: 100%;
+        width: 100%; }
+      .grid td.value a {
         color: inherit;
         border-color: transparent; }
         .grid td.value a:hover, .grid td.value a.hover {
@@ -785,38 +786,6 @@ button:focus {
     color: #999; }
   #transactions:-moz-placeholder {
     color: #999; }
-
-#controlsBACKUP {
-  margin-top: 1em;
-  text-align: right; }
-  .active #controlsBACKUP {
-    display: block; }
-  .inactive #controlsBACKUP {
-    display: none; }
-  #controlsBACKUP input[type="submit"] {
-    margin: 0 0 0 1em;
-    padding: 0.5em 1em;
-    border: solid 1px #999;
-    border-radius: 5px;
-    font-size: 120%;
-    background: #e8f6b7;
-    cursor: pointer; }
-    #controlsBACKUP input[type="submit"]:disabled {
-      opacity: 0.5;
-      background: #e8f6b7 !important;
-      cursor: default !important; }
-    #controlsBACKUP input[type="submit"].submit {
-      border-color: #9ebd2e;
-      background: #cce17e;
-      box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #9ebd2e; }
-      #controlsBACKUP input[type="submit"].submit:hover, #controlsBACKUP input[type="submit"].submit:focus, #controlsBACKUP input[type="submit"].submit:active {
-        background: #9ebd2e; }
-    #controlsBACKUP input[type="submit"].preview {
-      background: #EEE !important;
-      color: #333;
-      box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #cccccc; }
-      #controlsBACKUP input[type="submit"].preview:hover, #controlsBACKUP input[type="submit"].preview:focus, #controlsBACKUP input[type="submit"].preview:active {
-        background: #DDD; }
 
 #controls {
   margin-top: 1em;

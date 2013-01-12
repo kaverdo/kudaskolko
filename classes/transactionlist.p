@@ -282,7 +282,7 @@ $hasCollapsedItems(false)
 			<h2>^if(^form:expanded.int(0) == 1){
 			<a class="expander" href="/$hTransactions.0.expandLink" title="Свернуть все обратно">&minus^;</a>
 		}{
-			^if($hasCollapsedItems){
+			^if($hasCollapsedItems && !^form:ctid.int(0)){
 				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1^if(!^form:p.int(0)){&type=$hParams.type}" title="Развернуть категории">+</a>
 			}
 
@@ -376,7 +376,8 @@ $hasCollapsedItems(false)
 			</td>
 			<td class="quantity">^if($v.quantity ne 1 || def $sQuantityLink){$v.quantity}^if(def $sQuantityLink){ (<a href="$sQuantityLink">$v.tEntries.count_of_transactions</a>)}</td>
 			<td class="value" title="$v.percent%">
-			^if($v.isRest){<div class="bg" style="background-size: $v.percent% 100%"><span>$v.value</span></div>}{
+			^if($v.isRest){<span class="a-replacer">
+			<div class="bg" style="background-size: $v.percent% 100%"><span>$v.value</span></div></span>}{
 			^actions[$v.tEntries;<div class="bg" style="background-size: $v.percent% 100%"><span>$v.value</span></div>]}
 # 			<div class="date">^actions[$v.tEntries;Изменить;class="dt"]</div>
 # 			<div style="background-size: $v.percent% 100%">$v.value</div>

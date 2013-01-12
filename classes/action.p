@@ -247,58 +247,77 @@ $self.hPage.sTitle[$tValues.name]
 #	$iItemID(^createItemAndReturnIfNotExist[^form:path.trim[]])
 	$iid(^form:i.int(0))
 	^if(^form:newCategoryName.trim[] ne $tValues.name){
-		$newNameID(^oSql.int{
+		$tNewCategory[^oSql.table{
 			SELECT
-				i.iid
+				i.iid,
+				i.pid
 			FROM nesting_data current
 				LEFT JOIN nesting_data parents ON parents.iid = current.pid
 				LEFT JOIN nesting_data siblings ON siblings.pid = parents.iid
 				LEFT JOIN items i ON siblings.iid = i.iid					
 			WHERE 
 				current.user_id = $self.USERID AND
-				# где текущая категория
+# 				где текущая категория
 				current.iid = ^form:i.int(0) AND
-				# Искомое название
+# 				Искомое название
 				i.name = '^form:newCategoryName.trim[]' AND
-				# исключить текущую категорию из результатов
+# 				исключить текущую категорию из результатов
 				siblings.iid <> current.iid AND
-				# использовать только первого родителя
+# 				использовать только первого родителя
 				parents.iid = parents.pid	AND
 				parents.level = current.level-1 AND
-				# вывести братьев и первого родителя
+# 				вывести братьев и первого родителя
 				(current.level = siblings.level OR siblings.level = parents.level )
 
-			}[$.limit(1)$.default(0)])
+			}[$.limit(1)]]
 
 # 	$newNameID(^oSql.int{SELECT iid FROM items WHERE name = '^form:newCategoryName.trim[]'}[$.limit(1)$.default(0)])
-		^if($newNameID != 0){
-			^if(^form:createAlias.int(0)){
+		^if($tNewCategory){
+			^if(!^form:t.int(0) || ^form:createAlias.int(0)){
 # временно отключаем алиасы до уточнения как с ними работать 
 #(переименовали категорию, создали алиас, затем эту категорию еще раз переименовали - 
 # алиас остался работать на старый вариант категории)				
 # 				^oSql.void{
 # 					UPDATE items SET alias_id = $newNameID WHERE iid = ^form:i.int(0)
 # 				}
+
+# временно просто сливаем категории
 				^oSql.void{
 					UPDATE transactions
 					SET ^rem{alias_id = iid,}
-					iid = $newNameID
+					iid = $tNewCategory.iid
 					WHERE iid = ^form:i.int(0)
 					AND user_id = $self.USERID
 				}
+
+				$tMovedCategories[^oSql.table{
+					SELECT iid FROM items
+					WHERE pid = ^form:i.int(0)
+					AND user_id = $self.USERID
+					}]
+				^if($tMovedCategories){
+					^oSql.void{
+						UPDATE items
+						SET ^rem{alias_id = iid,}
+						pid = $tNewCategory.iid
+						WHERE pid = ^form:i.int(0)
+						AND user_id = $self.USERID
+					}
+					^dbo:rebuildNestingDataLocal[
+						$.iid[$tMovedCategories]
+						$.pid($tNewCategory.iid)
+					]
+				}
+				^dbo:deleteItem[$.iid(^form:i.int(0))]
 			}{
 				^oSql.void{
 					UPDATE transactions
-					SET iid = $newNameID
+					SET iid = $tNewCategory.iid
 					WHERE tid = ^form:t.int(0)
 					AND user_id = $self.USERID
 				}
 			}
-
-# 	 			^oSql.void{
-# 	 			DELETE FROM items WHERE iid = ^form:i.int(0) AND user_id = $self.USERID
-# 	 			}
-			$iid($newNameID)
+			$iid($tNewCategory.iid)
 		}{
 			^if(^form:createAlias.int(0)){
 				^oSql.void{
@@ -322,7 +341,7 @@ $self.hPage.sTitle[$tValues.name]
 				$iid($hItem.tValues.iid)
 			}
 
-# 			^dbo:rebuildNestingData[]
+
 		}
 	}
 	$response:location[^goBack[$.i($iid)$.p($iid)]]
@@ -345,11 +364,14 @@ $value(^if((def $tValues.countOfEntries && $tValues.countOfEntries > 1)
 	($tValues.type & $dbo:TYPES.CHARGE == $dbo:TYPES.CHARGE)
 	|| 
 	($tValues.type & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME) ){0}{1})
-# <input type="hidden" id="IDCreateAlias" name="createAlias" value="$value"/>
 
-<h2>Переименовать ^if(def $tValues.countOfEntries && $tValues.countOfEntries > 1){
+<h2>Переименовать 
+^if(def $tValues.countOfEntries && $tValues.countOfEntries > 1){
 	<span class="operamini"><input type="checkbox" id="IDCreateAlias" name="createAlias" value="$value" ^if($value){checked="checked"}><label for="IDCreateAlias">все записи с таким именем</label></span>
-	<span class="notoperamini" id="IDCreateAliasSpan">только эту запись</span>}
+	<span class="notoperamini" id="IDCreateAliasSpan">только эту запись</span>
+}{
+	<input type="hidden" id="IDCreateAlias" name="createAlias" value="$value"/>
+}
 </h2>
 # <h1 class="categoryName"><span>$sCurrentName</span></h1>
 <div class="controls">

@@ -303,39 +303,7 @@ $hParams[^hash::create[$hParams]]
 	^rebuildNestingDataLocal[$.iid(^hParams.iid.int(0))]
 }
 
-@rebuildNestingDataLocal[hParams]
-$hParams[^hash::create[$hParams]]
-^oSql.void{
-	DELETE FROM nesting_data
-	WHERE iid = $hParams.iid AND user_id = $USERID
-}
-^if(^hParams.pid.int(0)){
-	^oSql.void{
-		INSERT INTO nesting_data (iid, pid, type, user_id, level)
-		SELECT 
-			$hParams.iid,
-			$hParams.iid,
-			type,
-			user_id,
-			level + 1
-		FROM nesting_data
-		WHERE 
-			iid = $hParams.pid 
-			AND iid=pid 
-			AND user_id = $USERID
-	}
-	^oSql.void{
-		INSERT INTO nesting_data (iid, pid, type, user_id, level)
-		SELECT 
-			$hParams.iid,
-			pid,
-			type,
-			user_id,
-			level + 1
-		FROM nesting_data
-		WHERE iid = $hParams.pid AND user_id = $USERID
-	}
-}
+
 
 @createGroup[hParams]
 $hParams[^hash::create[$hParams]]
@@ -543,6 +511,7 @@ $result[^oSql.table{
 
 ^if(!^hParams.ctid.int(0) && (^hParams.pid.int(0) || ^hParams.type.int(0))){
 SELECT
+	0 AS sublevel,
 	i.name,
 	NULL as parentname,
 	NULL AS parent_id,
@@ -593,6 +562,7 @@ UNION
 
 }{
 SELECT
+	0 AS sublevel,
 	i.name,
 	NULL as parentname,
 	NULL AS parent_id,
@@ -625,6 +595,7 @@ GROUP BY t.ctid
 }
 
 SELECT
+	1 AS sublevel,
 	i.name,
 	last_parent.name AS parentname,
 	last_parent.iid AS parent_id,
@@ -798,7 +769,7 @@ GROUP BY
 #	,ndp.level}
 ORDER BY
 ## ^if(!^hParams.ctid.int(0)){ndp.level,}
-sum DESC
+sublevel, sum DESC
 }]
 
 @getEntries[hParams][tEntries]
@@ -1016,6 +987,84 @@ $tAccountState[^oSql.table{
 
 
 
+
+@rebuildNestingDataLocal[hParams][locals]
+$hParams[^hash::create[$hParams]]
+^file:lock[../tmp/rebuild.^math:random(10).lock]{
+	^if($hParams.iid is table){
+		^hParams.iid.menu{
+			^rebuildNestingDataLocalUpdate[
+				$.iid($hParams.iid.iid)
+				$.pid($hParams.pid)
+			]
+		}
+	}{
+		^rebuildNestingDataLocalUpdate[$hParams]
+	}
+}
+
+@rebuildNestingDataLocalUpdate[hParams][locals]
+$hParams[^hash::create[$hParams]]
+^rem{ удаляем все ссылки про текущую запись }
+^oSql.void{
+	DELETE FROM nesting_data
+	WHERE 
+	(
+		iid = $hParams.iid 
+		OR 
+		pid = $hParams.iid
+	)
+	AND user_id = $USERID
+}
+
+^if(^hParams.pid.int(0)){
+^rem{ если нам передали родителя, то создаем ссылку для записи 
+	на саму себя с правильным level и типом }
+	^oSql.void{
+		INSERT INTO nesting_data (iid, pid, type, user_id, level)
+		SELECT 
+			$hParams.iid,
+			$hParams.iid,
+			type,
+			user_id,
+			level + 1
+		FROM nesting_data
+		WHERE 
+			iid = $hParams.pid
+			AND iid = pid
+			AND user_id = $USERID
+	}
+^rem{ копируем все родительские ссылки для текущей записи }
+	^oSql.void{
+		INSERT INTO nesting_data (iid, pid, type, user_id, level)
+		SELECT 
+			$hParams.iid,
+			pid,
+			type,
+			user_id,
+			level + 1
+		FROM nesting_data
+		WHERE iid = $hParams.pid AND user_id = $USERID
+	}
+^rem{ ищем прямых детей текущей записи, для которых еще не создали ссылки,
+ если дети есть, то повторяем все сначала для каждого ребенка }
+	$tChildren[^oSql.table{
+		SELECT i.iid FROM items i
+		WHERE i.pid = $hParams.iid 
+		AND i.user_id = $USERID
+		AND NOT EXISTS (
+			SELECT * FROM nesting_data nd
+			WHERE nd.iid = i.iid AND nd.pid = i.pid
+		)
+	}]
+	^tChildren.menu{
+		^rebuildNestingDataLocalUpdate[
+			$.iid($tChildren.iid)
+			$.pid($hParams.iid)
+		]
+	}
+}
+
 @rebuildNestingData[]
 ^_rebuildNestingData[$USERID]
 # ^_rebuildNestingData[]
@@ -1141,3 +1190,99 @@ $iLevel(0)
 	}
 }
 
+
+@_rebuildChildrenLocal[iUserID;pid;level][iLevel;iCountBefore;iCountAfter;iCountOfInserted]
+$iLevel(^level.int(0))
+
+^oSql.void{DELETE FROM nesting_data
+	WHERE (
+		pid = $pid OR
+		iid in (SELECT DISTINCT pid FROM nesting_data WHERE pid = $pid)
+	) AND iid <> $pid
+	^if($iUserID){
+		AND user_id = $iUserID
+	}
+}
+
+^rem{ Для записей каждого уровня находим их прямых детей и создаем для них ссылки на прямых родителей до тех пор, пока ссылки создаются }
+^while($iLevel >= 0){
+	$iCountBefore(^oSql.int{SELECT COUNT(*) FROM nesting_data 
+		WHERE (pid = $pid OR
+		iid in (SELECT DISTINCT pid FROM nesting_data WHERE pid = $pid))
+		^if($iUserID){
+			AND user_id = $iUserID
+		}
+		})
+
+# 	ДАЛЬШЕ надо добавить привязку к нужной ветке (за параметр было бы неплохо брать не pid, а iid, 
+# 		если у нас есть проблема в предварительном получени pid - по сути pid это и есть iid обрабатываемой категории)
+# 	ЕЩЕ надо узнавать текущий level и использовать его как начальное значение счетчика
+	^oSql.void{
+# 		^if($iLevel == 2){INSERTINSERT}
+	  INSERT INTO nesting_data (iid, pid, level, user_id, type)
+		(	SELECT v.iid, v.pid, ^eval($iLevel+1), v.user_id, nd.type
+			FROM items v
+			LEFT JOIN nesting_data nd ON v.pid = nd.iid
+			LEFT JOIN nesting_data nd2 ON nd.pid = nd2.iid 
+			WHERE
+			v.pid = $pid
+			nd2.level = 0 AND
+			EXISTS
+				(	SELECT *
+					FROM nesting_data vd
+					WHERE 
+					v.pid = vd.iid 
+					AND vd.level = $iLevel
+					AND v.iid <> v.pid
+# 					AND v.pid = $pid
+# 					AND vd.user_id = $USERID
+				)
+			^if($iUserID){
+				AND v.user_id = $iUserID
+			}
+		)
+	}
+# 	$iCountAfter(^oSql.int{SELECT COUNT(*) FROM nesting_data 
+# 		WHERE
+# 			pid = $pid
+# 			AND iid <> pid
+# 			^if($iUserID){
+# 				AND user_id = $iUserID
+# 			}
+# 		})
+	$iCountAfter(^oSql.int{SELECT COUNT(*) FROM nesting_data 
+		WHERE (pid = $pid OR
+		iid in (SELECT DISTINCT pid FROM nesting_data WHERE pid = $pid))
+		^if($iUserID){
+			AND user_id = $iUserID
+		}
+		})
+
+
+	$iCountOfInserted($iCountAfter - $iCountBefore)
+# Для записей каждого уровня находим их прямых детей и копируем для них ссылки на прародителей 
+	^oSql.void{
+# 		^if($iLevel == 4){INSERTINSERT}
+	  INSERT INTO nesting_data (iid, pid, level, user_id, type)
+		(
+			SELECT v1.iid, v2.pid, ^eval($iLevel+1), v1.user_id, v2.type
+			FROM nesting_data v1
+			LEFT JOIN nesting_data v2 ON v2.iid = v1.pid
+# 			LEFT JOIN nesting_data nd2 ON v2.pid = nd2.iid 
+			WHERE 
+# 			nd2.level = 0 AND
+			v1.level = ^eval($iLevel+1) AND v2.level = $iLevel
+			AND v2.pid <> v1.pid
+			AND v1.user_id = v2.user_id
+			AND 
+			^if($iUserID){
+				AND v1.user_id = $iUserID
+			}
+		)
+	}
+	^if($iCountOfInserted == 0){
+		$iLevel(-1)
+	}{
+		$iLevel($iLevel + 1)
+	}
+}

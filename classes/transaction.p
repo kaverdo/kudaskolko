@@ -6,88 +6,89 @@ utils.p
 dbo.p
 common/array.p
 
-@auto[]
-$hFields[^hash::create[]]
+@OPTIONS
+locals
 
-
-@getFields[hParams]
-$result[^hash::create[$hFields]]
-
-@create[hParams]
-$hFields[^hParams::create[]]
-
-@setFields[hParams]
-^hFields.add[^hParams::create[]]
-
-@recalculateTransactions[hTransactions][l]
+@recalculateTransactions[hTransactions]
 $hTransactions[^hash::create[$hTransactions]]
-$l[^hash::create[]]
 
-$l.iResultOfSubTransactions[]
-$l.iShopTransaction[]
-$l.dtChequeTransDate[]
+$iResultOfSubTransactions[]
+$iShopTransaction[]
+$dtChequeTransDate[]
 ^hTransactions.foreach[k;v]{
-	^if($v.isSubTransaction && def $l.iResultOfSubTransactions){
-		^hTransactions.[$l.iResultOfSubTransactions].dAmount.dec($v.dAmount)
-		^hTransactions.[$l.iResultOfSubTransactions].add[$.isResultOfSubTransactions(true)]
-	}{
-		^if(!$v.isSubTransaction){
-			$l.iResultOfSubTransactions[$k]
+	^if($v.isSubTransaction){
+		^if(def $iResultOfSubTransactions && def $hTransactions.[$iResultOfSubTransactions].dAmount){
+			^hTransactions.[$iResultOfSubTransactions].dAmount.dec($v.dAmount)
+			^hTransactions.[$iResultOfSubTransactions].add[$.isResultOfSubTransactions(true)]
+		}{
+			$v.isSubTransaction(false)
 		}
+	}{
+		$iResultOfSubTransactions[]
 	}
+
 	^if($v.isCheque){
-		$l.iShopTransaction[$k]
+		$iShopTransaction[$k]
 		$v.dPositionSum(0)
-		$l.dtChequeTransDate[$v.dtTransDate]
+		$dtChequeTransDate[$v.dtTransDate]
 	}{
-		^if(def $l.iShopTransaction){
-			$v.iShopTransaction[$l.iShopTransaction]
-			^hTransactions.[$l.iShopTransaction].dPositionSum.inc($v.dAmount)
+		^if(def $iShopTransaction){
+			$v.iShopTransaction[$iShopTransaction]
+			^if(def $hTransactions.[$iShopTransaction].dPositionSum){
+				^hTransactions.[$iShopTransaction].dPositionSum.inc($v.dAmount)
+			}
+			^if(def $v.isSubTransaction){
+				$v.isSubTransaction(false)
+			}
+		}{
+			^if(!def $iResultOfSubTransactions){
+				$iResultOfSubTransactions[$k]
+			}
 		}
 	}
-	^if(def $l.dtChequeTransDate){
-		$v.dtTransDate[$l.dtChequeTransDate]
+	^if(def $dtChequeTransDate){
+		$v.dtTransDate[$dtChequeTransDate]
 	}
 	^if(def $v.isEmpty){
-		$l.iResultOfSubTransactions[]
-		$l.iShopTransaction[]
-		$l.dtChequeTransDate[]
+		$iResultOfSubTransactions[]
+		$iShopTransaction[]
+		$dtChequeTransDate[]
 	}
 }
 
 # Расчет скидки
-$l.dMaxTransaction(0)
-$l.dPositionSum(0)
-$l.dFinalPositionSum(0)
-$l.iShopTransaction[]
-$l.iMaxTransaction[]
-$l.dChequeAmount(-1)
+$dMaxTransaction(0)
+$dPositionSum(0)
+$dFinalPositionSum(0)
+$iShopTransaction[]
+$iMaxTransaction[]
+$dChequeAmount(-1)
 ^hTransactions.foreach[k;v]{
-	^if(def $v.isEmpty || ($v.isCheque && def $l.iShopTransaction)){
+	^if(def $v.isEmpty || ($v.isCheque && def $iShopTransaction)){
 		^recalculate_correctDifference[]
-		$l.dChequeAmount(-1)
-		$l.dPositionSum(0)
-		$l.dMaxTransaction(0)
-		$l.dFinalPositionSum(0)
-		$l.iShopTransaction[]
-		$l.iMaxTransaction[]
+		$dChequeAmount(-1)
+		$dPositionSum(0)
+		$dMaxTransaction(0)
+		$dFinalPositionSum(0)
+		$iShopTransaction[]
+		$iMaxTransaction[]
 	}
 	^if($v.isCheque && def $v.dChequeAmount){
-		$l.iShopTransaction[$k]
-		$l.dPositionSum($v.dPositionSum)
- 		$l.dFinalPositionSum($v.dChequeAmount)
-		$l.dChequeAmount($v.dChequeAmount)
+		$iShopTransaction[$k]
+		$dPositionSum($v.dPositionSum)
+ 		$dFinalPositionSum($v.dChequeAmount)
+		$dChequeAmount($v.dChequeAmount)
 	}{
-		^if($l.dChequeAmount > -1 && ($l.dPositionSum - $l.dChequeAmount) > 0 && def $v.sAmount){
-			$l.dDiscAmount(^math:round($v.dAmount*$l.dChequeAmount / $l.dPositionSum * 100)/100)
-			$v.dDiscount($v.dAmount - $l.dDiscAmount)
-			$v.dAmount($l.dDiscAmount)
-			^if($l.dDiscAmount > $l.dMaxTransaction){
-				$l.dMaxTransaction($l.dDiscAmount)
-				$l.iMaxTransaction[$k]
+		^if($dChequeAmount > -1 && ($dPositionSum - $dChequeAmount) > 0 && def $v.sAmount){
+			$dDiscAmount(^math:round($v.dAmount*$dChequeAmount / $dPositionSum * 100)/100)
+			$v.dDiscount($v.dAmount - $dDiscAmount)
+			$v.dAmount($dDiscAmount)
+			^if($dDiscAmount > $dMaxTransaction){
+				$dMaxTransaction($dDiscAmount)
+				$iMaxTransaction[$k]
 
 			}
-			^l.dFinalPositionSum.dec($l.dDiscAmount)
+			^dFinalPositionSum.dec($dDiscAmount)
 		}
 	}
 }
@@ -106,7 +107,7 @@ $result[$hTransactions]
 	^caller.hTransactions.[$caller.l.iMaxTransaction].dDiscount.dec($caller.l.dFinalPositionSum)
 }
 
-@checkTransactions[hTransactions][hNotValid]
+@checkTransactions[hTransactions]
 $hTransactions[^hash::create[$hTransactions]]
 $hNotValid[^hash::create[]]
 ^hTransactions.foreach[k;v]{
@@ -118,6 +119,9 @@ $hNotValid[^hash::create[]]
 			$hNotValid.[$k][чек без позиций]
 		}
 	}{
+		^if($v.isResultOfSubTransactions && !$isSubTransaction && $v.dAmount < 0){
+			$hNotValid.[$k][$v.dAmount это ниже нуля]
+		}
 		^if(!def $v.dAmount){
 			$hNotValid.[$k][позиция без суммы]
 		}
@@ -238,8 +242,11 @@ $dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
 	</tr>
 }
 
-@processMoneyOut[hParams][hTransactions;hNotValid]
+@processMoneyOut[hParams]
 $hParams[^hash::create[$hParams]]
+^if(!def $hParams.isAjax){
+	$hParams.isAjax(^form:ajax.int(0))
+}
 ^if(!def $hParams.sData){
 	$response:location[$hParams.sReturnURL]
 }{
@@ -248,7 +255,7 @@ $hParams[^hash::create[$hParams]]
 	$hNotValid[^hash::create[^checkTransactions[$hTransactions]]]
 	^if(^hNotValid._count[] > 0 || $hParams.isPreview){
 
-		^if(^form:ajax.int(0)){
+		^if($hParams.isAjax){
 			^previewTransaction[$hTransactions;$hNotValid]
 		}{
 			^MAIN:makeHTML[Предпросмотр;
@@ -435,27 +442,32 @@ $hParams[^hash::create[$hParams]]
 
 </div>
 
-@processTransactions[hTransactions][dtNow]
+@processTransactions[hTransactions]
 # отправляем транзакции в базу
 $hTransactions[^hash::create[$hTransactions]]
 $dtNow[^date::now[]]
 $dtNow[^dtNow.sql-string[]]
 $hNotValid[^hash::create[$hNotValid]]
-$l[^hash::create[]]
 
+$hBaseItem[]
+$hBaseTransaction[]
+$hItem[]
+$hTransaction[]
 ^hTransactions.foreach[k;v]{
 	^if($v.isEmpty){
-		$l.hBaseItem[]
-		$l.hBaseTransaction[]
+		$hBaseItem[]
+		$hBaseTransaction[]
+		$hItem[]
+		$hTransaction[]
 	}
 
 	^if($v.isCheque){
-		$l.hBaseItem[^dbo:createItem[
+		$hBaseItem[^dbo:createItem[
 			$.name[$v.sChequeName]
 		]]
 
-		$l.hBaseTransaction[^dbo:createTransaction[
-			$.iid[$l.hBaseItem.tValues.iid]
+		$hBaseTransaction[^dbo:createTransaction[
+			$.iid[$hBaseItem.tValues.iid]
 			$.operday[$v.dtTransDate]
 			$.tdate[$v.dtTransDate]
 			$.is_displayed(0)
@@ -465,7 +477,7 @@ $l[^hash::create[]]
 			$.adate[$dtNow]
 		]]
 	}{
-		$l.hItem[^dbo:createItem[
+		$hItem[^dbo:createItem[
 			$.name[$v.sName]
 		^if(def $v.sUnitName){
 			$.unit[$v.sUnitName]
@@ -477,10 +489,10 @@ $l[^hash::create[]]
 			$.type($v.iType)
 		}
 		]]
-		$l.hTransaction[^dbo:createTransaction[
-			$.iid[$l.hItem.tValues.iid]
-			^if(def $l.hBaseTransaction){
-				$.ctid[$l.hBaseTransaction.tValues.tid]
+		$hTransaction[^dbo:createTransaction[
+			$.iid[$hItem.tValues.iid]
+			^if(def $hBaseTransaction){
+				$.ctid[$hBaseTransaction.tValues.tid]
 			}
 			$.operday[$v.dtTransDate]
 			$.tdate[$v.dtTransDate]
@@ -502,7 +514,6 @@ $hResult[^hash::create[]]
 $aTransactions[^array::new[]]
 $tTransactions[^sTransactions.match[
 
-# ^^\s*((?:(позавчера|вчера|сегодня|(?:(?:0?[123456789]|[12][0-9]|3[01])\.(?:0?[123456789]|1[012])(?:\.\d\d\d\d)?))\s*)|(.*?))^$][gmxi]]
 ^^[ \t]*(\x23)?((?:(
 	(?>(?:(?:прошл(?:ое|ый|ая)\s+)?(?>воскресенье|понедельник|вторник))|позавчера|вчера|сегодня)
 	|
@@ -510,7 +521,6 @@ $tTransactions[^sTransactions.match[
 	(?>января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)
 	(?:\s*\d\d(?:\d\d)?)?)
 	|
-# 	(?:(?:0?[123456789]|[12][0-9]|3[012])\.(?:0?[123456789]|1[012])(?:\.\d\d(?:\d\d)?)?)
 	(?:(?:[12][0-9]|3[012]|0?[123456789])\.(?:0?[123456789]|1[012])(?:\.\d\d(?:\d\d)?)?)
 	)
  	\s*)|

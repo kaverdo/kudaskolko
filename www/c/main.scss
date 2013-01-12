@@ -50,6 +50,13 @@ $tbMargin: 0.2em;
 	transition: $transition;
 }
 
+@mixin clearfix(){
+	&:after	{
+		content: "";
+		display: table;
+		clear: both;	
+	}
+}
 
 body{
 	margin:0;//2em;
@@ -727,12 +734,13 @@ a.day{
 			.date{
 				visibility: hidden;
 			}
-			a {
+			a,.a-replacer{
 				padding: 0.5em 0;
 				display: inline-block;
 				height:100%; 
 				width:100%;
-
+			}
+			a {
 				color: inherit;
 				border-color: transparent;
 				&:hover, &.hover{
@@ -1153,53 +1161,6 @@ button:focus{
 
 }
 
-#controlsBACKUP{
-	margin-top: 1em;
-	text-align:right;
-
-	.active &{
-		display: block;
-	}
-	.inactive &{
-		display: none;
-	}
-
-	input[type="submit"]{
-		margin: 0 0 0 1em;
-		padding: 0.5em 1em;
-		border: solid 1px #999;
-		border-radius: 5px;
-		font-size: 120%;
-		background: $LightGreen;
-		cursor: pointer;
-
-		&:disabled{
-			opacity: 0.5;
-			background: $LightGreen !important;
-			cursor: default !important;
-		}
-
-		&.submit{
-			border-color:$DarkGreen;
-			background: $Green;
-			box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $DarkGreen;
-
-			&:hover, &:focus, &:active {
-				background:$DarkGreen;
-			}
-		}
-		&.preview{
-			background: #EEE !important;
-			color:#333;
-			box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px #CCC;
-
-			&:hover, &:focus, &:active {
-				background:#DDD;
-			}
-		}
-
-	}
-}
 
 
 #controls{
