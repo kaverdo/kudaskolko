@@ -348,7 +348,9 @@ $hasCollapsedItems(false)
 			]">
 			<span>$v.tEntries.parentname</span></a></span>]
 		}
-		^if(def $v.tiname && !^form:ctid.int(0)){
+		^if(def $v.tiname && !^form:ctid.int(0) &&
+			!$v.tEntries.has_children && 
+			$v.tEntries.count_of_transactions == 1){
 			$sDate[^if(def $sDate){$sDate }<span class="cheque"><a href="^makeQueryString[
 				$.ctid[$v.ctid]
 # 				$.type[$hParams.type]
@@ -374,7 +376,7 @@ $hasCollapsedItems(false)
 
 
 			</td>
-			<td class="quantity">^if($v.quantity ne 1 || def $sQuantityLink){$v.quantity}^if(def $sQuantityLink){ (<a href="$sQuantityLink">$v.tEntries.count_of_transactions</a>)}</td>
+			<td class="quantity">^if($v.quantity ne 1 || def $sQuantityLink){$v.quantity}^if(def $sQuantityLink){ (<a href="$sQuantityLink">$v.tEntries.count_of_transactions</a>)}</td>
 			<td class="value" title="$v.percent%">
 			^if($v.isRest){<span class="a-replacer">
 			<div class="bg" style="background-size: $v.percent% 100%"><span>$v.value</span></div></span>}{
