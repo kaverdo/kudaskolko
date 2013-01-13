@@ -341,7 +341,9 @@ $hasCollapsedItems(false)
 		^if(def $v.tEntries.parentname){
 			$sDate[^if(def $sDate){$sDate }<span class="category">
 			<a href="^makeQueryString[
-				$.p[$v.tEntries.parent_id]
+				^if(!^v.tEntries.is_parent_root.int(0)){
+					$.p[$v.tEntries.parent_id]
+				}
 				$.groupid[$form:groupid]
 # 				$.type[$hParams.type]
 				$.operday[^if(def $form:operday){$form:operday}{$v.tEntries.operday}]
