@@ -187,9 +187,9 @@ $sDate[^dtf:format[%h;$v]]
 		<div class="bar-container ^if($hMonthsSum.[1$k].sum + $hMonthsSum.[2$k].sum == 0){ empty}">
 #		^if(def $sFullSumm){ title="$sFullSumm"}>
 
-		^printBars[$hMonthsSum.[1$k].sum;$hSums.1.dTotalSum;minus one;1]
+		^printBars[$hMonthsSum.[1$k].sum;$hSums.1.dTotalSum;minus one;1;0]
 		^printBars[$hMonthsSum.[2$k].sum;$dTotalSum;plus both;2]
-		^printBars[$hMonthsSum.[2$k].sum;$hSums.2.dTotalSum;plus one;2]
+		^printBars[$hMonthsSum.[2$k].sum;$hSums.2.dTotalSum;plus one;2;0]
 		^printBars[$hMonthsSum.[1$k].sum;$dTotalSum;minus both;1]
 # 		$sSum[^u:formatValue($hMonthsSum.[$k].sum;true)]
 # 		^if(!^data.pid.int(0)){
@@ -254,9 +254,9 @@ $sDate[^dtf:format[%h;$v]]
 @isNotToday[]
 $result(def $request:query && ($data.dtNow != $data.currentDate || $data.startDate != $data.endDate))
 
-@printBars[iMonthSum;dTotalSum;sClass;sType][iHeight;sSum;dDelta;dLastSum]
+@printBars[iMonthSum;dTotalSum;sClass;sType;isOnlyKilos][iHeight;sSum;dDelta;dLastSum]
 $sSum[^u:formatValue($iMonthSum;true)]
-^if(!^data.pid.int(0)){
+^if(!^data.pid.int(0) && ^isOnlyKilos.int(1)){
 # 	$sFullSumm[$sSum]
 	$sSum[^u:formatValueByDivision($iMonthSum;1000;true)]
 }
