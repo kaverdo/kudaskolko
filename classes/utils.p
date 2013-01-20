@@ -359,7 +359,7 @@ $iFracLength(^hParam.iFracLength.int(^sMantissa.length[]))
 
 $sNumber[^ceiling($dNumber;$iFracLength)]
 $tPart[^sNumber.split[.][lh]]
-$sIntegerPart[^eval(^math:abs($tPart.0))[%.0f]]
+$sIntegerPart[^math:abs($tPart.0)]
 $sMantissa[$tPart.1]
 $iFracLength(^hParam.iFracLength.int(^sMantissa.length[]))
 $sThousandDivider[^if(def $hParam.sThousandDivider){$hParam.sThousandDivider}{&nbsp^;}]
