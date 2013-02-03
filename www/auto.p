@@ -16,8 +16,8 @@ $isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
  	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
 
 @initAuthDBObjects[]
-^use[../classes/sql/MySqlComp.p]
-^use[../classes/auth2.p]
+^use[/../classes/sql/MySqlComp.p]
+^use[/../classes/auth2.p]
 $oSql[^MySqlComp::create[$SQL.connect-string;
 	$.bDebug($IS_LOCAL && 1)
 	$.sCacheDir[/../data/sql_cache]
@@ -40,16 +40,16 @@ $dbo:USERID($USERID)
 
 
 @initObjects[]
-^use[../classes/dbo.p]
-^use[../classes/common/dtf.p]
-^use[../classes/import.p]
-^use[../classes/update.p]
-^use[../classes/utils.p]
-^use[../classes/calendar.p]
-^use[../classes/action.p]
-^use[../classes/transaction.p]
-^use[../classes/transactionlist.p]
-^use[../classes/common/array.p]
+^use[/../classes/dbo.p]
+^use[/../classes/common/dtf.p]
+^use[/../classes/import.p]
+^use[/../classes/update.p]
+^use[/../classes/utils.p]
+^use[/../classes/calendar.p]
+^use[/../classes/action.p]
+^use[/../classes/transaction.p]
+^use[/../classes/transactionlist.p]
+^use[/../classes/common/array.p]
 
 $oCalendar[^calendar::create[$.USERID($USERID)]]
 $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
@@ -151,7 +151,7 @@ $result[$sBody]
 @anonymousLauncher[]
 ^switch[$form:action]{
 	^case[out]{
-		^use[../classes/transaction.p]
+		^use[/../classes/transaction.p]
 		^transaction:processMoneyOut[
 			$.sData[$form:transactions]
 			$.isPreview(def $form:preview)
