@@ -653,16 +653,16 @@ $(function() {
 		$("#howto2").toggleClass("expanded");
 		if($("#howto2").hasClass("expanded")){
 			// $("#howto2 span").text("Скрыть описание");
-			$("#howto2 #examples").show();
+			$("#howto2 pre").show();
 		} else {
 			// $("#howto2 span").text("?");
-			$("#howto2 #examples").hide();
+			$("#howto2 pre").hide();
 		}
 
 	});
 var transactionBeforeExample = '';
 var isExamplesUsed = false;
- $("#__examples ul li").click(function(event){
+ $("#examples ul li").click(function(event){
  	if(!isExamplesUsed && $("#transactions").val() != ''){
  		transactionBeforeExample = $("#transactions").val();
  		isExamplesUsed = true;
