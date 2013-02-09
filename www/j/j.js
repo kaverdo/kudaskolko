@@ -19,7 +19,7 @@ $(function() {
 			})
 			.autocomplete({
 				delay: 300,
-				minLength: 2,
+				minLength: 1,
 				autoFocus: false,
 				position: { my : "left top", at: "left bottom" },
 				// source: function( request, response ) {

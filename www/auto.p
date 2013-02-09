@@ -254,7 +254,8 @@ $isSubItem(false)
 	$isSubItem(true)
 	$sInput[^sInput.trim[left;- ]]
 }
-^if(def $sInput && (^sInput.length[] > 2 || $isCheque)){
+# ^if(def $sInput && (^sInput.length[] > 2 || $isCheque)){
+^if(def $sInput && (true || $isCheque)){
 # 		^if(^sInput.left(1) eq "@"){
 # 			$isCheque(true)
 # 			$sInput[^sInput.trim[left;@]]
