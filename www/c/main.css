@@ -16,9 +16,12 @@ body {
   padding: 0;
   color: #111;
   background: #FFF;
-  font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
+  font-family: 'PT Sans','Open Sans','Helvetica',sans-serif;
   /*margin:0 5% 0 5%;*/
   /*margin:0em 2em 0em 2em;*/ }
+
+input, textarea, button {
+  font-family: 'PT Sans','Open Sans','Helvetica',sans-serif; }
 
 body.beta .home:after {
   content: ' \03B2'; }
@@ -84,9 +87,6 @@ body.beta .home:after {
     			color: $LinkHover;
     			border-bottom-color: $LinkBorderHover;
     		}*/ }
-
-input, textarea, button {
-  font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif; }
 
 body .operamini {
   display: none; }
@@ -816,8 +816,10 @@ button:focus {
     #controls input[type="submit"]:hover, #controls input[type="submit"]:active, #controls input[type="submit"]:focus, #controls button:hover, #controls button:active, #controls button:focus {
       box-shadow: inset 0px 1px 0px 0px #cce17e;
       border-color: #6e8320; }
-    #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active, #controls button.submit:hover, #controls button.submit:focus, #controls button.submit:active {
-      background: #9ebd2e; }
+    #controls input[type="submit"].submit, #controls button.submit {
+      width: 14em; }
+      #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active, #controls button.submit:hover, #controls button.submit:focus, #controls button.submit:active {
+        background: #9ebd2e; }
     #controls input[type="submit"].preview, #controls button.preview {
       background: #EEE;
       border-color: #CCC;

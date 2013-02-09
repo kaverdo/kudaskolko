@@ -63,9 +63,13 @@ body{
 	padding:0;
 	color: #111;
 	background: #FFF;
-	font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
+	font-family: 'PT Sans','Open Sans','Helvetica',sans-serif;
 	/*margin:0 5% 0 5%;*/
 	/*margin:0em 2em 0em 2em;*/
+}
+
+input,textarea,button{
+	font-family: 'PT Sans','Open Sans','Helvetica',sans-serif;
 }
 
 body.beta .home:after{
@@ -147,9 +151,7 @@ body.beta .home:after{
 		clear:both;
 	}*/
 }
-input,textarea,button{
-	font-family: 'PT Sans','Open Sans','Myriad Pro',sans-serif;
-}
+
 
 body .operamini{
 	display:none;
@@ -1205,6 +1207,7 @@ button:focus{
 			&:hover, &:focus, &:active {
 				background:$DarkGreen;
 			}
+			width: 14em;
 		}
 		&.preview{
 			background: #EEE;

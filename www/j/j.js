@@ -203,7 +203,7 @@ function setRows(textarea, isEmpty, isFocus){
 }
 
 function showHideControls(textarea){
-	showHideControlsAll(textarea, (textarea.val() == '' && textarea.val().trim() == ''), textarea.is(":focus"));
+	showHideControlsAll(textarea, (textarea.val() == '' && !textarea.val().trim()), textarea.is(":focus"));
 }
 
 function showHideControlsAll(textarea, isEmpty, isFocus){
@@ -213,15 +213,15 @@ function showHideControlsAll(textarea, isEmpty, isFocus){
 	if(isEmpty){
 		$("#controls input").attr("disabled",true);
 		if(!isFocus){
-			$("#ta-container").addClass("inactive");
-			$("#ta-container").removeClass("active");
+			taContainerID.addClass("inactive")
+			.removeClass("active");
 		} else {
-			$("#ta-container").addClass("active");
-			$("#ta-container").removeClass("inactive");
+			taContainerID.addClass("active")
+			.removeClass("inactive");
 		}
 	} else {
-		$("#ta-container").addClass("active");
-		$("#ta-container").removeClass("inactive");
+		taContainerID.addClass("active")
+		.removeClass("inactive");
 		// $("#controls input").attr("disabled",false);
 		// $("#controls .submit").attr("disabled",false);
 	}
@@ -271,12 +271,15 @@ function enableDisableControlAll(input,control,originValue) {
 }
 
 var transactionsValue = '';
-var hasAjaxPreviewHTTPErorr = false;
+var hasAjaxPreviewHTTPError = false;
+var hasAjaxPreviewFormatError = false;
+var previewTimer;
 
 function ajaxPreview(text){
+	clearTimeout(previewTimer);
 	var value;
 	if(text == null)
-		value = $("#transactions").val().trim();
+		value = transactionsID.val().trim();
 	else
 		value = text.trim();
 	if(value == '') {
@@ -285,8 +288,10 @@ function ajaxPreview(text){
 		$("#IDAjaxPreview .dataContainer").html("");
 		return;
 	}
-	if(value == transactionsValue && !hasAjaxPreviewHTTPErorr){
-		$("#controls .preview").attr("disabled",true);
+	if(value == transactionsValue && !hasAjaxPreviewHTTPError){
+		controlsPreview.attr("disabled",true);
+		if(hasAjaxPreviewFormatError)
+			controlsSubmit.attr("disabled",true);
 		return;
 	}
 	transactionsValue = value;
@@ -301,25 +306,36 @@ function ajaxPreview(text){
 		// 	$("#IDAjaxPreview .dataContainer").html("..."); 
 		// }
 	}).done(function( html ) {
-		hasAjaxPreviewHTTPErorr = false;
+		hasAjaxPreviewHTTPError = false;
 		$("#IDAjaxPreview .dataContainer").html(html);
 		$("#IDAjaxPreview").removeClass("hidden");
-		$("#controls .preview").attr("disabled",true);
-		if($("#IDAjaxPreview .dataContainer .grid").hasClass("hasError")){
-			$("#controls .submit").attr("disabled",true);
+		controlsPreview.attr("disabled",true);
+		hasAjaxPreviewFormatError = $("#IDAjaxPreview .dataContainer .grid").hasClass("hasError");
+		if(hasAjaxPreviewFormatError){
+			controlsSubmit.attr("disabled",true);
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
 		}
 	}).fail(function(jqXHR, textStatus) {
-		hasAjaxPreviewHTTPErorr = true;
+		hasAjaxPreviewHTTPError = true;
 		$("#IDAjaxPreview .dataContainer").html("Ошибка подключения к серверу, попробуйте повторить ("+textStatus+")");
 		$("#IDAjaxPreview").removeClass("hidden");
-		// $("#controls .preview").attr("disabled",false);
+		// controlsPreview.attr("disabled",false);
 	});
 
 }
 
+var transactionsID;
+var taContainerID;
+var controlsSubmit;
+var controlsPreview;
+
+
 $(document).ready(function(){
 	
+	transactionsID = $("#transactions");
+	taContainerID = $("#ta-container");
+	controlsPreview = $("#controls .preview");
+	controlsSubmit = $("#controls .submit");
 
 $(function() {
 	$( "#IDTransactionDate" ).datepicker({
@@ -346,18 +362,18 @@ $(function() {
 
 	doubleHover('.grid .value a, .grid .actions a','hover');
 
-	if($("#ta-container").hasClass('activated')){
-		$('#transactions').focus();
+	if(taContainerID.hasClass('activated')){
+		transactionsID.focus();
 	}
 	// },100);
-	showHideControls($("#transactions"));
+	showHideControls(transactionsID);
 
 	/* Делаем по таймауту, потому что Опера при нажатии кнопки "Назад"
 		может не успеть считать значение из поля,
 		в результате при непустом поле не будут показаны контролы&transactions=Vodka%20133
 	 */
 	setTimeout(function(){
-		showHideControls($("#transactions"));
+		showHideControls(transactionsID);
 	},100);
 
 	/* скрытие пустой формы, если кликают в другие места*/
@@ -365,45 +381,49 @@ $(function() {
 
 		if(!$(e.target).is('#ta-container .form *')
 			/* только если форма активна */
-			&& $("#ta-container").hasClass('active')
+			&& taContainerID.hasClass('active')
 			/* только если подсказка свернута */
 			&& !$('#howto2').hasClass('expanded')) {
 
-			if($("#transactions").val() == $("#operday").val() + '\n'){
-				$("#transactions").val('');
+			if(transactionsID.val() == $("#operday").val() + '\n'){
+				transactionsID.val('');
 			}
 
 			// setTimeout(function(){
-			showHideControls($("#transactions"));
+			showHideControls(transactionsID);
 			// }, 100);
 		}
 	});
 
-	$("#ta-container *").click(function(e){
-		e.stopPropagation();
-	});
+// 	$("#ta-container *").click(function(e){
+//		e.stopPropagation();
+// 	});
 
 
-	$("#transactions").focus(function(){
+	transactionsID.focus(function(){
 
 		// без нулевого таймаута или без явного указания, Хром не понимает, что поле получило фокус
 		setTimeout(function(){ 
-			showHideControls($("#transactions"));
+			showHideControls(transactionsID);
 		}, 0);
 
-		// showHideControlsAll($("#transactions"), $("#transactions").val() == '', true);
+		// showHideControlsAll(transactionsID, transactionsID.val() == '', true);
 
 		// без нулевого таймаута или без явного указания, Хром выставляет курсор в место, 
 		// куда ткнул пользователь (а посколько поле пустое и показывается в виде одной строки,
 		// то фокус курсор попадает в первую строку с названием месяца)
 		setTimeout(function(){
-			if($("#transactions").val() == '' && $("#operday").length > 0){
-				$("#transactions").val($("#operday").val() + '\n');
+			if(transactionsID.val() == '' && $("#operday").length > 0){
+				transactionsID.val($("#operday").val() + '\n');
 			}
 		}, 50);
 	});
 
-	$("#controls .preview").click(function(event){
+	controlsSubmit.mouseover(function(event){
+		ajaxPreview();
+	});
+
+	controlsPreview.click(function(event){
 		event.preventDefault();
 		// var value = $("#transactions").val();
 		// // if(value == '')
@@ -441,7 +461,7 @@ $(function() {
 
 	// $("#transactions").keypress(function(event){
 	// 	var keyCode = (event.which ? event.which : event.keyCode);
-	// 	var timer = setTimeout(function() {
+	// 	var previewTimer = setTimeout(function() {
 	// 		ajaxPreview();
 	// 	}, 5000);
 
@@ -450,8 +470,8 @@ $(function() {
 	// 		// $(this).val().substr(-1) == "\n"
 	// 		$(this).val().substr(-1) != " "
 	// 		){
-	// 		clearTimeout(timer);
-	// 		timer = 0;
+	// 		clearTimeout(previewTimer);
+	// 		previewTimer = 0;
 	// 		// alert('"'+$(this).val().trim()+'"');
 	// 		// alert('"'+($(this).val().substr(-1)=="\n"?"Y":"N")+'"');
 	// 		// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
@@ -461,14 +481,14 @@ $(function() {
 	// 	}
 	// });
 
-	$("#transactions").keyup(function(event){
-		var isEmpty = $(this).val().trim() == '';
-		
-		$("#controls input").attr("disabled",isEmpty);
+	transactionsID.keyup(function(event){
+		var isEmpty = !$(this).val().trim();// == '';
+		controlsSubmit.val("Записать расходы и доходы");
+
 		if(isEmpty) {
 			ajaxPreview();
 		}
-		setRows($("#transactions"),isEmpty,true);
+		setRows(transactionsID,isEmpty,true);
 		var keyCode = (event.which ? event.which : event.keyCode);  
 		if (keyCode == 13 &&
 			!isEmpty &&
@@ -485,27 +505,36 @@ $(function() {
 	});
 
 
-	$("#transactions").keydown(function(event){
-		var keyCode = (event.which ? event.which : event.keyCode);   
-		if (keyCode === 10 || keyCode == 13 && event.ctrlKey) {
+	transactionsID.keydown(function(event){
+		var keyCode = (event.which ? event.which : event.keyCode);
+		if (event.ctrlKey) {
+			controlsSubmit.val("Ctrl + Enter");
+			ajaxPreview();
+		}
+		if ((keyCode === 10 || keyCode == 13 && event.ctrlKey) && !controlsSubmit.attr("disabled")
+		  ) {
 			$("#formTransactions").submit();
 		}
-		// else if (keyCode == 13){
-		// 	// alert('"'+$(this).val().trim()+'"');
-		// 	alert('"'+$(this).val().substr(-1)+'"');
-		// 	// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
-		// 	ajaxPreview();
-		// }
 	});
 
-	$("#transactions").bind("input", function(){
-		// $("#controls input").attr("disabled",$(this).val().trim() == '');
+
+
+	transactionsID.bind("input", function(){
+		clearTimeout(previewTimer);
 		if($(this).val().trim()){
-			$("#controls .preview").attr("disabled",false);
+			controlsPreview.attr("disabled",false);
+			controlsSubmit.attr("disabled",false);
+		previewTimer = setTimeout(function() {
+			ajaxPreview();
+		}, 2000); 
+
+		} else {
+			controlsPreview.attr("disabled",true);
+			controlsSubmit.attr("disabled",true);
 		}
 	});
 
-	$("#transactions").bind('paste', function(e) {
+	transactionsID.bind('paste', function(e) {
 		setTimeout(function() {
 			ajaxPreview();
 		}, 10);
@@ -624,16 +653,16 @@ $(function() {
 		$("#howto2").toggleClass("expanded");
 		if($("#howto2").hasClass("expanded")){
 			// $("#howto2 span").text("Скрыть описание");
-			$("#howto2 pre").show();
+			$("#howto2 #examples").show();
 		} else {
 			// $("#howto2 span").text("?");
-			$("#howto2 pre").hide();
+			$("#howto2 #examples").hide();
 		}
 
 	});
 var transactionBeforeExample = '';
 var isExamplesUsed = false;
- $("#examples ul li").click(function(event){
+ $("#__examples ul li").click(function(event){
  	if(!isExamplesUsed && $("#transactions").val() != ''){
  		transactionBeforeExample = $("#transactions").val();
  		isExamplesUsed = true;
@@ -656,6 +685,41 @@ var isExamplesUsed = false;
 		 $("#examples ul li").removeClass("active");
 		$(this).addClass("active");
 	});
+
+$('ul.tabs').each(function(){
+    // For each set of tabs, we want to keep track of
+    // which tab is active and it's associated content
+    var $active, $content, $links = $(this).find('a');
+
+    // If the location.hash matches one of the links, use that as the active tab.
+    // If no match is found, use the first link as the initial active tab.
+    $active = $($links.filter('[href="'+location.hash+'"]')[0] || $links[0]);
+    $active.addClass('active');
+    $content = $($active.attr('href'));
+
+    // Hide the remaining content
+    $links.not($active).each(function () {
+        $($(this).attr('href')).hide();
+    });
+
+    // Bind the click event handler
+    $(this).on('click', 'a', function(e){
+        // Make the old tab inactive.
+        $active.removeClass('active');
+        $content.hide();
+
+        // Update the variables with the new link and content
+        $active = $(this);
+        $content = $($(this).attr('href'));
+
+        // Make the tab active.
+        $active.addClass('active');
+        $content.show();
+
+        // Prevent the anchor's default click action
+        e.preventDefault();
+    });
+});
 
 //  $("#browser a").click(function(event){
 // 		event.preventDefault();
