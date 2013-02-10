@@ -202,7 +202,8 @@ $tValues[^oSql.table{
 			i.type
 		FROM transactions t
 		LEFT JOIN items i ON t.iid = i.iid
-		WHERE 
+		LEFT JOIN nesting_data nd ON nd.pid = i.iid
+		WHERE
 			t.iid = ^form:i.int(0)
 			AND t.user_id = $self.USERID
 		GROUP BY t.iid
