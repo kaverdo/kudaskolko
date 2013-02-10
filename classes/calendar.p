@@ -275,7 +275,7 @@ $caller.hSums.[$sType].dLastSum($iMonthSum)
 ^if(def $iMonthSum){
 	$iHeight(^if($dTotalSum > 0;(^math:round(100 *$iMonthSum / $dTotalSum)-1);0))
 	^if(def $form:log){
-		$iHeight(^if($dTotalSum > 0;(^math:log(^math:round(100 *$iMonthSum / $dTotalSum))-1);0))
+		$iHeight(^if($dTotalSum > 0;^math:round(100 *^math:log($iMonthSum) / ^math:log($dTotalSum));0))
 	}
 	<div class="bar $sClass" style="height: ${iHeight}%">
  	<span>$sSum
