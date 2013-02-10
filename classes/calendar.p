@@ -351,13 +351,14 @@ $mondayOperday[^u:getOperdayByDate[^date::create[$tCalendar.monday]]]
 ^tCalendar.offset(-1)
 $sundayOperday[^u:getOperdayByDate[^date::create[$tCalendar.sunday]]]
 
-$hWeeks[^oSql.hash{
+$tWeeks[^oSql.table{
 SELECT
 	WEEK(t.tdate, 3) w,
 	BIT_OR(POW(2,(IF(DAYOFWEEK(t.tdate)=1,8,DAYOFWEEK(t.tdate))-1))) AS weekdays,
 	MIN(t.tdate) mindate,
 	MAX(t.tdate) maxdate,
-	SUM(t.amount) sum
+	SUM(t.amount) sum,
+	nd.type
 FROM transactions t
 #operdays o
 #LEFT JOIN transactions t ON t.operday = o.operday
@@ -367,7 +368,7 @@ FROM transactions t
 	LEFT JOIN items i ON nd.pid = i.iid
 # }
 
-WHERE
+WHERE	
 	t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
@@ -375,13 +376,15 @@ WHERE
 	^if($data.pid){
 		AND nd.pid = $data.pid
 	}{
-		AND nd.pid = (SELECT iid FROM items 
-			WHERE type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
-			AND user_id = $USERID)
+# 		AND nd.pid = (SELECT iid FROM items 
+# 			WHERE type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
+# 			AND user_id = $USERID)
 	}
-GROUP BY w
-}[$.type[table]]
-]
+GROUP BY w, nd.type
+}]
+
+$hWeeks[^tWeeks.hash{${tWeeks.type}${tWeeks.w}}[$.type[hash]]]
+
 #^hWeeks.foreach[k;v]{$k $v.sum}[-]
 <div class="weeks">
 $nextDateIsCurrent(true)
@@ -415,13 +418,13 @@ $nextDateIsCurrent(true)
 	^if($form:operday eq $sOperdayForWeek){
 #		<div class="date active"><span>$sDate</span></div>
 	}{
-	^if($hWeeks.[^tCalendar.week.int(-1)].sum){
+	^if($hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].sum || $hWeeks.[$dbo:TYPES.INCOME^tCalendar.week.int(-1)].sum){
 	$st[^data.currentDate.sql-string[] >= ^dtMonday.sql-string[] && ^data.currentDate.sql-string[] <= ^dtSunday.sql-string[]]
 	^if(!$isActive){
 	<div class="week^if($isDefault){ default}">
 		<a ^rem{title="$st" }class="date^if($isActive){ active}"
 	href="?operday=$sOperdayForWeek^getURI[]"><span>$sDate</span></a>
-		<div class="amount">^u:formatValue[$hWeeks.[^tCalendar.week.int(-1)].sum](true)</div>
+		<div class="amount">^u:formatValue[$hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].sum](true)</div>
 	</div>
 	}
 
@@ -434,7 +437,7 @@ $nextDateIsCurrent(true)
 		^if(!$isActive){
 		<div class="week^if($isDefault){ default}">
 	<div class="date nodata"><span>$sDate</span></div>
-	<div class="amount">^u:formatValue[$hWeeks.[^tCalendar.week.int(-1)].sum](true)</div>
+	<div class="amount">^u:formatValue[$hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].sum](true)</div>
 	</div>
 }
 	}
@@ -443,9 +446,13 @@ $nextDateIsCurrent(true)
 #</div>
 ^if($isActive){
 	<div class="week extended">
-	<div class="date^if($form:operday eq $sOperdayForWeek){ active}^if(!$hWeeks.[^tCalendar.week.int(-1)].sum){ nodata}">^daySelector[$dtMonday;$dtSunday;$hWeeks.[^tCalendar.week.int(-1)].weekdays]</div>
+	<div class="date^if($form:operday eq $sOperdayForWeek){ active}^if(!$hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].sum && !$hWeeks.[$dbo:TYPES.INCOME^tCalendar.week.int(-1)].sum){ nodata}">
+	^daySelector[$dtMonday;$dtSunday;
+	^eval($hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].weekdays | $hWeeks.[$dbo:TYPES.INCOME^tCalendar.week.int(-1)].weekdays)
+
+	]</div>
 # 	<div class="clear"></div>
-	<div class="amount">^u:formatValue[$hWeeks.[^tCalendar.week.int(-1)].sum](true)</div>
+	<div class="amount">^u:formatValue[$hWeeks.[$dbo:TYPES.CHARGE^tCalendar.week.int(-1)].sum](true)</div>
 	</div>
 }
 }
