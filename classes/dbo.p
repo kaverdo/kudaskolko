@@ -219,12 +219,13 @@ $hResult[^hash::create[]]
 				SELECT IFNULL(i.alias_id,i.iid) FROM items i
 				LEFT JOIN nesting_data nd ON nd.iid = i.iid
 				WHERE 
-				i.user_id = $USERID
+				nd.iid <> nd.pid
+				AND i.user_id = $USERID
 				AND i.name IN ($sFuzzy)
 				^if(^hParams.type.int(0)){
 					AND nd.type & ^hParams.type.int(0) = ^hParams.type.int(0)
 				}
-				ORDER BY nd.level DESC
+				ORDER BY nd.type, nd.level DESC
 				}[$.default(0)$.limit(1)])
 			}
 		}
