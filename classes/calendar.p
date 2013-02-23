@@ -46,6 +46,14 @@ $hMonths[^hash::create[]]
 $iMonthCount(7)
 $dFirstDate[]
 $dLastDate[]
+$hFirstDay[
+	$.0[^u:getFirstDay[$data.currentDate]]
+]
+$currentFirstDay[^u:getFirstDay[$data.currentDate]]
+$currentFirstDay[^u:getFirstDay[$data.currentDate]]
+$isPastDate($data.currentDate < $data.dtNow)
+$iPastDiff(^u:getFirstDay[$data.dtNow] - ^u:getFirstDay[$data.currentDate])
+$isDateNowShown(!$isPastDate)
 ^for[i](1;$iMonthCount){
 	$date[^u:getFirstDay[$data.currentDate]]
  
@@ -53,7 +61,22 @@ $dLastDate[]
 #	^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
 
 #Текущий месяц - предпоследний
-^date.roll[month]( $i - $iMonthCount + 1)
+^if($iPastDiff > 0){
+	^if($iPastDiff > 31){
+			^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
+		}{
+# 			^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
+			^date.roll[month]( $i - $iMonthCount + 2)
+		}
+	
+	}{
+
+	^date.roll[month]( $i - $iMonthCount + 1)
+}
+^if($date == $data.dtNow){
+	$isDateNowShown(true)
+}
+
 ^rem{
 1 -5 
 2 -4
@@ -82,6 +105,11 @@ i - iMountCount + 1
 	}
 }
 
+^if(!$isDateNowShown){
+	$dtNowFirstDay[^u:getFirstDay[$data.dtNow]]
+ 	$hMonths.[${dtNowFirstDay.year}^dtNowFirstDay.month.format[%02d]][$dtNowFirstDay]
+}
+
 # $dFirstDate[^date::create($data.currentDate.year;$data.currentDate.month;1)]
 # ^dFirstDate.roll[month](-2)
 # $dLastDate[^date::create($data.currentDate.year;$data.currentDate.month;^date:last-day($data.currentDate.year;$data.currentDate.month))]
@@ -103,8 +131,18 @@ FROM transactions t
 WHERE
 	t.is_displayed = 1
 	AND t.user_id = $USERID
-	AND t.operday >= ^u:getOperdayByDate[$dFirstDate]
-	AND t.operday <= ^u:getOperdayByDate[$dLastDate]
+	AND 
+	(
+		(t.operday >= ^u:getOperdayByDate[$dFirstDate]
+	AND t.operday <= ^u:getOperdayByDate[$dLastDate])
+	^if(!$isDateNowShown){
+		OR
+		(
+			t.operday >= ^u:getOperdayByDate[^u:getFirstDay[$data.dtNow]]
+		AND t.operday <= ^u:getOperdayByDate[^u:getLastDay[$data.dtNow]]
+		)
+	}
+	)
 	^if($data.pid){
 		AND nd.pid = $data.pid
 	}{
@@ -156,7 +194,18 @@ $hSums.2.dTotalSum($hSums.2.dMaxSum)
 $dLastSum(0)
 $iYear(0)
 $isActiveMonth(false)
+$dtPreviousDate[]
 ^hMonths.foreach[k;v]{
+
+^if(def $dtPreviousDate && $v - $dtPreviousDate > 31){
+		<div class="month">
+ 			<div class="bar-container empty">
+#		<div class="bard" style="height: 0"></div>
+ 		</div>
+		<div class="date nodata"><span>...</span></div>
+	</div>
+}
+
 ^if($iYear != $v.year){
 	$iYear($v.year)
 	<div class="month year">
@@ -215,7 +264,6 @@ $sDate[^dtf:format[%h;$v]]
 
 		</div>
 
-
 	$sOperdayForMonth[^u:getOperdayByDate[$dtFirstDay]-^u:getOperdayByDate[$dtFirstDay]-^u:getOperdayByDate[$dtLastDay]]
 	^if($form:operday eq $sOperdayForMonth){
 		$isActiveMonth(true)
@@ -235,6 +283,8 @@ $sDate[^dtf:format[%h;$v]]
 		
 # 		<div class="amount">$sSum</div>
 	</div>
+
+	$dtPreviousDate[$v]
 }
 
 ^if(def $request:query && ($data.dtNow != $data.currentDate || $data.startDate != $data.endDate)){
