@@ -420,7 +420,9 @@ FROM transactions t
 # }
 
 WHERE	
-	t.is_displayed = 1
+	(i.type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
+	OR i.type & $dbo:TYPES.INCOME = $dbo:TYPES.INCOME)
+	AND t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
