@@ -60,19 +60,20 @@ $isDateNowShown(!$isPastDate)
 # Текущий месяц - средний
 #	^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
 
-#Текущий месяц - предпоследний
-^if($iPastDiff > 0){
-	^if($iPastDiff > 31){
-			^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
-		}{
-# 			^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
-			^date.roll[month]( $i - $iMonthCount + 2)
-		}
-	
-	}{
 
-	^date.roll[month]( $i - $iMonthCount + 1)
+^if($iPastDiff > (31 * 2) ){
+# Текущий месяц - средний
+	^date.roll[month](( ($iMonthCount - 1)/2 - $i + 1 ) * -1)
+}{
+	^if($iPastDiff > 31){
+# Текущий месяц - третий с конца
+		^date.roll[month]( $i - $iMonthCount + 2)
+	}{
+# Текущий месяц - предпоследний
+		^date.roll[month]( $i - $iMonthCount + 1)
+	}
 }
+
 ^if($date == $data.dtNow){
 	$isDateNowShown(true)
 }
