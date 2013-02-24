@@ -170,7 +170,7 @@ GROUP BY ym,nd.type
 ]
 $hMonthsSum[^hMonthsSum.hash{${hMonthsSum.type}${hMonthsSum.ym}}[$.type[hash]]]
 <div 
-class="months^if(!^form:p.int(0)){ pm 
+class="months^if(!(^form:p.int(0) || ^form:ciid.int(0))){ pm 
 	^if(def $cookie:barstate){$cookie:barstate}{ m p}}">
 $hSums[
 	$.1[
