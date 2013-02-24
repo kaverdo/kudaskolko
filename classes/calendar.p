@@ -572,14 +572,14 @@ $nextDateIsCurrent(true)
 }
 
 @printCurrentCheque[]
-$result[^@^oSql.string{SELECT name FROM items WHERE iid = $data.ciid}[$.default[]$.limit(1)]]
+$result[^if($data.ciid){^oSql.string{SELECT CONCAT('^@',name) FROM items WHERE iid = $data.ciid}[$.default[]$.limit(1)]}]
 
 @printCurrentDate[][usedDate]
 $usedDate[$data.currentDate]
 ^if($data.currentDate != $data.startDate){
 	$usedDate[$data.startDate]
 }
-$result[^dtf:format[%e %h^if($usedDate.year != $data.dtNow.year){ %Y};$usedDate;$dtf:rr-locale]]
+$result[^dtf:format[%e %h^if($usedDate.year != $data.dtNow.year){ %Y};$usedDate;$dtf:rr-locale] ^printCurrentCheque[]]
 
 @isToday[]
 $result($data.dtNow == $data.currentDate)
