@@ -17,7 +17,7 @@ $result[^result.upper[]]
 	$dtEnd[^date::create[$dtStart]]
 }
 $dtNow[^date::now[]]
-^if($dtEnd.year != $dtNow.year){$sYear[ %Y]}
+^if($dtEnd.year != $dtNow.year || ^math:abs(^getFirstDay[$dtEnd] - ^getFirstDay[$dtNow]) > 31*5){$sYear[ %Y]}
 ^rem{
 	12-15 марта month == month yer = currentyer
 	12 апреля - 14 марта yer=yer=currentyer
