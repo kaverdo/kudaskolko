@@ -622,7 +622,7 @@ $result[^regex::create[
 	(?:([-\+])?([\d\.,]+)) # 13 type2 14 sAmount3 || sPrice
 
 )\s*))?
-		^$][gmx]]
+		^$][gmxi]]
 
 @parseTransaction[sTransaction;pattern][locals]
 $hResult[^hash::create[]]
