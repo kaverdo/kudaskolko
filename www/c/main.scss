@@ -595,6 +595,8 @@ a.day{
 
 		}
 
+
+
 		&.name{
 		padding: 0 0 0 0;//0.5em;
 		height:100%;
@@ -779,6 +781,17 @@ a.day{
 		color: #999;
 		/*font-style: italic;*/
 		opacity: 0.5;
+	}
+
+	tr.date{
+		.name{
+
+			font-size: 80%;
+		}
+		td{
+			padding-top:1em;
+			font-style: italic;
+		}
 	}
 
 	tr:first-child td{

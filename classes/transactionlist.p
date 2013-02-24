@@ -16,7 +16,7 @@ $USERID(^hParams.USERID.int(0))
 @printBreadScrumbs[]
 <ul class="breadscrumbs">
 $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
-^if(!$tParents && (^form:p.int(0) || ^form:ctid.int(0))){
+^if(!$tParents && (^form:p.int(0) || ^form:ciid.int(0))){
 # && (^form:type.int(0) && !^form:pid.int(0))){
 <li><a href="^makeQueryString[
 				$.groupid[$form:groupid]
@@ -91,6 +91,7 @@ $tEntries[^dbo:getEntries[
 	$.endOperday($oCalendar.data.endOperday)
 	$.detailed[$form:detailed]
 	$.ctid[$form:ctid]
+	$.ciid[$form:ciid]
 	$.isExpanded[$form:expanded]
 	$.type[$hParams.type]
 ]]
@@ -102,8 +103,8 @@ $entryName[$tEntries.name]
 		FROM items
 		WHERE 
 		user_id = $USERID AND
- 	^if(^form:p.int(0)){
-		iid = ^form:p.int(0)
+ 	^if(^form:ciid.int(^form:p.int(0))){
+		iid = ^form:ciid.int(^form:p.int(0))
 	}{
 		type & $hParams.type = $hParams.type
 	}
@@ -129,7 +130,7 @@ $hTransactions.0[^hash::create[]]
 ^h.iTotalSum.inc($h.iSum)
 $h.iOffset(0)
 $hTransactions.0.date[^oCalendar.printDateRange[]]
-^if((^form:p.int(0) != 0 && ^form:p.int(0) == $tEntries.iid) || ^form:ctid.int(0) == 0){
+^if((^form:p.int(0) != 0 && ^form:p.int(0) == $tEntries.iid) || ^form:ciid.int(0) == 0){
 	^if(!def $form:detailed){
 		$h.iSum($tEntries.sum)
 		^h.iTotalSum.inc($h.iSum)
@@ -158,10 +159,10 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 		^tEntries.offset(1)
 	}
 }{
-^if(^form:ctid.int(0) != 0){
-	$hPage.sTitle[@ $tEntries.name ^u:formatOperday[$tEntries.operday]]
-	$hTransactions.0.name[<span>@</span>$tEntries.name]
-	$hTransactions.0.date[^u:getDateRange[^u:stringToDate[$tEntries.operday]]]
+^if(^form:ciid.int(0) != 0){
+	$hPage.sTitle[@ $entryName ^u:formatOperday[$tEntries.operday]]
+	$hTransactions.0.name[<span>@</span>$entryName]
+# 	$hTransactions.0.date[^u:getDateRange[^u:stringToDate[$tEntries.operday]]]
 # 	$hTransactions.0.date[^u:formatOperday[$tEntries.operday]]
 	$hTransactions.0.value[^u:formatValue($tEntries.sum)]
 	$h.iOffset(1)
@@ -182,7 +183,7 @@ $h.iTotalSum(^dbo:getTotalOut[
 	$.startOperday($oCalendar.data.startOperday)
 	$.endOperday($oCalendar.data.endOperday)
 # 	$.pid($oCalendar.data.pid)
-	$.ctid(^form:ctid.int(0))
+	$.ciid(^form:ciid.int(0))
 ])
 # 	$hTransactions.0.value[^u:formatValue($h.iTotalSum)]
 # 	$hTransactions.0.value[^u:formatValue($tEntries.sum)]
@@ -205,6 +206,7 @@ $h.iTotalSum(^dbo:getTotalOut[
 		^if(def $tEntries.tiname && ($tEntries.type & $dbo:TYPES.CHEQUE) != $dbo:TYPES.CHEQUE){
 			$hCurrent.tiname[$tEntries.tiname]
 			$hCurrent.ctid[$tEntries.ctid]
+			$hCurrent.ciid[$tEntries.ciid]
 		}
 	}
 
@@ -275,6 +277,7 @@ $hasCollapsedItems(false)
 	}
 }
 # ^u:p[^if($hasCollapsedItems){t}{f}]
+$lastOperday[]
 ^hTransactions.foreach[k;v]{
 	^if($k == 0){
 		<tr class="$hTransactions.0.no_entries">
@@ -305,6 +308,23 @@ $hasCollapsedItems(false)
 			<td class="actions"></td>
 		</tr>
 	}{
+		^if(^form:ciid.int(0) && $oCalendar.data.startDate != $oCalendar.data.endDate){
+			^if($lastOperday ne $v.tEntries.operday){
+	<tr class="date">
+			<td class="name"><a class="dt" href="^makeQueryString[
+					$.p[$form:p]
+				$.ciid[$form:ciid]
+					$.operday[$v.tEntries.operday]
+				]"><span>^u:formatOperday[$v.tEntries.operday]</span></a></td>
+				<td class="quantity"></td>
+				<td class="value"></td>
+# 			<td class="groups"></td>
+				<td class="actions"></td>
+			</tr>
+			}
+			$lastOperday[$v.tEntries.operday]
+		}
+
 		$sLink[]
 		$sQuantityLink[]
 		$sDate[]
@@ -326,7 +346,7 @@ $hasCollapsedItems(false)
  		}
 		^if(!$v.tEntries.has_children && 
 			$v.tEntries.count_of_transactions == 1 &&
-			!^form:ctid.int(0) && 
+			!^form:ciid.int(0) && 
 			($oCalendar.data.startDate != $oCalendar.data.endDate) &&
 			!$v.isRest &&
 			!def $v.no_entries){
@@ -350,11 +370,12 @@ $hasCollapsedItems(false)
 			]">
 			<span>$v.tEntries.parentname</span></a></span>]
 		}
-		^if(def $v.tiname && !^form:ctid.int(0) &&
+		^if(def $v.tiname && !^form:ciid.int(0) &&
 			!$v.tEntries.has_children && 
 			$v.tEntries.count_of_transactions == 1){
 			$sDate[^if(def $sDate){$sDate }<span class="cheque"><a href="^makeQueryString[
-				$.ctid[$v.ctid]
+# 				$.ctid[$v.ctid]
+				$.ciid[$v.ciid]
 # 				$.type[$hParams.type]
 				$.operday[$form:operday]
 			]"><span>$v.tiname</span></a>
@@ -434,7 +455,8 @@ $sUrl[^makeQueryString[
 	$.detailed[$form:detailed]
 	$.p[$form:p]
 	$.type[$form:type]
-	$.ctid[$form:ctid]
+# 	$.ctid[$form:ctid]
+	$.ciid[$form:ciid]
 ]]
 
 <a href="$sUrl" class="$sClass">$sValue</a>

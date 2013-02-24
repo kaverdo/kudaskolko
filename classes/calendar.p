@@ -35,6 +35,7 @@ $data.endOperday[^u:getOperdayByDate[$data.endDate]]
 $data.pid(^form:p.int(0))
 $data.gid(^form:groupid.int(0))
 $data.ctid(^form:ctid.int(0))
+$data.ciid(^form:ciid.int(0))
 $data.isDetailed(^form:detailed.int(0))
 
 @isMonthSelected[]
@@ -128,6 +129,10 @@ FROM transactions t
 # ^if($data.pid){
 	LEFT JOIN nesting_data nd ON nd.iid = t.iid
 # }
+^if($data.ciid){
+	LEFT JOIN transactions cheque ON cheque.tid = t.ctid
+
+}
 #  	LEFT JOIN items i ON nd.pid = i.iid
 WHERE
 	t.is_displayed = 1
@@ -147,6 +152,9 @@ WHERE
 	^if($data.pid){
 		AND nd.pid = $data.pid
 	}{
+		^if($data.ciid){
+			AND cheque.iid = $data.ciid
+		}
 # 		^if(^form:type.int(0)){
 # 			AND nd.type & ^form:type.int(0) = ^form:type.int(0)
 # 		}{
@@ -156,6 +164,7 @@ WHERE
 		AND nd.iid = nd.pid
 #		AND nd.pid IN ( SELECT iid FROM items WHERE type & 1 = 1 OR type & 2 = 2)
 	}
+# 	AND nd.iid = nd.pid
 GROUP BY ym,nd.type
 }
 #[$.type[table]]
@@ -372,6 +381,7 @@ $result[
 @getURI[][sResult]
 $sResult[]
 ^if($data.pid){$sResult[&p=$data.pid]}
+^if($data.ciid){$sResult[&ciid=$data.ciid]}
 $result[$sResult]
 
 @weekSelector[isDefault][isActive;nextDateIsCurrent]
@@ -414,24 +424,37 @@ FROM transactions t
 #operdays o
 #LEFT JOIN transactions t ON t.operday = o.operday
 # ^if($data.pid){
-	JOIN nesting_data nd ON nd.iid = t.iid
+	LEFT JOIN nesting_data nd ON nd.iid = t.iid
+# 	LEFT JOIN nesting_data parent ON parent.iid = nd.pid
 # }{
 	LEFT JOIN items i ON nd.pid = i.iid
 # }
+	^if($data.ciid){
+		LEFT JOIN transactions cheque ON cheque.tid = t.ctid
+	}
 
 WHERE	
+^if($data.pid){
+	 nd.pid = $data.pid
+	}{
+
 	(i.type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
 	OR i.type & $dbo:TYPES.INCOME = $dbo:TYPES.INCOME)
+}
 	AND t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
-	^if($data.pid){
-		AND nd.pid = $data.pid
-	}{
-# 		AND nd.pid = (SELECT iid FROM items 
-# 			WHERE type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
-# 			AND user_id = $USERID)
+	AND nd.pid <> nd.iid
+# 	^if($data.pid){
+# 		AND parent.iid = $data.pid
+# # 	}{
+# # 		AND nd.pid = (SELECT iid FROM items 
+# # 			WHERE type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
+# # 			AND user_id = $USERID)
+# 	}
+	^if($data.ciid){
+		AND cheque.iid = $data.ciid
 	}
 GROUP BY w, nd.type
 }]

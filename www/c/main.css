@@ -541,6 +541,11 @@ a.day {
     color: #999;
     /*font-style: italic;*/
     opacity: 0.5; }
+  .grid tr.date .name {
+    font-size: 80%; }
+  .grid tr.date td {
+    padding-top: 1em;
+    font-style: italic; }
   .grid tr:first-child td {
     padding: 0.5em 0;
     /*border-bottom: 1px solid #999;*/

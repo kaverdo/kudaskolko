@@ -616,7 +616,7 @@ $.operday[$form:operday]
 	$.type[$form:type]
 	$.expanded[$form:expanded]
 	$.detailed[$form:detailed]
-	$.ctid[$form:ctid]
+	$.ciid[$form:ciid]
 ]
 
 

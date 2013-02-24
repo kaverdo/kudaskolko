@@ -505,7 +505,6 @@ LEFT JOIN groups g ON tig.gid = g.gid
 
 $result[^tGroups.hash[tid][$.distinct[tables]]]
 
-
 @getChequeEntries[hParams][tEntries]
 $hParams[^hash::create[$hParams]]
 $result[^oSql.table{
@@ -520,6 +519,7 @@ SELECT
 	i.type AS parent_type,
 	0 as tid,
 	0 as ctid,
+	0 AS ciid,
 	0 AS type,
 # 	0 AS account_from_paytype,
 # 	0 AS account_to_paytype,
@@ -572,6 +572,7 @@ SELECT
 	i.type AS parent_type,
 	0 as tid,
 	0 as ctid,
+	0 AS ciid,
 	0 AS type,
 # 	0 AS account_from_paytype,
 # 	0 AS account_to_paytype,
@@ -606,6 +607,7 @@ SELECT
 	^if(!^hParams.ctid.int(0)){ndi.type}{NULL} AS parent_type,
 	t2.tid,
 	t2.ctid,
+	ct.iid AS ciid,
 	t2.type,
 # 	af.paytype AS account_from_paytype,
 # 	at.paytype AS account_to_paytype,
@@ -760,6 +762,7 @@ last_parent_nd.pid = last_parent_nd.iid
 	}
 }
 
+
 GROUP BY
 ##^if(def $hParams.detailed){
 ##	t2.tid,
@@ -776,10 +779,146 @@ ORDER BY
 sublevel, sum DESC
 }]
 
+
+@getEntriesForCheque[hParams][tEntries]
+$hParams[^hash::create[$hParams]]
+$result[^oSql.table{
+SELECT
+	0 AS sublevel,
+	i.name,
+	NULL as parentname,
+	NULL AS parent_id,
+	NULL AS is_parent_root,
+	i.type AS parent_type,
+	0 as tid,
+	0 as ctid,
+	0 AS ciid,
+	0 AS type,
+	i.iid,
+	0 AS extraname,
+	0 AS tiname,
+	i.pid,
+	SUM(t.amount) AS sum,
+	SUM(i.quantity_factor*t.quantity) AS quantity,
+	COUNT(*) AS count_of_transactions,
+	1 AS has_children,
+	0 AS operday
+
+# FROM transactions t
+# LEFT JOIN transactions ct ON ct.tid = t.ctid 
+# LEFT JOIN items i ON i.iid = ct.iid
+
+FROM items i
+LEFT JOIN transactions ct ON ct.iid = i.iid 
+LEFT JOIN transactions t ON t.ctid = ct.tid
+
+LEFT JOIN nesting_data nd ON nd.iid = t.iid 
+WHERE
+	ct.iid = ^hParams.ciid.int(0)
+	AND nd.iid = nd.pid
+	AND nd.type & ^hParams.type.int($dbo:TYPES.CHARGE) = ^hParams.type.int($dbo:TYPES.CHARGE)
+	AND t.user_id = $USERID
+^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0){
+	^if(^hParams.startOperday.int(0) == ^hParams.endOperday.int(0)){
+		AND t.operday = ^hParams.startOperday.int(0)
+	}{
+		AND t.operday >= ^hParams.startOperday.int(0)
+		AND t.operday <= ^hParams.endOperday.int(0)
+	}
+}
+
+
+GROUP BY ct.iid
+	UNION
+
+
+SELECT
+	1 AS sublevel,
+	i.name,
+	last_parent.name AS parentname,
+	last_parent.iid AS parent_id,
+	IFNULL(last_parent.type,0) AS is_parent_root,
+	^if(!^hParams.ciid.int(0)){ndi.type}{NULL} AS parent_type,
+	t2.tid,
+	t2.ctid,
+	ct.iid AS ciid,
+	t2.type,
+	i.iid,
+	NULL AS extraname,
+	ti.name AS tiname,
+	i.pid,
+	sum(t2.amount) AS sum,
+
+	sum(i.quantity_factor*t2.quantity) AS quantity,
+	COUNT(*) count_of_transactions,
+	(t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children,
+
+	t2.operday
+FROM transactions t2
+
+LEFT JOIN transactions ct ON ct.tid = t2.ctid
+LEFT JOIN items i ON t2.iid = i.iid
+LEFT JOIN items ti ON ti.iid = ct.iid
+# LEFT JOIN nesting_data nd ON nd.iid = t2.iid
+^if(^hParams.gid.int(0) != 0){
+	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+}
+
+LEFT JOIN nesting_data transaction_for_last_parent_nd ON transaction_for_last_parent_nd.iid = t2.iid 
+LEFT JOIN nesting_data last_parent_nd ON last_parent_nd.iid = transaction_for_last_parent_nd.pid 
+LEFT JOIN items last_parent ON last_parent.iid = last_parent_nd.iid
+	^if((^hParams.pid.int(0) || ^hParams.type.int(0)) && !^hParams.ctid.int(0)){
+# если раскомментировать, то при разворачивании
+# категории у ее прямых детей не будет отображатьсяназвание родительскй категории
+#	 AND last_parent_nd.pid <> nd.pid
+	}
+WHERE
+transaction_for_last_parent_nd.type & ^hParams.type.int($dbo:TYPES.CHARGE) = ^hParams.type.int($dbo:TYPES.CHARGE)
+AND t2.user_id = $USERID
+ AND i.user_id = $USERID AND
+(last_parent_nd.level = transaction_for_last_parent_nd.level-1 
+OR transaction_for_last_parent_nd.level = 0)
+AND
+last_parent_nd.pid = last_parent_nd.iid
+
+^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0){
+	^if(^hParams.startOperday.int(0) == ^hParams.endOperday.int(0)){
+		AND t2.operday = ^hParams.startOperday.int(0)
+	}{
+		AND t2.operday >= ^hParams.startOperday.int(0)
+		AND t2.operday <= ^hParams.endOperday.int(0)
+	}
+}
+
+	^if(^hParams.gid.int(0) != 0){
+		AND tig2.gid = ^hParams.gid.int(0)
+	}
+	AND t2.is_displayed = 1
+	^if(^hParams.ciid.int(0)){
+	AND ct.iid = ^hParams.ciid.int(0)
+	}
+
+GROUP BY
+	i.name,
+	i.iid,
+	i.pid
+# ^if(^hParams.isExpanded.int(0)){
+	,	t2.tid
+# }
+
+ORDER BY
+sublevel, operday, sum DESC, name
+}]
+
 @getEntries[hParams][tEntries]
 $hParams[^hash::create[$hParams]]
 ^if(!^hParams.ctid.int(0) && !^hParams.isExpanded.int(0)){
-	$result[^getAllEntries[$hParams]]
+
+	^if(!^hParams.ciid.int(0)){
+		$result[^getAllEntries[$hParams]]
+	}{
+		$result[^getEntriesForCheque[$hParams]]
+	}
 }{
 	$result[^getChequeEntries[$hParams]]
 }
@@ -793,6 +932,7 @@ SELECT
 # 	tti.name AS transaction_name,
 	t2.tid,
 	t2.ctid,
+	cheque.iid AS ciid,
 	t2.type,
 # 	af.paytype AS account_from_paytype,
 # 	at.paytype AS account_to_paytype,
@@ -823,6 +963,7 @@ FROM items i
 LEFT JOIN nesting_data ndp ON i.iid=ndp.iid
 LEFT JOIN nesting_data nd ON nd.pid=ndp.iid
 LEFT JOIN transactions t2 ON t2.iid = nd.iid
+LEFT JOIN transactions cheque ON t2.ctid = cheque.tid
 # LEFT JOIN units u ON u.unit_id = i.unit_id
 # LEFT JOIN units ub ON ub.unit_id = u.base_unit_id
 LEFT JOIN items ai ON ai.iid = t2.alias_id
