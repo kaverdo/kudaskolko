@@ -406,7 +406,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 ^tParents.menu{
 ^if(^tParents.line[] == ^tParents.count[]){
 	
-^if((^form:expanded.int(0) || ^form:detailed.int(0)) && ^form:p.int(0) == $tParents.iid){
+# ^if((^form:expanded.int(0) || ^form:detailed.int(0)) && ^form:p.int(0) == $tParents.iid){
 <li><a href="^makeQueryString[
 				$.groupid[$form:groupid]
 				$.operday[$form:operday]
@@ -415,13 +415,14 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 # 					$.type[$form:type]
 				}
 # 				^if($tParents.iid == ^form:p.int(0)){
-					$.expanded[$form:expanded]
-					$.detailed[$form:detailed]
+# 					$.expanded[$form:expanded]
+# 					$.detailed[$form:detailed]
+					$.detailed[1]
 # 				}
 			]">$tParents.name</a></li>
-}{
-	<li>$tParents.name</li>
-}
+# }{
+# 	<li>$tParents.name</li>
+# }
 
 
 }{
