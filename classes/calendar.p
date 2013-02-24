@@ -571,6 +571,9 @@ $nextDateIsCurrent(true)
 	}
 }
 
+@printCurrentCheque[]
+$result[^@^oSql.string{SELECT name FROM items WHERE iid = $data.ciid}[$.default[]$.limit(1)]]
+
 @printCurrentDate[][usedDate]
 $usedDate[$data.currentDate]
 ^if($data.currentDate != $data.startDate){

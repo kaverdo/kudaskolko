@@ -351,7 +351,7 @@ $hParams[^hash::create[$hParams]]
 <form method="post" action="/" id="formTransactions">
 <input type="hidden" name="action" value="out"/>
 ^if(!^oCalendar.isToday[]){
-<input type="hidden" name="operday" id="operday" value="^oCalendar.printCurrentDate[]"/>
+<input type="hidden" name="operday" id="operday" value="^if(^form:ciid.int(0)){^oCalendar.printCurrentCheque[]}{^oCalendar.printCurrentDate[]}"/>
 }
 <textarea name="transactions" id="transactions" placeholder="Записать расходы и доходы..." cols="50" rows="10">^if(def $sData){^untaint[as-is]{$sData}}</textarea>
 
