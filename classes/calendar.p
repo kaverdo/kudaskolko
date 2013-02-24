@@ -34,7 +34,6 @@ $data.startOperday[^u:getOperdayByDate[$data.startDate]]
 $data.endOperday[^u:getOperdayByDate[$data.endDate]]
 $data.pid(^form:p.int(0))
 $data.gid(^form:groupid.int(0))
-$data.ctid(^form:ctid.int(0))
 $data.ciid(^form:ciid.int(0))
 $data.isDetailed(^form:detailed.int(0))
 
@@ -247,9 +246,9 @@ $sDate[^dtf:format[%h;$v]]
 #		^if(def $sFullSumm){ title="$sFullSumm"}>
 
 		^printBars[$hMonthsSum.[1$k].sum;$hSums.1.dTotalSum;minus one;1;0]
-		^printBars[$hMonthsSum.[2$k].sum;$dTotalSum;plus both;2]
+		^printBars[$hMonthsSum.[2$k].sum;$dTotalSum;plus both;2;^if($data.ciid != 0){0}]
 		^printBars[$hMonthsSum.[2$k].sum;$hSums.2.dTotalSum;plus one;2;0]
-		^printBars[$hMonthsSum.[1$k].sum;$dTotalSum;minus both;1]
+		^printBars[$hMonthsSum.[1$k].sum;$dTotalSum;minus both;1;^if($data.ciid != 0){0}]
 # 		$sSum[^u:formatValue($hMonthsSum.[$k].sum;true)]
 # 		^if(!^data.pid.int(0)){
 # 			$sFullSumm[$sSum]

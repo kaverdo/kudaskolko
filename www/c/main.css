@@ -369,6 +369,9 @@ a.day {
 #incomes .dt {
   color: #d77e19 !important; }
 
+#charges .dt {
+  color: #9ebd2e !important; }
+
 .grid {
   font-size: 130%;
   /*margin-left: -0.5em;*/
@@ -541,11 +544,16 @@ a.day {
     color: #999;
     /*font-style: italic;*/
     opacity: 0.5; }
-  .grid tr.date .name {
+  .grid tr.chequedate .name {
     font-size: 80%; }
-  .grid tr.date td {
-    padding-top: 1em;
+    .grid tr.chequedate .name a span {
+      border: none !important; }
+  .grid tr.chequedate td {
+    padding-top: 2em;
+    padding-bottom: -0.5em;
     font-style: italic; }
+  .grid tr.chequedate.first td {
+    padding-top: 0em !important; }
   .grid tr:first-child td {
     padding: 0.5em 0;
     /*border-bottom: 1px solid #999;*/

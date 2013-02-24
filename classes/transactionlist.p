@@ -160,7 +160,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 	}
 }{
 ^if(^form:ciid.int(0) != 0){
-	$hPage.sTitle[@ $entryName ^u:formatOperday[$tEntries.operday]]
+	$hPage.sTitle[@ $entryName ^oCalendar.printDateRange[]]
 	$hTransactions.0.name[<span>@</span>$entryName]
 # 	$hTransactions.0.date[^u:getDateRange[^u:stringToDate[$tEntries.operday]]]
 # 	$hTransactions.0.date[^u:formatOperday[$tEntries.operday]]
@@ -310,7 +310,7 @@ $lastOperday[]
 	}{
 		^if(^form:ciid.int(0) && $oCalendar.data.startDate != $oCalendar.data.endDate){
 			^if($lastOperday ne $v.tEntries.operday){
-	<tr class="date">
+	<tr class="chequedate^if(!def $lastOperday){ first}">
 			<td class="name"><a class="dt" href="^makeQueryString[
 					$.p[$form:p]
 				$.ciid[$form:ciid]

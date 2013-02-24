@@ -554,6 +554,10 @@ a.day{
 	color: $IncomesTextColor !important;
 }
 
+#charges .dt {
+
+	color: $ChargesTextColor !important;
+}
 .grid{
 
 	font-size: 130%;
@@ -783,14 +787,22 @@ a.day{
 		opacity: 0.5;
 	}
 
-	tr.date{
+	tr.chequedate{
 		.name{
-
 			font-size: 80%;
+			a span{
+				border: none !important;
+			}
 		}
 		td{
-			padding-top:1em;
+			padding-top:2em;
+			padding-bottom:-0.5em;
 			font-style: italic;
+		}
+		&.first {
+			td{
+				padding-top:0em !important;
+			}
 		}
 	}
 

@@ -1082,6 +1082,9 @@ $hParams[^hash::create[$hParams]]
 		^if(^hParams.pid.int(0)){
 			LEFT JOIN nesting_data nd ON nd.iid = t.iid
 		}
+		^if(^hParams.ciid.int(0)){
+			LEFT JOIN transactions cheque ON cheque.tid = t.ctid
+		}
 		WHERE
 			t.user_id = $USERID AND
 			t.is_displayed = 1
@@ -1096,6 +1099,9 @@ $hParams[^hash::create[$hParams]]
 		}
 		^if(^hParams.pid.int(0)){
 			AND nd.pid = ^hParams.pid.int(0)
+		}
+		^if(^hParams.ciid.int(0)){
+			AND cheque.iid = ^hParams.ciid.int(0)
 		}
 	})
 }{
