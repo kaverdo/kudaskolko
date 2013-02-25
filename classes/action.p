@@ -417,7 +417,7 @@ $tParents[^dbo:getParentItems[$.iid($iid)]]
 # 				^if($tParents.iid == ^form:p.int(0)){
 # 					$.expanded[$form:expanded]
 # 					$.detailed[$form:detailed]
-					$.detailed[1]
+					$.expanded[1]
 # 				}
 			]">$tParents.name</a></li>
 # }{
