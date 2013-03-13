@@ -205,8 +205,8 @@ $hResult[^hash::create[]]
 
 	^rem{ если ничего не нашли }
 	^if($hResult.tValues.iid == 0){
-		/* для перемещения категории в новую, которая должна быть между перемещаемой категорией и ее бывшей родительской*/
-		^if(^hParams.pid.int(0) == 0 && ^hParams.iid.int(0) != 0){
+		^rem{ для перемещения категории в новую, которая должна быть между перемещаемой категорией и ее бывшей родительской }
+		^if(!^hParams.pid.int(0) && ^hParams.iid.int(0)){
 			$hParams.pid(^oSql.int{SELECT pid 
 				FROM items 
 				WHERE 
@@ -219,7 +219,7 @@ $hResult[^hash::create[]]
 				SELECT IFNULL(i.alias_id,i.iid) FROM items i
 				LEFT JOIN nesting_data nd ON nd.iid = i.iid
 				WHERE 
-				nd.iid <> nd.pid
+				nd.iid = nd.pid
 				AND i.user_id = $USERID
 				AND i.name IN ($sFuzzy)
 				^if(^hParams.type.int(0)){
@@ -1217,12 +1217,18 @@ $hParams[^hash::create[$hParams]]
 }
 
 @rebuildNestingData[]
+^if(def $form:allusers){
+
+^_rebuildNestingData[]
+	}{
+		
 ^_rebuildNestingData[$USERID]
+	}
 # ^_rebuildNestingData[]
 
 
 @_rebuildNestingData[iUserID]
-^if(!$iUserID){
+^if(!$iUserID && !def $form:allusers){
 	^u:p[не пришел userid]
 }
 # для того, чтобы перестроение дерева выполнялось атомарно
