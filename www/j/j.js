@@ -274,6 +274,7 @@ var transactionsValue = '';
 var hasAjaxPreviewHTTPError = false;
 var hasAjaxPreviewFormatError = false;
 var previewTimer;
+var saveDraftTimer;
 
 function ajaxPreview(text){
 	clearTimeout(previewTimer);
@@ -295,6 +296,7 @@ function ajaxPreview(text){
 		return;
 	}
 	transactionsValue = value;
+	$.cookie("draft", value, { expires : 90 });
 	$.ajax({
 		type: "POST",
 		url: "/?action=out&preview=1&ajax=1&anonymous=1",
@@ -425,61 +427,8 @@ $(function() {
 
 	controlsPreview.click(function(event){
 		event.preventDefault();
-		// var value = $("#transactions").val();
-		// // if(value == '')
-		// // 	return;
-		// $.ajax({
-		// 	type: "GET",
-		// 	url: "/?action=out&preview=1&ajax=1",
-		// 	datatype: "html",
-		// 	cache: true,
-		// 	data: {transactions: value}
-		// }).done(function( html ) {
-		// 	$("#IDAjaxPreview").html(html);
-		// });
-
 		ajaxPreview();
-		// return false;
 	});
-
-	// $("#transactions").change( function() {
-	// 	ajaxPreview();
-	// // 	var value = $(this).val();
-	// // 	// if(value == '')
-	// // 	// 	return;
-	// // 	$.ajax({
-	// // 		type: "GET",
-	// // 		url: "/?action=out&preview=1&ajax=1",
-	// // 		datatype: "html",
-	// // 		cache: true,
-	// // 		data: {transactions: value}
-	// // 	}).done(function( html ) {
-	// // 		$("#IDAjaxPreview").html(html);
-	// // 	});
-
-	// });
-
-	// $("#transactions").keypress(function(event){
-	// 	var keyCode = (event.which ? event.which : event.keyCode);
-	// 	var previewTimer = setTimeout(function() {
-	// 		ajaxPreview();
-	// 	}, 5000);
-
-	// 	if (keyCode == 13 &&
-	// 		$(this).val().trim() != "" &&
-	// 		// $(this).val().substr(-1) == "\n"
-	// 		$(this).val().substr(-1) != " "
-	// 		){
-	// 		clearTimeout(previewTimer);
-	// 		previewTimer = 0;
-	// 		// alert('"'+$(this).val().trim()+'"');
-	// 		// alert('"'+($(this).val().substr(-1)=="\n"?"Y":"N")+'"');
-	// 		// && $(this).val().trim() != "" && $(this).val().substr(-1) === 13
-	// 		ajaxPreview();
-
-
-	// 	}
-	// });
 
 	transactionsID.keyup(function(event){
 		var isEmpty = !$(this).val().trim();// == '';
@@ -521,14 +470,19 @@ $(function() {
 
 	transactionsID.bind("input", function(){
 		clearTimeout(previewTimer);
+		clearTimeout(saveDraftTimer);
 		if($(this).val().trim()){
 			controlsPreview.attr("disabled",false);
 			controlsSubmit.attr("disabled",false);
-		previewTimer = setTimeout(function() {
-			ajaxPreview();
-		}, 2000); 
+			saveDraftTimer = setTimeout(function() {
+				$.cookie("draft", transactionsID.val().trim(), { expires : 90 });
+			}, 200); 
+			previewTimer = setTimeout(function() {
+				ajaxPreview();
+			}, 2000);
 
 		} else {
+			$.cookie("draft", null);
 			controlsPreview.attr("disabled",true);
 			controlsSubmit.attr("disabled",true);
 		}

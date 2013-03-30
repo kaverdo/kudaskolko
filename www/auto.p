@@ -191,7 +191,7 @@ $result[$sBody]
 			^initObjects[]
 			^makeHTML[test][
 			<div id="top">
-				^transaction:htmlMoneyOutForm[]
+				^transaction:htmlMoneyOutForm[$cookie:draft]
 #				^remains:printRemains[]
 			</div>
 				^oCalendar.showCalendar[]

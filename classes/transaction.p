@@ -248,6 +248,7 @@ $hParams[^hash::create[$hParams]]
 	$hParams.isAjax(^form:ajax.int(0))
 }
 ^if(!def $hParams.sData && def $hParams.sReturnURL){
+	$cookie:draft[$.value[]$.expires[session]]
 	$response:location[$hParams.sReturnURL]
 }{
 	$hTransactions[^recalculateTransactions[^parseTransactionList[$hParams.sData]]]
@@ -261,11 +262,13 @@ $hParams[^hash::create[$hParams]]
 			^MAIN:makeHTML[Предпросмотр;
 			<h1>Предварительный просмотр</h1>
 			^previewTransaction[$hTransactions;$hNotValid]
+			$cookie:draft[$.value[$hParams.sData]$.expires(90)]
 			^htmlMoneyOutForm[$hParams.sData]
 			]
 		}
 	}{
 		^processTransactions[$hTransactions]
+		$cookie:draft[$.value[]$.expires[session]]
 		^if(def $hParams.sReturnURL){
 			$response:location[$hParams.sReturnURL]
 		}
