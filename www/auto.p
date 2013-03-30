@@ -37,7 +37,7 @@ $.csql[$oSql]
 $USERID($oAuth.user.id)
 $dbo:oSql[$oSql]
 $dbo:USERID($USERID)
-
+$dbo:IS_LOCAL($IS_LOCAL)
 
 @initObjects[]
 ^use[/../classes/dbo.p]

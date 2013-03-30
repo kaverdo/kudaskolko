@@ -1217,18 +1217,16 @@ $hParams[^hash::create[$hParams]]
 }
 
 @rebuildNestingData[]
-^if(def $form:allusers){
-
-^_rebuildNestingData[]
-	}{
-		
-^_rebuildNestingData[$USERID]
-	}
+^if(def $form:allusers && $IS_LOCAL){
+	^_rebuildNestingData[]
+}{
+	^_rebuildNestingData[$USERID]
+}
 # ^_rebuildNestingData[]
 
 
 @_rebuildNestingData[iUserID]
-^if(!$iUserID && !def $form:allusers){
+^if(!$iUserID && !(def $form:allusers && $IS_LOCAL) ){
 	^u:p[не пришел userid]
 }
 # для того, чтобы перестроение дерева выполнялось атомарно
