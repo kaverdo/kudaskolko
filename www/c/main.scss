@@ -133,8 +133,58 @@ body.beta .home:after{
 			}
 
 		}
+
+	#accounts{
+
+		margin-left: 2em;
+
+		> span {
+			display: none;
+
+			/*display: inline-block;*/
+			/*color: #999;*/
+			/*padding: 0.2em 0;*/
+		}
+	
+		&.main #main,
+		&.reserve #reserve,
+		&.total #total {
+			display: inline-block;
+			cursor: pointer;
+			color: #999;
+			border-bottom: dashed 1px $SuperDarkGreen;
+		}
+		#reserve .sum{
+			color: $SuperDarkGreen;
+			border-bottom: dashed 1px $SuperDarkGreen;
+			/*background: $LightGreen;*/
+			&:before{
+				content: ' + ';
+			}
+		}
+		#total  .sum{
+			color: $DarkGreen;
+			&:before{
+				content: ' = ';
+			}
+		}
+		#main  .sum{
+
+			color: #000;
+			/*font-weight: bold;*/
+			&:after{
+				content: ' + ';
+			}
+		}
+		.type{
+			display: none;
+		}
+
+	}
+
+
 	.user{
-		float:right;
+		float: right;
 		margin-left: 30%;
 		padding-right: 3em;
 /*		a {
@@ -207,6 +257,10 @@ a{
 // Specific styles
 
 
+// Accounts
+
+
+// Bars
 .bar-container{
 	height: 50px;
 	/*overflow: hidden;*/
@@ -1458,17 +1512,17 @@ button:focus{
 	#IDDeleteConfirm{
 
 	}
-	input[type="submit"]{
+	.controls{
 		display: none;
 	}
 	.operamini & {
-		input[type="submit"]{
-			display: inline;
+		.controls{
+			display: block;
 		}
 	}
 	&.confirm{
-		input[type="submit"]{
-			display: inline;
+		.controls{
+			display: block;
 		}
 		#IDDeleteConfirm{
 			color: $DarkGreen;

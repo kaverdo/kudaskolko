@@ -307,6 +307,9 @@ $t[^string.split[ ]]
 $result[^s.trim[both;, ]]
 
 
+@contains[sBase;sSubstring]
+$result(^sBase.pos[$sSubstring] != -1)
+
 @formatValueByDivision[dValue;iDivider;isOmitZeroes]
 ^formatValue[^math:ceiling($dValue/$iDivider);$isOmitZeroes]
 

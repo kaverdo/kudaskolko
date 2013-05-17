@@ -75,6 +75,35 @@ body.beta .home:after {
       /*border-bottom: none;*/ }
       .header a.home:hover u {
         border-color: #cce17e; }
+  .header #accounts {
+    margin-left: 2em; }
+    .header #accounts > span {
+      display: none;
+      /*display: inline-block;*/
+      /*color: #999;*/
+      /*padding: 0.2em 0;*/ }
+    .header #accounts.main #main, .header #accounts.reserve #reserve, .header #accounts.total #total {
+      display: inline-block;
+      cursor: pointer;
+      color: #999;
+      border-bottom: dashed 1px #6e8320; }
+    .header #accounts #reserve .sum {
+      color: #6e8320;
+      border-bottom: dashed 1px #6e8320;
+      /*background: $LightGreen;*/ }
+      .header #accounts #reserve .sum:before {
+        content: ' + '; }
+    .header #accounts #total .sum {
+      color: #9ebd2e; }
+      .header #accounts #total .sum:before {
+        content: ' = '; }
+    .header #accounts #main .sum {
+      color: #000;
+      /*font-weight: bold;*/ }
+      .header #accounts #main .sum:after {
+        content: ' + '; }
+    .header #accounts .type {
+      display: none; }
   .header .user {
     float: right;
     margin-left: 30%;
@@ -1001,12 +1030,12 @@ button:focus {
     color: #af321d;
     border-bottom: 1px dashed #af321d;
     cursor: pointer; }
-  #actionDeleteTransaction input[type="submit"] {
+  #actionDeleteTransaction .controls {
     display: none; }
-  .operamini #actionDeleteTransaction input[type="submit"] {
-    display: inline; }
-  #actionDeleteTransaction.confirm input[type="submit"] {
-    display: inline; }
+  .operamini #actionDeleteTransaction .controls {
+    display: block; }
+  #actionDeleteTransaction.confirm .controls {
+    display: block; }
   #actionDeleteTransaction.confirm #IDDeleteConfirm {
     color: #9ebd2e;
     border-color: #9ebd2e;

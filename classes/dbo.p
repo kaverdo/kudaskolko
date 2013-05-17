@@ -283,12 +283,39 @@ $hParams[^hash::create[$hParams]]
 # 	]
 }
 
-^oSql.void{
+^if(^hParams.isDeleteCheque.int(0)){
+
+	$iChequeTid(^oSql.int{SELECT ctid FROM transactions WHERE tid = ^hParams.tid.int(0)}[
+		$.limit(1)
+		$.default(0)
+		])
+	^if($iChequeTid != 0){
+		^oSql.void{
+		DELETE FROM transactions 
+		WHERE 
+			(ctid = $iChequeTid OR tid = $iChequeTid)
+			AND user_id = $USERID
+		}
+	}{
+		^oSql.void{
+		DELETE FROM transactions 
+		WHERE 
+			tid = ^hParams.tid.int(0)
+			AND user_id = $USERID
+		}
+	}
+
+
+}{
+	^oSql.void{
 	DELETE FROM transactions 
 	WHERE 
 		tid = ^hParams.tid.int(0)
 		AND user_id = $USERID
+	}
 }
+
+
 
 
 @deleteItem[hParams]

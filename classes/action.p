@@ -160,7 +160,8 @@ $sDate[^dtf:format[%e %h %Y;$tTransaction.tdate;$dtf:rr-locale]]
 	^dbo:deleteTransaction[
 		$.tid(^form:t.int(0))
 		$.isDeleteEmptyCategories(1)
-# 		$.isDeleteSubCategories(0)
+#  		$.isDeleteSubCategories(0)
+		$.isDeleteCheque(^form:delete_cheque.int(0))
 	]
 	$response:location[^goBack[]]
 }{
@@ -177,9 +178,12 @@ $sDate[^dtf:format[%e %h %Y;$tTransaction.tdate;$dtf:rr-locale]]
 	<span id="IDDeleteConfirm" class="notoperamini">Удалить запись...</span>
 # 	<span id="IDDeleteCancel" class="notoperamini">Нет, мы передумали</span>
 	</h2>
- 	<input type="submit" value="Да, удалить"/>
-
+	<div class="controls">
+ 		<input type="submit" value="Да, удалить"/>
+ 		<input type="checkbox" id="IDDeleteCheque" name="delete_cheque" value="1"/><label for="IDDeleteCheque">Удалить весь чек</label>
+	</div>
 	</form>
+
 </div>	
 }
 

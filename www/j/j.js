@@ -338,6 +338,7 @@ $(document).ready(function(){
 	taContainerID = $("#ta-container");
 	controlsPreview = $("#controls .preview");
 	controlsSubmit = $("#controls .submit");
+	accounts = $("#accounts");
 
 $(function() {
 	$( "#IDTransactionDate" ).datepicker({
@@ -578,6 +579,30 @@ $(function() {
 		}
 	});
 
+
+	// $('.main, .reserve, .total').click(function() {                             
+	// 	this.className = {
+	// 		main : 'reserve', reserve: 'total', total: 'main'
+	// 	}[this.className];
+	// });
+
+	accounts.click(function(e){
+
+		var main = "main";
+		var reserve = "reserve";
+		var total = "total";
+
+		if(accounts.hasClass(main)){
+			accounts.removeClass(main).addClass(reserve);
+		} else {
+			if(accounts.hasClass(reserve)){
+				accounts.removeClass(reserve).addClass(total);
+			} else {
+				accounts.removeClass(total).addClass(main);
+			}	
+		}
+		
+	});
 	
 
 	$("#IDCreateAliasSpan").click(function(e){
