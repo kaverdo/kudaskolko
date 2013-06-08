@@ -711,7 +711,7 @@ ORDER BY
 sublevel,
 sum DESC,
 operday,
-i.name
+name
 }]
 
 
