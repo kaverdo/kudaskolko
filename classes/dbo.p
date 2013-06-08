@@ -601,11 +601,7 @@ SELECT
 	0 as ctid,
 	0 AS ciid,
 	0 AS type,
-# 	0 AS account_from_paytype,
-# 	0 AS account_to_paytype,
-# 	0 AS unit_name,
 	i.iid,
-# 	0 AS barcode,
 	0 AS extraname,
 	0 AS tiname,
 	i.pid,
@@ -636,52 +632,18 @@ SELECT
 	t2.ctid,
 	ct.iid AS ciid,
 	t2.type,
-# 	af.paytype AS account_from_paytype,
-# 	at.paytype AS account_to_paytype,
-	
-
-	
-#	IFNULL(u.name,ub.name) as unit_name,
-# 	u.name as unit_name,
 	i.iid,
-# 	IFNULL(ai.barcode,i.barcode) AS barcode,
 	ai.name AS extraname,
 	ti.name AS tiname,
 	i.pid,
-# ^if(^hParams.pid.int(0)){
 	sum(t2.amount) AS sum,
-#	sum(t2.quantity) AS quantity,
-#	sum(IFNULL(u.factor,1)*t2.quantity) AS quantity,
 	sum(i.quantity_factor*t2.quantity) AS quantity,
 	COUNT(*) count_of_transactions,
 	(t2.iid <> i.iid OR (t2.iid = i.iid AND COUNT(DISTINCT t2.iid) > 1)) AS has_children,
-# }{
-# 	t2.amount AS sum,
-# 	t2.quantity AS quantity,
-# 	1 AS count_of_transactions,
-# 	0 AS has_children,
-# }
-#	g.name AS group_name,
-#	g.gid,
 	t2.operday
-#	t2.amount,
-
-#(t2.iid <> i.iid) AS has_children
-#	(t2.iid <> i.iid OR (t2.iid = i.iid AND t2.amount <> sum(t2.amount))) AS has_children
-## ^if(!^hParams.ctid.int(0)){	
-# FROM items i
-# LEFT JOIN nesting_data ndp ON i.iid=ndp.iid
-# LEFT JOIN nesting_data nd ON nd.pid=ndp.iid
-# LEFT JOIN transactions t2 ON t2.iid = nd.iid
-## }{
 FROM transactions t2
 LEFT JOIN items i ON t2.iid = i.iid
-## }
-# LEFT JOIN units u ON u.unit_id = i.unit_id
-# LEFT JOIN units ub ON ub.unit_id = u.base_unit_id
 LEFT JOIN items ai ON ai.iid = t2.alias_id
-# LEFT JOIN accounts af ON af.account_id = t2.account_id_from
-# LEFT JOIN accounts at ON at.account_id = t2.account_id_to
 LEFT JOIN transactions ct ON ct.tid = t2.ctid
 LEFT JOIN items ti ON ti.iid = ct.iid
 ^if(^hParams.gid.int(0) != 0){
@@ -716,46 +678,6 @@ last_parent_nd.pid = last_parent_nd.iid
 		AND t2.operday <= ^hParams.endOperday.int(0)
 	}
 }
-^rem{
-^if(def $hParams.level){
-# уровень иерархии
-	AND ndp.level = ^hParams.level.int(0)
-}
-^if(def $hParams.pid && ^hParams.pid.int(0) > 0  && !^hParams.ctid.int(0)){
-# id родительской категории, детей которой показываем
-	AND i.pid = ^hParams.pid.int(0)
-}
-}
-
-^rem{
-##
-^if(def $hParams.pid && ^hParams.pid.int(0) > 0 && !^hParams.ctid.int(0)){
-# id родительской категории, детей которой показываем
-	AND (
-#^if(!def $form:detailed){
-		(	ndp.level = ^eval(^hParams.level.int(0)-1)
-			AND i.iid = ^hParams.pid.int(0)
-		)
-		OR
-#}
-		(	ndp.level = ^hParams.level.int(0)
-			AND i.pid = ^hParams.pid.int(0)
-		)
-	)
-}{
-##	^if(def $hParams.level && !^hParams.ctid.int(0)){
-##	# уровень иерархии
-##		AND ndp.level = ^hParams.level.int(0)
-##	}
-}
-}
-##
-
-#	AND (
-#	(g.name IS NOT NULL && g.group_type = $GROUP_TYPES.CHEQUE)
-#	OR
-#	g.name IS NULL
-#	)
 
 	^if(^hParams.gid.int(0) != 0){
 		AND tig2.gid = ^hParams.gid.int(0)
@@ -766,22 +688,10 @@ last_parent_nd.pid = last_parent_nd.iid
 	}
 
 
-# 	^if(^hParams.pid.int(0)){
-# 	AND (
-# 		nd.pid = ^hParams.pid.int(0)
-# # 		OR nd.iid = ^hParams.pid.int(0)
-# 		)
-# 	}{
-# 		^if(!^hParams.ctid.int(0)){
-# 			AND ndi.type & ^hParams.type.int(0) = ^hParams.type.int(0)
-# 		}
-# 	}
-
 ^if(!^hParams.ctid.int(0)){
 	^if(^hParams.pid.int(0)){
 	AND (
 		nd.pid = ^hParams.pid.int(0)
-# 		OR nd.iid = ^hParams.pid.int(0)
 		)
 	}{
 
@@ -791,19 +701,17 @@ last_parent_nd.pid = last_parent_nd.iid
 
 
 GROUP BY
-##^if(def $hParams.detailed){
-##	t2.tid,
-##}
 	i.name,
 	i.iid,
 	i.pid
 ^if(^hParams.isExpanded.int(0)){,	t2.tid
 }
-#	^if(!^hParams.ctid.int(0)){
-#	,ndp.level}
 ORDER BY
-## ^if(!^hParams.ctid.int(0)){ndp.level,}
-sublevel, sum DESC
+
+sublevel,
+sum DESC,
+operday,
+i.name
 }]
 
 
