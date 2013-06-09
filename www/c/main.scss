@@ -16,7 +16,9 @@
 $LightGreen: #E8F6B7;
 $Green: #CCE17E;
 $DarkGreen: #9EBD2E;
-$SuperDarkGreen: #6e8320;
+$SuperDarkGreen: #6E8320;
+
+$LightRed: #F6DCB7;
 
 $Link: #0065C3;
 $LinkHover: #AF321D;
@@ -914,6 +916,8 @@ tr:nth-child(2) td
 }
 
 .grid.preview{
+	margin: 0 0 0em -0.5em;
+
 	#IDAjaxPreview &{
 		font-size: 110%;
 	}
@@ -921,7 +925,6 @@ tr:nth-child(2) td
 		font-size: 100%;
 	}
 
-	margin:0 0 1em -0.5em;
 	td.name{
 		max-width: 600px;
 	}
@@ -929,68 +932,75 @@ tr:nth-child(2) td
 		border-color: transparent;
 		padding: 0.1em 0.5em;
 	}
-/*	tr:hover{
-		td{
-			background: $Green;
-		}
-	}*/
 
-	tr.spacer td {
-		padding-top:0.5em;
+	.spacer td {
+		padding: 0.1em;
 	}
-	tr.date td{
-		/*background: $DarkGreen;*/
-		span {
-			opacity: 1;
-			font-style: italic;
-			/*font-size: 120%;*/
-			/*color: #FFF !important;*/
-		}
-		border-top: solid 1px $Green;
+	.last td{
+		padding-bottom: 0.25em;
+	}
 
+	.total td,
+	.chequeheader td
+	{
+		padding: 0.5em;
 	}
+
 	tr.charge td.value{
-		/*color: $ChargesTextColor;*/
 		background: $ChargesBGColor;
 	}
 	tr.income td {
-		/*color: $IncomesTextColor;*/
 		background: transparent;
-		&.value{background: $IncomesBGColor;}
+		&.value{
+			background: $IncomesBGColor;
+		}
+	}
+	tr.date{
+		&:first-child td{
+			border: none;
+		}
+		td {
+			padding-top: 0.5em;
+			border-top: solid 5px #FFF;//$Green;
+			span {
+				opacity: 1;
+				font-style: italic;
+			}
+		}
 	}
 
-	tr.date:first-child td{
-		border:none;
+	.chequefooter,
+	.chequeheader,
+	.chequepos{
+		&.partial td{
+			background-color: $LightRed;
+		}
+		td{
+			background-color: $LightGreen;
+		}
 	}
-
-	tr.date td,
-	tr.chequeheader td{
-		padding-top: 0.5em !important;
-	}
-
-
-	tr.chequefooter {
+	.chequefooter {
 		td {
 			color: $DarkGreen;
 		}
-		&.partial td{
-			color: $LinkHover;//#CFB535;
-			font-style:italic;
+	}
+	.chequeheader {
+		&.partial * {
+			color: $LinkHover;
+		}
+		* {
+			font-weight: bold;
+			color: $SuperDarkGreen;
 		}
 	}
-	tr.chequefooter,
-	tr.chequeheader,
-	tr.chequepos{
-		background-color: $LightGreen;//#EAF5C1;//#EEF4D7;
-
+	.partial+.last td{
+		background-color: $LightRed !important;
 	}
-/*tr.chequefooter.last.partial td{
-	color: #836D20;
-}*/
-	tr.chequefooter.last td{
-		padding-bottom: 0.5em;
-		font-weight: bold;
-		color: $SuperDarkGreen;
+
+
+	.total td{
+		color: #999;
+		border-top: solid 5px #FFF;//#DDD;//dashed 1px $Green;
 	}
 
 	tr.error td{
@@ -1004,34 +1014,16 @@ tr:nth-child(2) td
 		color: #DDD !important;
 	}
 
-	.value{
-		.wodisc{
-			font-size: 80%;
-			color: $LinkHover;
-			text-decoration: line-through;
-
-			span{
-				color: #666;
-			}
-		}
-		.wdisc{
-			/*font-weight: bold;*/
+	.wodisc{
+		color: $LinkHover;
+		text-decoration: line-through;
+		span{
+			opacity: 0.5;
+			color: #666;
+			font-weight: normal;
 		}
 	}
-
-
-	tr.resultofsubtransactions .value {
-		/*text-decoration: line-through;*/
-	}
-	tr.resultofsubtransactions.total {
-		/*font-style: italic;*/
-		.name{
-			visibility: hidden;
-		}
-		.value{
-/*			text-decoration: none;
-			font-weight: bold;*/
-		}
+	tr.subtransaction td{
 	}
 
 }
@@ -1126,8 +1118,8 @@ tr:nth-child(2) td
 		background-color: #F5F5DC;
 		border-radius: 6px;
 		/*border-radius: 0px 0px 6px 6px;*/
-		box-shadow: 0px 0px 5px 1px $LightGreen;
-		border: solid 1px $Green;
+/*		box-shadow: 0px 0px 5px 1px $LightGreen;
+		border: solid 1px $Green;*/
 		/*padding: 0.5em;*/
 
 		.grid.preview{

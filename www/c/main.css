@@ -601,15 +601,7 @@ a.day {
         background-position: 0.5em 0.8em; }
 
 .grid.preview {
-  margin: 0 0 1em -0.5em;
-  /*	tr:hover{
-  		td{
-  			background: $Green;
-  		}
-  	}*/
-  /*tr.chequefooter.last.partial td{
-  	color: #836D20;
-  }*/ }
+  margin: 0 0 0em -0.5em; }
   #IDAjaxPreview .grid.preview {
     font-size: 110%; }
   .grid.preview h2 {
@@ -619,42 +611,47 @@ a.day {
   .grid.preview tr td {
     border-color: transparent;
     padding: 0.1em 0.5em; }
-  .grid.preview tr.spacer td {
-    padding-top: 0.5em; }
-  .grid.preview tr.date td {
-    /*background: $DarkGreen;*/
-    border-top: solid 1px #cce17e; }
-    .grid.preview tr.date td span {
-      opacity: 1;
-      font-style: italic;
-      /*font-size: 120%;*/
-      /*color: #FFF !important;*/ }
+  .grid.preview .spacer td {
+    padding: 0.1em; }
+  .grid.preview .last td {
+    padding-bottom: 0.25em; }
+  .grid.preview .total td,
+  .grid.preview .chequeheader td {
+    padding: 0.5em; }
   .grid.preview tr.charge td.value {
-    /*color: $ChargesTextColor;*/
     background: #cce17e; }
   .grid.preview tr.income td {
-    /*color: $IncomesTextColor;*/
     background: transparent; }
     .grid.preview tr.income td.value {
       background: #f1c16d; }
   .grid.preview tr.date:first-child td {
     border: none; }
-  .grid.preview tr.date td,
-  .grid.preview tr.chequeheader td {
-    padding-top: 0.5em !important; }
-  .grid.preview tr.chequefooter td {
-    color: #9ebd2e; }
-  .grid.preview tr.chequefooter.partial td {
-    color: #af321d;
-    font-style: italic; }
-  .grid.preview tr.chequefooter,
-  .grid.preview tr.chequeheader,
-  .grid.preview tr.chequepos {
+  .grid.preview tr.date td {
+    padding-top: 0.5em;
+    border-top: solid 5px #FFF; }
+    .grid.preview tr.date td span {
+      opacity: 1;
+      font-style: italic; }
+  .grid.preview .chequefooter.partial td,
+  .grid.preview .chequeheader.partial td,
+  .grid.preview .chequepos.partial td {
+    background-color: #f6dcb7; }
+  .grid.preview .chequefooter td,
+  .grid.preview .chequeheader td,
+  .grid.preview .chequepos td {
     background-color: #e8f6b7; }
-  .grid.preview tr.chequefooter.last td {
-    padding-bottom: 0.5em;
+  .grid.preview .chequefooter td {
+    color: #9ebd2e; }
+  .grid.preview .chequeheader.partial * {
+    color: #af321d; }
+  .grid.preview .chequeheader * {
     font-weight: bold;
     color: #6e8320; }
+  .grid.preview .partial + .last td {
+    background-color: #f6dcb7 !important; }
+  .grid.preview .total td {
+    color: #999;
+    border-top: solid 5px #FFF; }
   .grid.preview tr.error td {
     background-color: #E33526;
     color: #FFF; }
@@ -662,23 +659,13 @@ a.day {
     font-size: 90%;
     font-style: italic;
     color: #DDD !important; }
-  .grid.preview .value .wodisc {
-    font-size: 80%;
+  .grid.preview .wodisc {
     color: #af321d;
     text-decoration: line-through; }
-    .grid.preview .value .wodisc span {
-      color: #666; }
-  .grid.preview .value .wdisc {
-    /*font-weight: bold;*/ }
-  .grid.preview tr.resultofsubtransactions .value {
-    /*text-decoration: line-through;*/ }
-  .grid.preview tr.resultofsubtransactions.total {
-    /*font-style: italic;*/ }
-    .grid.preview tr.resultofsubtransactions.total .name {
-      visibility: hidden; }
-    .grid.preview tr.resultofsubtransactions.total .value {
-      /*			text-decoration: none;
-      			font-weight: bold;*/ }
+    .grid.preview .wodisc span {
+      opacity: 0.5;
+      color: #666;
+      font-weight: normal; }
 
 #top > div {
   float: left; }
@@ -739,8 +726,8 @@ a.day {
   background-color: #F5F5DC;
   border-radius: 6px;
   /*border-radius: 0px 0px 6px 6px;*/
-  box-shadow: 0px 0px 5px 1px #e8f6b7;
-  border: solid 1px #cce17e;
+  /*		box-shadow: 0px 0px 5px 1px $LightGreen;
+  		border: solid 1px $Green;*/
   /*padding: 0.5em;*/ }
   .active #IDAjaxPreview {
     display: block !important; }

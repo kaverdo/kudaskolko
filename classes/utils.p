@@ -261,6 +261,9 @@ $iYear(^sOperday.left(4))
 	$result[^sOperday.right(2).^sOperday.mid(4;2)]
 }
 
+@formatValueWithoutCeiling[dValue]
+$result[^numberFormat[$dValue;$.sThousandDivider[ ]$.sDecimalDivider[,]]]
+
 
 @formatValue[dValue;isOmitZeroes]
 ^if($dValue > 0 && $dValue < 1.0){
