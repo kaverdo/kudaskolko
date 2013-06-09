@@ -10,12 +10,12 @@
 /*!40101 SET NAMES utf8 */;
 /*!40014 SET FOREIGN_KEY_CHECKS=0 */;
 
--- Dumping database structure for budget_prod
-CREATE DATABASE IF NOT EXISTS `budget_prod` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `budget_prod`;
+-- Dumping database structure for kudaskolko
+CREATE DATABASE IF NOT EXISTS `kudaskolko` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `kudaskolko`;
 
 
--- Dumping structure for table budget_prod.transaction_types
+-- Dumping structure for table kudaskolko.transaction_types
 CREATE TABLE IF NOT EXISTS `transaction_types` (
   `type` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,

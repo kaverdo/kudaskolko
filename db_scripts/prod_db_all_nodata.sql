@@ -10,12 +10,12 @@
 /*!40101 SET NAMES utf8 */;
 /*!40014 SET FOREIGN_KEY_CHECKS=0 */;
 
--- Dumping database structure for budget_prod
-CREATE DATABASE IF NOT EXISTS `budget_prod` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `budget_prod`;
+-- Dumping database structure for kudaskolko
+CREATE DATABASE IF NOT EXISTS `kudaskolko` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `kudaskolko`;
 
 
--- Dumping structure for table budget_prod.accounts
+-- Dumping structure for table kudaskolko.accounts
 CREATE TABLE IF NOT EXISTS `accounts` (
   `account_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.accounts_entries
+-- Dumping structure for table kudaskolko.accounts_entries
 CREATE TABLE IF NOT EXISTS `accounts_entries` (
   `account_id` smallint(6) NOT NULL,
   `operday` int(10) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `accounts_entries` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.acl
+-- Dumping structure for table kudaskolko.acl
 CREATE TABLE IF NOT EXISTS `acl` (
   `object_id` int(10) unsigned NOT NULL DEFAULT '0',
   `auser_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `acl` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.aevent_log
+-- Dumping structure for table kudaskolko.aevent_log
 CREATE TABLE IF NOT EXISTS `aevent_log` (
   `aevent_log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `auser_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `aevent_log` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.asession
+-- Dumping structure for table kudaskolko.asession
 CREATE TABLE IF NOT EXISTS `asession` (
   `asession_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `auser_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `asession` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.auser
+-- Dumping structure for table kudaskolko.auser
 CREATE TABLE IF NOT EXISTS `auser` (
   `auser_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `auser_type_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `auser` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.auser_to_auser
+-- Dumping structure for table kudaskolko.auser_to_auser
 CREATE TABLE IF NOT EXISTS `auser_to_auser` (
   `auser_id` int(10) unsigned NOT NULL DEFAULT '0',
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `auser_to_auser` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.groups
+-- Dumping structure for table kudaskolko.groups
 CREATE TABLE IF NOT EXISTS `groups` (
   `gid` smallint(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.importdata
+-- Dumping structure for table kudaskolko.importdata
 CREATE TABLE IF NOT EXISTS `importdata` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ck_number` int(10) unsigned DEFAULT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `importdata` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.items
+-- Dumping structure for table kudaskolko.items
 CREATE TABLE IF NOT EXISTS `items` (
   `iid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pid` int(10) unsigned NOT NULL,
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `items` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.items_in_groups
+-- Dumping structure for table kudaskolko.items_in_groups
 CREATE TABLE IF NOT EXISTS `items_in_groups` (
   `gid` smallint(10) unsigned NOT NULL,
   `iid` int(10) unsigned NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `items_in_groups` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.nesting_data
+-- Dumping structure for table kudaskolko.nesting_data
 CREATE TABLE IF NOT EXISTS `nesting_data` (
   `iid` int(10) unsigned NOT NULL,
   `pid` int(10) unsigned NOT NULL,
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `nesting_data` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.operdays
+-- Dumping structure for table kudaskolko.operdays
 CREATE TABLE IF NOT EXISTS `operdays` (
   `operday` int(10) NOT NULL,
   PRIMARY KEY (`operday`)
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `operdays` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.transactions
+-- Dumping structure for table kudaskolko.transactions
 CREATE TABLE IF NOT EXISTS `transactions` (
   `tid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'transaction id',
   `operday` int(10) unsigned NOT NULL,
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.transactions_in_groups
+-- Dumping structure for table kudaskolko.transactions_in_groups
 CREATE TABLE IF NOT EXISTS `transactions_in_groups` (
   `gid` int(10) unsigned NOT NULL,
   `tid` int(10) unsigned NOT NULL,
@@ -268,7 +268,7 @@ CREATE TABLE IF NOT EXISTS `transactions_in_groups` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.transaction_types
+-- Dumping structure for table kudaskolko.transaction_types
 CREATE TABLE IF NOT EXISTS `transaction_types` (
   `type` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -279,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `transaction_types` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.units
+-- Dumping structure for table kudaskolko.units
 CREATE TABLE IF NOT EXISTS `units` (
   `unit_id` smallint(3) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `units` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table budget_prod.users
+-- Dumping structure for table kudaskolko.users
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(50) NOT NULL,
