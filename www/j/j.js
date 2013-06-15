@@ -7,6 +7,11 @@ $(function() {
 		function extractLast( term ) {
 			return split( term ).pop();
 		}
+		function extractCurrent( val ) {
+			var caretPos = $( "#transactions" ).prop("selectionStart");
+			var startLinePos = val.lastIndexOf("\n", caretPos-1);
+			return val.substring((startLinePos == -1 ? 0 : startLinePos + 1), caretPos);
+		}
 		var cache = {},
 			lastXhr;
 		$( "#transactions" )
@@ -29,7 +34,7 @@ $(function() {
 				// },
 
 				source: function( request, response ) {
-					var term = extractLast( request.term );
+					var term = extractCurrent( $( "#transactions" ).val() );
 					if ( term in cache ) {
 						response( cache[ term ] );
 						return;
@@ -58,14 +63,22 @@ $(function() {
 				},
 
 				select: function( event, ui ) {
-					var terms = split( this.value );
-					// remove the current input
-					terms.pop();
-					// add the selected item
-					terms.push( ui.item.value + " ");
-					// add placeholder to get the comma-and-space at the end
-					// terms.push( "" );
-					this.value = terms.join( "\n" );
+					var caretPos = $( "#transactions" ).prop("selectionStart");
+					var oldValue = $( "#transactions" ).val();
+					var startLinePos = oldValue.lastIndexOf("\n", caretPos - 1);
+					var beforeCurrentLinePos =  startLinePos == -1 ? 0 : startLinePos + 1;
+					var newValue = ui.item.value + " ";
+					this.value = 
+						// то, что было до новой строки
+						oldValue.substring(0, beforeCurrentLinePos)
+						// результат автоподстановки
+						+ newValue
+						// то, что было после курсора
+						+ oldValue.substring(caretPos, oldValue.length);
+					// почему-то не работает $( "#transactions" ).setSelectionRange(m,n)
+					var input = document.getElementById("transactions");
+					var newCaretPos = beforeCurrentLinePos + newValue.length
+					input.setSelectionRange(newCaretPos, newCaretPos);
 					return false;
 				}
 			});
