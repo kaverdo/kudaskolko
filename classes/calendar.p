@@ -245,10 +245,10 @@ $sDate[^dtf:format[%h;$v]]
 		<div class="bar-container ^if($hMonthsSum.[1$k].sum + $hMonthsSum.[2$k].sum == 0){ empty}">
 #		^if(def $sFullSumm){ title="$sFullSumm"}>
 
-		^printBars[$hMonthsSum.[1$k].sum;$hSums.1.dTotalSum;minus one;1;0]
-		^printBars[$hMonthsSum.[2$k].sum;$dTotalSum;plus both;2;^if($data.ciid != 0){0}]
-		^printBars[$hMonthsSum.[2$k].sum;$hSums.2.dTotalSum;plus one;2;0]
-		^printBars[$hMonthsSum.[1$k].sum;$dTotalSum;minus both;1;^if($data.ciid != 0){0}]
+		^printBars[$hMonthsSum.[1$k].sum;$hSums.1.dTotalSum;minus one;$dbo:TYPES.CHARGE;0]
+		^printBars[$hMonthsSum.[2$k].sum;$dTotalSum;plus both;$dbo:TYPES.INCOME;^if($data.ciid != 0){0}]
+		^printBars[$hMonthsSum.[2$k].sum;$hSums.2.dTotalSum;plus one;$dbo:TYPES.INCOME;0]
+		^printBars[$hMonthsSum.[1$k].sum;$dTotalSum;minus both;$dbo:TYPES.CHARGE;^if($data.ciid != 0){0}]
 # 		$sSum[^u:formatValue($hMonthsSum.[$k].sum;true)]
 # 		^if(!^data.pid.int(0)){
 # 			$sFullSumm[$sSum]
@@ -313,23 +313,19 @@ $sDate[^dtf:format[%h;$v]]
 @isNotToday[]
 $result(def $request:query && ($data.dtNow != $data.currentDate || $data.startDate != $data.endDate))
 
-@printBars[iMonthSum;dTotalSum;sClass;sType;isOnlyKilos][iHeight;sSum;dDelta;dLastSum]
+@printBars[iMonthSum;dTotalSum;sClass;iType;isOnlyKilos][iHeight;sSum;dDelta;dLastSum]
 $sSum[^u:formatValue($iMonthSum;true)]
 ^if(!^data.pid.int(0) && ^isOnlyKilos.int(1)){
 # 	$sFullSumm[$sSum]
-	$sSum[^u:formatValueByDivision($iMonthSum;1000;true)]
+	^if($iType == $dbo:TYPES.CHARGE){
+		$sSum[^u:formatValueByDivision($iMonthSum;1000;true)]
+	}{
+		$sSum[^u:formatValueByDivisionFloor($iMonthSum;1000;true)]
+		^if($iMonthSum < 1000){
+			$sSum[^u:formatValueWithoutCeiling($iMonthSum/1000)]
+		}
+	}
 }
-
-^rem{
-$dDelta(0)
-
-^if(def $iMonthSum && $caller.hSums.[$sType].dLastSum != 0){
-
-	$dDelta($iMonthSum - $caller.hSums.[$sType].dLastSum)
-}
-$caller.hSums.[$sType].dLastSum($iMonthSum)
-}
-# 		<div class="bar-average" style="height: ^math:round(100 *($dTotalSum/$iMonthCount) / $dTotalSum)%"></div>
 
 ^if(def $iMonthSum){
 	$iHeight(^if($dTotalSum > 0;(^math:round(100 *$iMonthSum / $dTotalSum)-1);0))
