@@ -316,6 +316,15 @@ $result(^sBase.pos[$sSubstring] != -1)
 @formatValueByDivision[dValue;iDivider;isOmitZeroes]
 ^formatValue[^math:ceiling($dValue/$iDivider);$isOmitZeroes]
 
+@formatValueByDivisionFloor[dValue;iDivider;isOmitZeroes]
+# $value(^math:floor($dValue/$iDivider))
+# ^if($value == 0){
+# 	$result[^formatValue[^u:round($dValue/$iDivider;1);$isOmitZeroes]]
+# }{
+
+# }
+^formatValue[^math:floor($dValue/$iDivider);$isOmitZeroes]
+
 @bankStringToDouble[sString;dDefault][resultString]
 $resultString[^sString.trim[]]
 $resultString[^resultString.replace[^table::create{from	to
