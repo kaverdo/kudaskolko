@@ -239,18 +239,40 @@ m	ь
 `	ё
 }]]
 
+@getMonthsByFirstCharacters[sFirst][locals]
+$months[^table::create{month
+августа
+апреля
+декабря
+июля
+июня
+марта
+мая
+ноября
+октября
+сентября
+февраля
+января}]
+$result[^months.select(^months.month.left(^sFirst.length[]) eq ^sFirst.lower[])]
 
+@getFuzzyDatesByFirst[sFirst][locals]
+$months[^table::create{month
+вчера
+позавчера
+сегодня}]
+$result[^months.select(^months.month.left(^sFirst.length[]) eq ^sFirst.lower[])]
 
-@returnCategories[][sInput;sChangedInput;tResult;isCheque;isSubItem]
+@returnCategories[][locals]
 # ^cache[/../data/cache/json/^math:md5[$form:term]](10){
-$sInput[$form:term]
+$sInput[^form:term.lower[]]
+$sFirst[^sInput.left(1)]
 $isCheque(false)
 $isSubItem(false)
-^if(^sInput.left(1) eq "@" || ^sInput.left(1) eq "^""){
+^if($sFirst eq "@" || $sFirst eq "^""){
 	$isCheque(true)
 	$sInput[^sInput.trim[left;@"]]
 }
-^if(^sInput.left(1) eq "-"){
+^if($sFirst eq "-"){
 	$isSubItem(true)
 	$sInput[^sInput.trim[left;- ]]
 }
@@ -261,7 +283,35 @@ $isSubItem(false)
 # 			$sInput[^sInput.trim[left;@]]
 # 		}
 		$sChangedInput[^changeKeyboard[$sInput]]
-		$tResult[^oSql.table{
+		$tResult[^table::create[nameless]{}]
+		$sDates[свп]
+		^if(^sDates.pos[$sFirst] != -1){
+			^tResult.join[^getFuzzyDatesByFirst[$sInput]]
+		}{
+			^if(^sDates.pos[^sChangedInput.left(1)] != -1){
+				^tResult.join[^getFuzzyDatesByFirst[$sChangedInput]]
+			}
+		}
+		$tSplitted[^sInput.split[ ;h]]
+		^if(def $tSplitted.0){
+			$day(^tSplitted.0.int(-1))
+			^if($day >= 1 && $day <= 32){
+				^if(def $tSplitted.1){
+					$months[^getMonthsByFirstCharacters[$tSplitted.1]]
+					^if(^months.count[] == 0){
+						^months.join[^getMonthsByFirstCharacters[^changeKeyboard[$tSplitted.1]]]
+					}
+					^months.menu{
+						^tResult.append{$day $months.month}
+					}
+				}{
+					^tResult.append{$day ^dtf:format[%h;^date::now[];$dtf:rr-locale]}
+				}
+			}
+		}
+
+
+		$tResultFromDB[^oSql.table{
 		SELECT
 
 		^if($isSubItem){
@@ -284,7 +334,8 @@ $isSubItem(false)
 			AND
 		}
 		(
-		(i.name like "$sInput%" OR i.name like "% $sInput%"
+			(i.name like "$sInput%"
+			OR i.name like "% $sInput%"
 			OR i.name like "%-$sInput%"
 			)
 		^if($sChangedInput ne $sInput){
@@ -292,7 +343,7 @@ $isSubItem(false)
 			(i.name like "$sChangedInput%" 
 				OR i.name like "% $sChangedInput%"
 				OR i.name like "%-$sChangedInput%"
-				)
+			)
 		}
 		)
 		GROUP BY i.name
@@ -305,7 +356,7 @@ $isSubItem(false)
 		}[$.limit(20)]
 #		[$.sFile[^math:md5[$form:term]]$.dInterval(1/24/60/60*10)]
 	]
-
+		^tResult.join[$tResultFromDB]
 		$result[^json:string[$tResult;$.table[compact]]]
 # 		^result.save[r.txt]
 
