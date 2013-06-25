@@ -338,7 +338,8 @@ $result(^stringToDouble[$resultString;$dDefault])
 ^if(def $sString){
 $resultString[^sString.trim[]]
 $resultString[^resultString.replace[^table::create{from	to
-,	.}]]
+,	.
+ 	}]]
 $result(^resultString.double($dDefault))
 }{
 $result($dDefault)

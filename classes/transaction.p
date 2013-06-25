@@ -124,6 +124,10 @@ $hNotValid[^hash::create[]]
 		}
 		^if(!def $v.dAmount){
 			$hNotValid.[$k][позиция без суммы]
+		}{
+			^if($v.dAmount < 0){
+				$hNotValid.[$k][$v.dAmount это ниже нуля]
+			}
 		}
 	}
 }
@@ -673,7 +677,7 @@ $result[^regex::create[
 
 # вариант Молоко 300*2, Молоко 200, Молоко 200/3
 
-	(?:([-\+])?([\d\.,]+)) # 4.5 type 5 sAmount || sPrice || quantity
+	(?:([-\+])?([\d\.,]+|\([ \*\+\d\.,-]+\))) # 4.5 type 5 sAmount || sPrice || quantity || expression
 
 	(?:
 		\s*
@@ -755,14 +759,52 @@ $hResult.sName[^u:capitalizeString[$h.sName]]
 $hResult.sUnitName[$h.sUnitName]
 $hResult.sAmount[$h.sAmount]
 ^if(def $hResult.sAmount){
-	$hResult.dQuantity(^u:stringToDouble[$h.dQuantity](1))
-	^if(def $h.dQuantityFactor){
-		$hResult.dQuantityFactor(^u:stringToDouble[$h.dQuantityFactor])
+# 	^u:p[$hResult.sAmount]
+# TODO: Упростить код вычисления
+	^if(^hResult.sAmount.left(1) eq "(" && ^hResult.sAmount.right(1) eq ")"){
+		$sTrimmed[^hResult.sAmount.trim[both;^(^)]]
+		$sTrimmed[^sTrimmed.replace[-;+-]]
+		$tSplittedSum[^sTrimmed.split[+]]
+		$hResult.dQuantity(0)
+		$hResult.dAmount(0)
+		^tSplittedSum.menu{
+			$tSplittedMultiple[^tSplittedSum.piece.split[*;h]]
+			^if(def $tSplittedMultiple.1){
+				$d(^u:stringToDouble[$tSplittedMultiple.0] * ^u:stringToDouble[$tSplittedMultiple.1])
+				^hResult.dAmount.inc($d)
+				^if($d > 0){
+					$q(^u:stringToDouble[$tSplittedMultiple.1])
+					^if(^tSplittedSum.line[] != 1 || $q > 1){
+						^hResult.dQuantity.inc($q)
+					}{
+						^if(^tSplittedSum.line[] == 1){
+							^hResult.dQuantity.inc[]
+						}
+					}
+				}
+
+			}{
+				^if(def $tSplittedMultiple.0){
+ 					$d(^u:stringToDouble[$tSplittedMultiple.0])
+					^hResult.dAmount.inc($d)
+					^if(^tSplittedSum.line[] == 1 || $d > 0){
+						^hResult.dQuantity.inc[]
+					}
+				}
+			}
+
+		}
+	}{
+		$hResult.dQuantity(^u:stringToDouble[$h.dQuantity](1))
+		^if(def $h.dQuantityFactor){
+			$hResult.dQuantityFactor(^u:stringToDouble[$h.dQuantityFactor])
+		}
+		$hResult.dAmount(^u:stringToDouble[$hResult.sAmount])
+		^if($hResult.dQuantity != 0 && $h.sAmountOrPrice eq "*"){
+			$hResult.dAmount($hResult.dAmount * $hResult.dQuantity)
+		}
 	}
-	$hResult.dAmount(^u:stringToDouble[$hResult.sAmount])
-	^if($hResult.dQuantity != 0 && $h.sAmountOrPrice eq "*"){
-		$hResult.dAmount($hResult.dAmount * $hResult.dQuantity)
-	}
+
 
 	$hResult.dAmountWithoutDisc($hResult.dAmount)
 	^if(def $h.type){
