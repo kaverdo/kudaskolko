@@ -286,18 +286,18 @@ $hTransactions[^hash::create[$hTransactions]]
 @previewChequeFooter[]
 ^if(def $caller.iShopTransaction){
 
-# $dChequeAmount[$caller.hTransactions.[$caller.iShopTransaction].dChequeAmount]
-# $dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
-# 	^if(def $dChequeAmount && $dChequeAmount != $dPositionSum){
-# 		<tr class="chequefooter ^if($dChequeAmount > $dPositionSum){partial}">
-# 			<td class="name">^if($dChequeAmount > $dPositionSum){Наценка}{Скидка}</td>
-# 			<td></td>
-# 			<td class="value">^u:formatValueWithoutCeiling(^eval(^math:abs($dPositionSum - $dChequeAmount)))</td>
-# 		</tr>
-# 	}
+$dChequeAmount[$caller.hTransactions.[$caller.iShopTransaction].dChequeAmount]
+$dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
+	^if(def $dChequeAmount && $dChequeAmount != $dPositionSum){
+		<tr class="chequefooter ^if($dChequeAmount > $dPositionSum){partial}">
+			<td class="name">^if($dChequeAmount > $dPositionSum){Наценка}{Скидка}</td>
+			<td></td><td></td>
+			<td class="value">^u:formatValueWithoutCeiling(^eval(^math:abs($dPositionSum - $dChequeAmount)))</td>
+		</tr>
+	}
 # 	<tr class="chequefooter last">
 # 		<td class="name">Итого по чеку</td>
-# 		<td></td>
+# 		<td></td><td></td>
 # 		<td class="value">^u:formatValueWithoutCeiling(^if(def $dChequeAmount){$dChequeAmount}{$dPositionSum})</td>
 # 	</tr>
 	<tr class="chequefooter last">

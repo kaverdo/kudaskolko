@@ -983,6 +983,10 @@ tr:nth-child(2) td
 		td {
 			color: $DarkGreen;
 		}
+
+		&.partial td{
+			color: $LinkHover !important;
+		}
 	}
 	.chequeheader {
 		&.partial * {
@@ -993,6 +997,7 @@ tr:nth-child(2) td
 			color: $SuperDarkGreen;
 		}
 	}
+
 	.partial+.last td{
 		background-color: $LightRed !important;
 	}

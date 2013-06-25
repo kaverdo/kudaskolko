@@ -642,6 +642,8 @@ a.day {
     background-color: #e8f6b7; }
   .grid.preview .chequefooter td {
     color: #9ebd2e; }
+  .grid.preview .chequefooter.partial td {
+    color: #af321d !important; }
   .grid.preview .chequeheader.partial * {
     color: #af321d; }
   .grid.preview .chequeheader * {
