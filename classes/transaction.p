@@ -759,40 +759,24 @@ $hResult.sName[^u:capitalizeString[$h.sName]]
 $hResult.sUnitName[$h.sUnitName]
 $hResult.sAmount[$h.sAmount]
 ^if(def $hResult.sAmount){
-# 	^u:p[$hResult.sAmount]
-# TODO: Упростить код вычисления
 	^if(^hResult.sAmount.left(1) eq "(" && ^hResult.sAmount.right(1) eq ")"){
-		$sTrimmed[^hResult.sAmount.trim[both;^(^)]]
-		$sTrimmed[^sTrimmed.replace[-;+-]]
-		$tSplittedSum[^sTrimmed.split[+]]
+		$hResult.sAmount[^hResult.sAmount.trim[both;^(^)]]
+		$hResult.sAmount[^hResult.sAmount.replace[-;+-]]
+		$tSplittedSum[^hResult.sAmount.split[+]]
 		$hResult.dQuantity(0)
 		$hResult.dAmount(0)
+		
 		^tSplittedSum.menu{
 			$tSplittedMultiple[^tSplittedSum.piece.split[*;h]]
-			^if(def $tSplittedMultiple.1){
-				$d(^u:stringToDouble[$tSplittedMultiple.0] * ^u:stringToDouble[$tSplittedMultiple.1])
-				^hResult.dAmount.inc($d)
-				^if($d > 0){
-					$q(^u:stringToDouble[$tSplittedMultiple.1])
-					^if(^tSplittedSum.line[] != 1 || $q > 1){
-						^hResult.dQuantity.inc($q)
-					}{
-						^if(^tSplittedSum.line[] == 1){
-							^hResult.dQuantity.inc[]
-						}
-					}
-				}
-
-			}{
-				^if(def $tSplittedMultiple.0){
- 					$d(^u:stringToDouble[$tSplittedMultiple.0])
-					^hResult.dAmount.inc($d)
-					^if(^tSplittedSum.line[] == 1 || $d > 0){
-						^hResult.dQuantity.inc[]
-					}
-				}
+			$dCurrentQuantity(^u:stringToDouble[$tSplittedMultiple.1](1))
+			$dCurrentAmount(^u:stringToDouble[$tSplittedMultiple.0](0) * $dCurrentQuantity)
+			^hResult.dAmount.inc($dCurrentAmount)
+			^if($dCurrentAmount > 0){
+				^hResult.dQuantity.inc($dCurrentQuantity)
 			}
-
+		}
+		^if( !($hResult.dQuantity > 0) ){
+			$hResult.dQuantity(1)
 		}
 	}{
 		$hResult.dQuantity(^u:stringToDouble[$h.dQuantity](1))
