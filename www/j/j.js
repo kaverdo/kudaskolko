@@ -1,6 +1,45 @@
 var transactionValueComplete = '';
 
 $(function() {
+
+		function makeTextareaData(val){
+			var result = new Object;
+			var oldCaretPos = $( "#transactions" ).prop("selectionStart");
+			var oldValue = $( "#transactions" ).val();
+			var startLinePos = oldValue.lastIndexOf("\n", oldCaretPos - 1);
+			var beforeCurrentLinePos =  startLinePos == -1 ? 0 : startLinePos + 1;
+			result.before = oldValue.substring(0, beforeCurrentLinePos)
+			result.after = oldValue.substring(oldCaretPos, oldValue.length);
+			result.newCaretPos = beforeCurrentLinePos + val.length
+			result.val = val;
+			return result;
+		}
+
+		function setCursorAt(position){
+			document.getElementById("transactions").setSelectionRange(position, position);
+		}
+
+		function markAsNotListed(id){
+			$.ajax({
+					type: "GET",
+					url: "/?action=hidefromlist&ajax=1",
+					datatype: "html",
+					cache: false,
+					data: {iid: id}
+				}).done(function( html ) {
+					
+					// $("#IDAjaxPreview .dataContainer").html(html);
+					// $("#IDAjaxPreview").removeClass("hidden");
+					// controlsPreview.attr("disabled",true);
+					// hasAjaxPreviewFormatError = $("#IDAjaxPreview .dataContainer .grid").hasClass("hasError");
+					// if(hasAjaxPreviewFormatError){
+					// 	controlsSubmit.attr("disabled",true);
+					// 	$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
+					// }
+				}).fail(function(jqXHR, textStatus) {
+				});
+		}
+
 		function split( val ) {
 			return val.trim().split( /\n/ );
 		}
@@ -61,55 +100,86 @@ $(function() {
 					// preve event, uint value inserted on focus
 					return false;
 				},
+				close: function( event, ui) {
+					// if(ui.item.label != ''){
+						// $( this ).autocomplete( "close");
+						// $(this).autocomplete( "search", "Шоколад" );
+					// }
+					return false;
+				},
 
 				select: function( event, ui ) {
-					var caretPos = $( "#transactions" ).prop("selectionStart");
-					var oldValue = $( "#transactions" ).val();
-					var startLinePos = oldValue.lastIndexOf("\n", caretPos - 1);
-					var beforeCurrentLinePos =  startLinePos == -1 ? 0 : startLinePos + 1;
-					var newValue = ui.item.value + " ";
-					this.value = 
-						// то, что было до новой строки
-						oldValue.substring(0, beforeCurrentLinePos)
-						// результат автоподстановки
-						+ newValue
-						// то, что было после курсора
-						+ oldValue.substring(caretPos, oldValue.length);
-					// почему-то не работает $( "#transactions" ).setSelectionRange(m,n)
-					var input = document.getElementById("transactions");
-					var newCaretPos = beforeCurrentLinePos + newValue.length
-					input.setSelectionRange(newCaretPos, newCaretPos);
+					if(ui.item.label != ''){
+						return false;
+					}
+					var result = makeTextareaData(ui.item.value + " ");
+					this.value = result.before + result.val + result.after;
+					setCursorAt(result.newCaretPos);
+
 					return false;
 				}
-			});
+			}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+
+				if(item.iid && item.id != 'undefined'){
+					var $anchor = $( "<div ><u>Открыть</u></div>" )
+						.addClass("search-link")
+						// .attr("href", '/?iid=' + item.iid )
+						.hover(function(e){
+							$(this).parent().addClass("hover-search");
+							// $(this).parent().css("background","red");
+						},function(e){
+							$(this).parent().removeClass("hover-search");
+							// $(this).parent().css("background","red");
+						}).click(function(e){
+							var result = makeTextareaData("");
+							if(!result.before && !result.after){
+								$("#transactions").val('');
+								$.cookie("draft", null);
+							}
+							window.location.href = '/?p=' + item.iid;
+								return false;
+					 		// e.preventDefault();
+							// cache = {};
+							// markAsNotListed(1234);
+					 		// $(this).hide();
+					 });
+					var $anchor2 = $( "<div ><u>1</u></div>" )
+						// .addClass("search-link")
+						.attr("href", '/?iid=' + item.iid )
+						.hover(function(e){
+							// $(this).parent().css("background","red");
+						})
+						.click(function(e){
+							// window.location.href = '/?p=test' + item.iid;
+								return false;
+
+					 		// e.preventDefault();
+							// cache = {};
+							// markAsNotListed(1234);
+					 		// $(this).hide();
+					 });
+						var t = extractCurrent( $( "#transactions" ).val() );
+						var matcher = new RegExp("(\\s+|^)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
+  						var resultValue = item.value.replace(matcher, "$1<i>$2</i>");
+					return $( "<li>" )
+					.append( $( "<a>" )
+						.append($anchor)
+						.append("<div class='value'>" + resultValue + "</div>")
+						// .append($anchor2)
+						 )
+					.appendTo( ul );
+				} else {
+					return $( "<li>" )
+					.append( "<a><div class='value'>" + item.value + "</div></a>" )
+					.appendTo( ul );
+				}
+
+    		};
 	});
 
 
 $(function() {
-		// var availableTags = [
-		// 	"ActionScript",
-		// 	"AppleScript",
-		// 	"Asp",
-		// 	"BASIC",
-		// 	"C",
-		// 	"C++",
-		// 	"Clojure",
-		// 	"COBOL",
-		// 	"ColdFusion",
-		// 	"Erlang",
-		// 	"Fortran",
-		// 	"Groovy",
-		// 	"Haskell",
-		// 	"Java",
-		// 	"JavaScript",
-		// 	"Lisp",
-		// 	"Perl",
-		// 	"PHP",
-		// 	"Python",
-		// 	"Ruby",
-		// 	"Scala",
-		// 	"Scheme"
-		// ];
+
 		function split( val ) {
 			return val.split( /,\s*/ );
 		}
@@ -346,7 +416,7 @@ var controlsPreview;
 
 
 $(document).ready(function(){
-	
+
 	transactionsID = $("#transactions");
 	taContainerID = $("#ta-container");
 	controlsPreview = $("#controls .preview");

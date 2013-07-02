@@ -240,7 +240,7 @@ m	ь
 }]]
 
 @getMonthsByFirstCharacters[sFirst][locals]
-$months[^table::create{month
+$months[^table::create{value
 августа
 апреля
 декабря
@@ -253,14 +253,14 @@ $months[^table::create{month
 сентября
 февраля
 января}]
-$result[^months.select(^months.month.left(^sFirst.length[]) eq ^sFirst.lower[])]
+$result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
 
 @getFuzzyDatesByFirst[sFirst][locals]
-$months[^table::create{month
+$months[^table::create{value
 вчера
 позавчера
 сегодня}]
-$result[^months.select(^months.month.left(^sFirst.length[]) eq ^sFirst.lower[])]
+$result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
 
 @returnCategories[][locals]
 # ^cache[/../data/cache/json/^math:md5[$form:term]](10){
@@ -268,6 +268,7 @@ $sInput[^form:term.lower[]]
 $sFirst[^sInput.left(1)]
 $isCheque(false)
 $isSubItem(false)
+$isSearchRequest(false)
 ^if($sFirst eq "@" || $sFirst eq "^""){
 	$isCheque(true)
 	$sInput[^sInput.trim[left;@"]]
@@ -276,6 +277,10 @@ $isSubItem(false)
 	$isSubItem(true)
 	$sInput[^sInput.trim[left;- ]]
 }
+^if($sFirst eq "?"){
+	$isSearchRequest(true)
+	$sInput[^sInput.trim[left;? ]]
+}
 # ^if(def $sInput && (^sInput.length[] > 2 || $isCheque)){
 ^if(def $sInput && (true || $isCheque)){
 # 		^if(^sInput.left(1) eq "@"){
@@ -283,7 +288,9 @@ $isSubItem(false)
 # 			$sInput[^sInput.trim[left;@]]
 # 		}
 		$sChangedInput[^changeKeyboard[$sInput]]
-		$tResult[^table::create[nameless]{}]
+# 		$tResult[^table::create[nameless]{}]
+		$tResult[^table::create{value	label	iid}]
+# 		^tResult.append{$sInput	Найти все записи '$sInput'}
 		$sDates[свп]
 		^if(^sDates.pos[$sFirst] != -1){
 			^tResult.join[^getFuzzyDatesByFirst[$sInput]]
@@ -302,7 +309,7 @@ $isSubItem(false)
 						^months.join[^getMonthsByFirstCharacters[^changeKeyboard[$tSplitted.1]]]
 					}
 					^months.menu{
-						^tResult.append{$day $months.month}
+						^tResult.append{$day $months.value}
 					}
 				}{
 					^tResult.append{$day ^dtf:format[%h;^date::now[];$dtf:rr-locale]}
@@ -318,7 +325,8 @@ $isSubItem(false)
 			CONCAT('- ',i.name)
 		}{
 			CONCAT(IF(t.type & $dbo:TYPES.CHEQUE <> 0,'@',''), i.name)
-		}
+		} AS value,
+		i.iid
 
 		FROM items i
 # 		^if($isCheque){
@@ -357,11 +365,11 @@ $isSubItem(false)
 #		[$.sFile[^math:md5[$form:term]]$.dInterval(1/24/60/60*10)]
 	]
 		^tResult.join[$tResultFromDB]
-		$result[^json:string[$tResult;$.table[compact]]]
+		$result[^json:string[$tResult;$.table[object]]]
 # 		^result.save[r.txt]
 
 }{
-	$result[^json:string[^table::create{};$.table[compact]]]
+	$result[^json:string[^table::create{};$.table[object]]]
 }
 # }
 
