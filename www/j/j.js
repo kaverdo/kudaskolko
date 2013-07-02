@@ -109,9 +109,9 @@ $(function() {
 				},
 
 				select: function( event, ui ) {
-					if(ui.item.label != ''){
-						return false;
-					}
+					// if(ui.item.label != ''){
+					// 	return false;
+					// }
 					var result = makeTextareaData(ui.item.value + " ");
 					this.value = result.before + result.val + result.after;
 					setCursorAt(result.newCaretPos);
@@ -159,7 +159,7 @@ $(function() {
 					 		// $(this).hide();
 					 });
 						var t = extractCurrent( $( "#transactions" ).val() );
-						var matcher = new RegExp("(\\s+|^)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
+						var matcher = new RegExp("(\\s+|^|@)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
   						var resultValue = item.value.replace(matcher, "$1<i>$2</i>");
 					return $( "<li>" )
 					.append( $( "<a>" )
