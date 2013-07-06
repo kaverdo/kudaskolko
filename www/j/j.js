@@ -118,9 +118,11 @@ $(function() {
 
 					return false;
 				}
-			}).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+		})
+		if($( "#transactions" ) && $( "#transactions" ).data( "ui-autocomplete" )) {
+			$( "#transactions" ).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
 
-				if(item.iid && item.id != 'undefined'){
+				if(item.iid && item.iid != 'undefined'){
 					var $anchor = $( "<div ><u>Открыть</u></div>" )
 						.addClass("search-link")
 						// .attr("href", '/?iid=' + item.iid )
@@ -175,6 +177,7 @@ $(function() {
 				}
 
     		};
+    	}
 	});
 
 
@@ -201,28 +204,6 @@ $(function() {
 				minLength: 2,
 				autoFocus: false,
 				position: { my : "left top", at: "left bottom" },
-				// source: function( request, response ) {
-				// 	// delegate back to autocomplete, but extract the last term
-				// 	response( $.ui.autocomplete.filter(
-				// 		availableTags, extractLast( request.term ) ) );
-				// },
-
-				// source: function( request, response ) {
-				// 	var term = request.term;
-				// 	// if ( term in cache ) {
-				// 	// 	response( cache[ term ] );
-				// 	// 	return;
-				// 	// }
-
-				// 	lastXhr = $.getJSON( "/?action=json", request, function( data, status, xhr ) {
-				// 		cache[ term ] = data;
-				// 		if ( xhr === lastXhr ) {
-				// 			// response( data );
-				// 	response( $.ui.autocomplete.filter(
-				// 		data, extractLast( request.term ) ) );
-				// 		}
-				// 	});
-				// },
 
 				source: function( request, response ) {
 					$.getJSON( "/?action=json", {
@@ -252,6 +233,14 @@ $(function() {
 					return false;
 				}
 			});
+
+			if($( "#IDNewCategory" ) && $( "#IDNewCategory" ).data( "ui-autocomplete" )) {
+				$( "#IDNewCategory" ).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+					return $( "<li>" )
+						.append( $( "<a>" ).text( item.value ) )
+						.appendTo( ul );
+				}
+			}
 	});
 
 function setRowsHeight(textarea, rows){

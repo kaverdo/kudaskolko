@@ -745,7 +745,7 @@ $i(1)
 
 #   ^u:p[$h.isCheque1 ~ $tTransaction.2]
 
-$hResult.sName[^u:capitalizeString[$h.sName]]
+$hResult.sName[^u:capitalizeString[^h.sName.left(255)]]
 ^if(def $h.sAmountOrPrice2){
 	$h.sUnitName[$h.sUnitName2]
 	$h.dQuantity[$h.dQuantity2]
