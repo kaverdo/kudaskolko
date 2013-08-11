@@ -3,6 +3,7 @@ u
 
 @USE
 common/dtf.p
+dbo.p
 
 @capitalizeString[sString]
 $result[^sString.left(1)]
@@ -276,6 +277,24 @@ $result[^numberFormat[$dValue;$.sThousandDivider[ ]$.sDecimalDivider[,]]]
 	}
 }
 
+@formatValueFloor[dValue;isOmitZeroes]
+^if($dValue > 0 && $dValue < 1.0){
+	$result[^numberFormat[$dValue;$.iFracLength(2)$.sThousandDivider[ ]$.sDecimalDivider[,]]]
+}{
+	^if($dValue == 0 && def $isOmitZeroes){
+		$result[]
+	}{
+		$result[^numberFormat[^math:floor($dValue);$.iFracLength(0)$.sThousandDivider[ ]$.sDecimalDivider[,]]]
+	}
+}
+
+@formatValueByType[dValue;iType;isOmitZeroes]
+^if($iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){
+	^formatValueFloor[$dValue;isOmitZeroes]
+}{
+	^formatValue[$dValue;isOmitZeroes]
+}
+
 @formatQuantity[dValue]
 ^if($dValue > 0 && $dValue < 1.0){
 	$result[^numberFormat[$dValue;$.iFracLength(3)$.sThousandDivider[ ]$.sDecimalDivider[,]]]
@@ -351,6 +370,8 @@ $result($dDefault)
 		^case(1){$result(0.1)}
 		^case(2){$result(0.01)}
 		^case(3){$result(0.001)}
+		^case(4){$result(0.0001)}
+		^case(5){$result(0.00001)}
 		^case[DEFAULT]{$result(1)}
 }
 
@@ -362,6 +383,11 @@ $result(^math:round($dDouble*^_getPrecision($iFracLength)))
 @ceiling[dDouble;iFracLength]
 # 0-1, 1 - 0,1 2-0,01
 $result(^math:ceiling($dDouble/^_getPrecision($iFracLength))*^_getPrecision($iFracLength))
+
+
+@floor[dDouble;iFracLength]
+# 0-1, 1 - 0,1 2-0,01
+$result(^math:floor($dDouble/^_getPrecision($iFracLength))*^_getPrecision($iFracLength))
 
 
 ###########################################################################

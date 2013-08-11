@@ -139,7 +139,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 	}
 
 	$hTransactions.0.name[$entryName]
-	$hTransactions.0.value[^u:formatValue($h.iSum)]
+	$hTransactions.0.value[^u:formatValueByType($h.iSum;$hParams.type)]
 # 	^if($tEntries.has_children == 1){
 		$hTransactions.0.expandLink[^makeQueryString[
 					$.groupid[$form:groupid]
@@ -164,7 +164,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 	$hTransactions.0.name[<span>@</span>$entryName]
 # 	$hTransactions.0.date[^u:getDateRange[^u:stringToDate[$tEntries.operday]]]
 # 	$hTransactions.0.date[^u:formatOperday[$tEntries.operday]]
-	$hTransactions.0.value[^u:formatValue($tEntries.sum)]
+	$hTransactions.0.value[^u:formatValueByType($tEntries.sum;$hParams.type)]
 	$h.iOffset(1)
 	^tEntries.offset(1)
 
@@ -210,7 +210,7 @@ $h.iTotalSum(^dbo:getTotalOut[
 		}
 	}
 
-$hCurrent.value[^u:formatValue($tEntries.sum)]
+$hCurrent.value[^u:formatValueByType($tEntries.sum;$hParams.type)]
 $hCurrent.percent[^u:formatValue(100*$tEntries.sum/$h.iTotalSum)]
 
 	^if($tEntries.has_children == 0 &&
@@ -240,7 +240,7 @@ $hTransactions.0.no_entries[nodata]
 	$hCurrent.isRest(true)
 	$hCurrent.name[Прочее в категории $hTransactions.0.name]
 	$hCurrent.quantity[$h.dRestQuantity]
-	$hCurrent.value[^u:formatValue($h.iSum)]
+	$hCurrent.value[^u:formatValueByType($h.iSum;$hParams.type)]
 	$hCurrent.percent[^u:formatValue(100*$h.iSum/$h.iTotalSum)]
 
 }

@@ -314,7 +314,7 @@ $sDate[^dtf:format[%h;$v]]
 $result(def $request:query && ($data.dtNow != $data.currentDate || $data.startDate != $data.endDate))
 
 @printBars[iMonthSum;dTotalSum;sClass;iType;isOnlyKilos][iHeight;sSum;dDelta;dLastSum]
-$sSum[^u:formatValue($iMonthSum;true)]
+$sSum[^u:formatValueByType($iMonthSum;$iType;true)]
 ^if(!^data.pid.int(0) && ^isOnlyKilos.int(1)){
 # 	$sFullSumm[$sSum]
 	^if($iType == $dbo:TYPES.CHARGE){
@@ -322,7 +322,7 @@ $sSum[^u:formatValue($iMonthSum;true)]
 	}{
 		$sSum[^u:formatValueByDivisionFloor($iMonthSum;1000;true)]
 		^if($iMonthSum < 1000){
-			$sSum[^u:formatValueWithoutCeiling($iMonthSum/1000)]
+			$sSum[^u:formatValueWithoutCeiling(^u:floor($iMonthSum/1000;3))]
 		}
 	}
 }

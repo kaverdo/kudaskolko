@@ -123,7 +123,7 @@ $(function() {
 			$( "#transactions" ).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
 
 				if(item.iid && item.iid != 'undefined'){
-					var $anchor = $( "<div ><u>Открыть</u></div>" )
+					var $anchor = $( "<div ><u>Все записи</u></div>" )
 						.addClass("search-link")
 						// .attr("href", '/?iid=' + item.iid )
 						.hover(function(e){
