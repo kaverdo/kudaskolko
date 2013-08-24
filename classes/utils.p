@@ -5,13 +5,18 @@ u
 common/dtf.p
 dbo.p
 
-@capitalizeString[sString]
-$result[^sString.left(1)]
-$result[^result.upper[]]
-^if(^sString.length[] > 1){
-	$result[$result^sString.mid(1;^sString.length[])]
+@upper[sString]
+^try{
+	$result[^sString.upper[]]
+}{
+	^rem{ Защита от "какашек" - UTF-символов, на котороых падает upper.
+	Например, 💩 (%F0%9F%92%A9)}	
+	$exception.handled(true)
+ 	$result[$sString]
 }
 
+@capitalizeString[sString]
+$result[^upper[^sString.left(1)]^sString.mid(1;^sString.length[])]
 
 @getDateRange[dtStart;dtEnd;dtCurrent][dtNow]
 ^if(!def $dtEnd){
