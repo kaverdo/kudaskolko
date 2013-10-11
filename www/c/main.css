@@ -794,6 +794,9 @@ a.day {
       /*margin-bottom: 1em;*/
       /*overflow: hidden;*/ }
 
+.iemobile #ta-container .form {
+  max-width: none !important; }
+
 #IDAjaxPreview {
   /*overflow: hidden;*/
   background-color: #F5F5DC;

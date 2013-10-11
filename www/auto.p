@@ -14,6 +14,7 @@ $MONEY[
 ]
 $isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
  	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
+$isIEMobileBrowser(^env:HTTP_USER_AGENT.pos[IEMobile] >= 0)
 
 @initAuthDBObjects[]
 ^use[/../classes/sql/MySqlComp.p]
@@ -106,7 +107,7 @@ $result[$sBody]
 }
 </head>
 
-<body class="^if($isOperaMiniBrowser){operamini} ^if($IS_LOCAL){beta}">^test[]
+<body class="^if($isOperaMiniBrowser){operamini }^if($isIEMobileBrowser){iemobile }^if($IS_LOCAL){beta}">^test[]
 # <div id="container">
 <div class="header">
 # ^oCalendar.isNotToday[]
