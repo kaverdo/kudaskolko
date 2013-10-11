@@ -75,6 +75,7 @@ $dChequeAmount(-1)
 	}
 	^if($v.isCheque && def $v.dChequeAmount){
 		$iShopTransaction[$k]
+		$v.dPositionSum(^math:round($v.dPositionSum * 100) / 100))
 		$dPositionSum($v.dPositionSum)
  		$dFinalPositionSum($v.dChequeAmount)
 		$dChequeAmount($v.dChequeAmount)
