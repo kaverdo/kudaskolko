@@ -453,6 +453,9 @@ a.day {
     float: left;
     margin: 0 4em 2em 0;
     max-width: 50%; }
+    .iemobile .transactions #incomes, .iemobile
+    .transactions #charges {
+      max-width: none !important; }
   .transactions #incomes {
     margin-right: 0;
     /*opacity: 0.5;*/ }
@@ -679,6 +682,8 @@ a.day {
     font-size: 100%; }
   .grid.preview td.name {
     max-width: 600px; }
+    .iemobile .grid.preview td.name {
+      max-width: none !important; }
   .grid.preview tr td {
     border-color: transparent;
     padding: 0.1em 0.5em; }
@@ -790,12 +795,11 @@ a.day {
     width: 100%;
     max-width: 700px;
     padding-right: 1em; }
+    .iemobile #ta-container .form {
+      max-width: none !important; }
     #ta-container .form #controls {
       /*margin-bottom: 1em;*/
       /*overflow: hidden;*/ }
-
-.iemobile #ta-container .form {
-  max-width: none !important; }
 
 #IDAjaxPreview {
   /*overflow: hidden;*/

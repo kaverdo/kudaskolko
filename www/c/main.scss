@@ -685,6 +685,9 @@ a.day{
 		float: left;
 		margin:0 4em 2em 0;
 		max-width: 50%;
+		.iemobile & {
+			max-width: none !important;
+		}
 	}
 
 	#incomes{
@@ -1024,6 +1027,9 @@ tr:nth-child(2) td
 
 	td.name{
 		max-width: 600px;
+		.iemobile & {
+			max-width: none !important;
+		}
 	}
 	tr td{
 		border-color: transparent;
@@ -1199,6 +1205,9 @@ tr:nth-child(2) td
 		margin-left: -1em;
 		width: 100%;
 		max-width: 700px;
+		.iemobile & {
+			max-width: none !important;
+		}
 		padding-right: 1em;
 		#controls{
 			/*margin-bottom: 1em;*/
@@ -1209,9 +1218,6 @@ tr:nth-child(2) td
 
 }
 
-.iemobile #ta-container .form {
-	max-width: none !important;
-}
 
 	#IDAjaxPreview{
 		.active &{
