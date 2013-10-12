@@ -67,6 +67,9 @@ $tbMargin: 0.2em;
     overflow-y: auto;
     overflow-x: hidden;
     max-width: 700px;
+    & .iemobile{
+    	max-width: none !important;
+    }
 
     .ui-state-highlight,
     .ui-state-highlight a,
@@ -452,6 +455,9 @@ a{
 
 .calendar{
 	/*margin-bottom: 0.5em;*/
+	.iemobile & {
+		display: none !important;
+	}
 }
 
 
@@ -1311,7 +1317,6 @@ button:focus{
 	color: #333;
 	overflow: auto;
 	width: 100%;
-	//max-width: 800px;
 	min-height: 2.5em;
 	margin-right: 1em;
 	padding: 0.5em;

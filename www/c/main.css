@@ -18,6 +18,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-width: 700px; }
+  .ui-autocomplete .iemobile {
+    max-width: none !important; }
   .ui-autocomplete .ui-state-highlight,
   .ui-autocomplete .ui-state-highlight a,
   .ui-autocomplete .ui-state-hover,
@@ -292,6 +294,8 @@ a {
 
 .calendar {
   /*margin-bottom: 0.5em;*/ }
+  .iemobile .calendar {
+    display: none !important; }
 
 .months {
   overflow: hidden;
