@@ -95,7 +95,9 @@ $result[$sBody]
 <link rel="shortcut icon" href="/favicon.ico" />
 <title>^if(def $hPage.sTitle){$hPage.sTitle | }Куда сколько</title>
 <link rel="stylesheet" type="text/css" href="/c/main.css">
-
+^if(!$isIEMobileBrowser){
+	<meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
+}
 ^if(!$isOperaMiniBrowser){
 	<link rel="stylesheet" type="text/css" href="/c/custom-theme/jquery-ui-1.8.22.custom.css"/>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
