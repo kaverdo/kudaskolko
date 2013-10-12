@@ -95,7 +95,7 @@ $result[$sBody]
 <link rel="shortcut icon" href="/favicon.ico" />
 <title>^if(def $hPage.sTitle){$hPage.sTitle | }Куда сколько</title>
 <link rel="stylesheet" type="text/css" href="/c/main.css">
-^if(!$isIEMobileBrowser){
+^if($isIEMobileBrowser){
 	<meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
 <meta name="mobileoptimized" content="0" />
 }
