@@ -455,6 +455,7 @@ a.day {
     max-width: 50%; }
     .iemobile .transactions #incomes, .iemobile
     .transactions #charges {
+      float: none;
       max-width: none !important; }
   .transactions #incomes {
     margin-right: 0;

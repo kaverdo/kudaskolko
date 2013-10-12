@@ -686,6 +686,7 @@ a.day{
 		margin:0 4em 2em 0;
 		max-width: 50%;
 		.iemobile & {
+			float: none;
 			max-width: none !important;
 		}
 	}
