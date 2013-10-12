@@ -97,6 +97,7 @@ $result[$sBody]
 <link rel="stylesheet" type="text/css" href="/c/main.css">
 ^if(!$isIEMobileBrowser){
 	<meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
+<meta name="mobileoptimized" content="0" />
 }
 ^if(!$isOperaMiniBrowser){
 	<link rel="stylesheet" type="text/css" href="/c/custom-theme/jquery-ui-1.8.22.custom.css"/>
