@@ -110,7 +110,7 @@ $result[$sBody]
 }
 </head>
 
-<body class="^if($isOperaMiniBrowser){operamini }^if($isIEMobileBrowser){iemobile }^if($IS_LOCAL){beta}">^test[]
+<body class="^if($isOperaMiniBrowser){operamini }^if($isIEMobileBrowser && false){iemobile }^if($IS_LOCAL){beta}">^test[]
 # <div id="container">
 <div class="header">
 # ^oCalendar.isNotToday[]
