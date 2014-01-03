@@ -103,9 +103,9 @@ $result[$hTransactions]
 # чем сумма чека (за счет округления до двух знаков),
 # то разницу нужно записать в виде скидки на самую дорогую позицию
 @recalculate_correctDifference[]
-^if(def $caller.l.iMaxTransaction && $caller.l.dFinalPositionSum < 0){
-	^caller.hTransactions.[$caller.l.iMaxTransaction].dAmount.inc($caller.l.dFinalPositionSum)
-	^caller.hTransactions.[$caller.l.iMaxTransaction].dDiscount.dec($caller.l.dFinalPositionSum)
+^if(def $caller.iMaxTransaction && $caller.dFinalPositionSum < 0){
+	^caller.hTransactions.[$caller.iMaxTransaction].dAmount.inc($caller.dFinalPositionSum)
+	^caller.hTransactions.[$caller.iMaxTransaction].dDiscount.dec($caller.dFinalPositionSum)
 }
 
 @checkTransactions[hTransactions]
