@@ -43,7 +43,6 @@ $dbo:IS_LOCAL($IS_LOCAL)
 @initObjects[]
 ^use[/../classes/dbo.p]
 ^use[/../classes/common/dtf.p]
-^use[/../classes/import.p]
 ^use[/../classes/update.p]
 ^use[/../classes/utils.p]
 ^use[/../classes/calendar.p]
@@ -58,7 +57,6 @@ $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
 
 
 $update:oSql[$oSql]
-$import:oSql[$oSql]
 $calendar:oSql[$oSql]
 $action:oSql[$oSql]
 $transactionlist:oSql[$oSql]
@@ -397,16 +395,6 @@ $isSearchRequest(false)
 		^rusage[returnCategories]
 		^returnCategories[]
 		^rusage[returnCategories]
-	}
-	^case[import_lenta]{
-		^if(def $form:importfile){
-			^import:importCheque[]
-		}{
-			^import:importLenta[]
-		}
-	}
-	^case[import_bank]{
-		^import:importBank[]
 	}
 	^case[rebuild]{
 		^dbo:rebuildNestingData[]
