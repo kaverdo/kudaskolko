@@ -138,7 +138,6 @@ $result[$hResult]
 @getJustDate[date]
 $result[^date::create($date.year;$date.month;$date.day)]
 
-
 @getLastDay[date]
 $result[^date::create(^getFullYear($date.year);$date.month;^date:last-day(^getFullYear($date.year);$date.month))]
 
@@ -160,6 +159,14 @@ $dtNow[^u:getJustDate[^date::now[]]]
 	}
 	^case[ПОЗАВЧЕРА]{
 		^dtNow.roll[day](-2)
+		$result[^date::create[$dtNow]]
+	}
+	^case[ЗАВТРА]{
+		^dtNow.roll[day](+1)
+		$result[^date::create[$dtNow]]
+	}
+	^case[ПОСЛЕЗАВТРА]{
+		^dtNow.roll[day](+2)
 		$result[^date::create[$dtNow]]
 	}
 	^case[DEFAULT]{

@@ -261,7 +261,9 @@ $result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
 $months[^table::create{value
 вчера
 позавчера
-сегодня}]
+сегодня
+завтра
+послезавтра}]
 $result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
 
 @returnCategories[][locals]
