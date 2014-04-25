@@ -361,7 +361,11 @@ function ajaxPreview(text){
 		$("#IDAjaxPreview .dataContainer").html("");
 		return;
 	}
-	if(value == transactionsValue && !hasAjaxPreviewHTTPError){
+	var re = new RegExp(".+?\\D$", "ig" );
+	var isSingleLine = (value.split("\n").length == 1) 
+	&& re.test($.ui.autocomplete.escapeRegex(value))
+	;
+	if (value == transactionsValue && !hasAjaxPreviewHTTPError){
 		controlsPreview.attr("disabled",true);
 		if(hasAjaxPreviewFormatError)
 			controlsSubmit.attr("disabled",true);
@@ -369,9 +373,13 @@ function ajaxPreview(text){
 	}
 	transactionsValue = value;
 	$.cookie("draft", value, { expires : 90 });
+	var ajaxUrl = "/?action=out&preview=1&ajax=1&anonymous=1";
+	if (isSingleLine) {
+		ajaxUrl = "/?action=searchtransactions"
+	}
 	$.ajax({
 		type: "POST",
-		url: "/?action=out&preview=1&ajax=1&anonymous=1",
+		url: ajaxUrl,
 		datatype: "html",
 		cache: true,
 		data: {transactions: value}
@@ -380,12 +388,15 @@ function ajaxPreview(text){
 		// 	$("#IDAjaxPreview .dataContainer").html("..."); 
 		// }
 	}).done(function( html ) {
+		if (isSingleLine) {
+			controlsSubmit.attr("disabled",true);
+		}
 		hasAjaxPreviewHTTPError = false;
 		$("#IDAjaxPreview .dataContainer").html(html);
 		$("#IDAjaxPreview").removeClass("hidden");
 		controlsPreview.attr("disabled",true);
 		hasAjaxPreviewFormatError = $("#IDAjaxPreview .dataContainer .grid").hasClass("hasError");
-		if(hasAjaxPreviewFormatError){
+		if (hasAjaxPreviewFormatError){
 			controlsSubmit.attr("disabled",true);
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
 		}

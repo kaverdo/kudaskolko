@@ -205,7 +205,6 @@ $result[$sBody]
 
 @processing[]
 ^if($form:action eq json){
-	^use[../classes/dbo.p]
 	^use[../classes/autocomplete.p]
 	$autocomplete:oSql[$oSql]
 	^rusage[returnCategories]
@@ -219,6 +218,12 @@ $result[$sBody]
 				$.sData[$form:transactions]
 				$.isPreview(def $form:preview)
 				$.sReturnURL[$MONEY.SERVER_HOST]
+			]
+		}
+		^case[searchtransactions]{
+				$transaction:oSql[$oSql]
+			^transaction:searchTransactions[
+				$.sData[$form:transactions]
 			]
 		}
 		^case[rebuild]{

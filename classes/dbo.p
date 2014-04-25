@@ -980,6 +980,71 @@ operday ASC,
 i.name
 }]
 
+@searchEntries[hParams][tEntries]
+$hParams[^hash::create[$hParams]]
+$result[^oSql.table{
+SELECT
+	i.name,
+	t2.tid,
+	t2.ctid,
+	cheque.iid AS ciid,
+	t2.type,
+	i.iid,
+	ai.name AS extraname,
+	ti.name AS tiname,
+	i.pid,
+	t2.amount AS sum,
+	i.quantity_factor * t2.quantity AS quantity,
+	t2.operday
+FROM items i
+LEFT JOIN nesting_data ndp ON i.iid=ndp.iid
+LEFT JOIN nesting_data nd ON nd.pid=ndp.iid
+LEFT JOIN transactions t2 ON t2.iid = nd.iid
+LEFT JOIN transactions cheque ON t2.ctid = cheque.tid
+LEFT JOIN items ai ON ai.iid = t2.alias_id
+LEFT JOIN transactions ct ON ct.tid = t2.ctid
+LEFT JOIN items ti ON ti.iid = ct.iid
+
+WHERE
+
+	i.user_id = $USERID AND
+	t2.user_id = $USERID AND
+	ndp.iid = ndp.pid
+
+	AND (i.name = '$hParams.name' )
+
+# ^if(def $hParams.pid && ^hParams.pid.int(0) > 0){
+# # id родительской категории, детей которой показываем
+# 	AND (
+# 			i.name = ^hParams.pid.int(0)
+# 		OR
+# 			i.pid = ^hParams.pid.int(0)
+# 	)
+# }{
+# 	^if(^hParams.type.int(0) != 0){
+# 		AND i.pid = (SELECT iid FROM items 
+# 			WHERE 
+# 			user_id = $USERID AND
+# 			type & ^hParams.type.int(0) = ^hParams.type.int(0))
+# 	}
+
+# }
+
+	AND t2.is_displayed = 1
+
+# GROUP BY
+# # ^if(def $hParams.detailed){
+# 	t2.tid
+# }
+# 	i.name,
+# 	i.iid,
+# 	i.pid
+ORDER BY 
+operday DESC,
+ndp.level,
+i.name
+}[$.limit(5)]]
+
 @getParentItems[hParams]
 $hParams[^hash::create[$hParams]]
 $result[^oSql.table{

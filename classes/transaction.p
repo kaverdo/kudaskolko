@@ -320,6 +320,38 @@ $dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
 	</tr>
 }
 
+@searchTransactions[hParams]
+$hParams[^hash::create[$hParams]]
+$sTransaction[^hParams.sData.trim[]]
+
+$tTransactions[^dbo:searchEntries[
+$.name[$sTransaction]
+$.detailed(true)
+$.limit(10)
+# $.orderByDesc(true)
+]]
+$aTransactions[^array::new[]]
+
+^tTransactions.menu{
+$hResult[^hash::create[]]
+$hResult.sName[$tTransactions.name]
+$hResult.dQuantity($tTransactions.quantity)
+$hResult.dAmount($tTransactions.sum)
+$hResult.dAmountWithoutDisc($tTransactions.sum)
+$hResult.dtTransDate[^u:stringToDate[$tTransactions.operday]]
+^aTransactions.add[$hResult]
+}
+
+# $hResult[^hash::create[]]
+# $hResult.sName[Молоко домик в деревне]
+# $hResult.dQuantity(2.0)
+# $hResult.dAmount(123.123)
+# $hResult.dAmountWithoutDisc(123.123)
+# $hResult.dtTransDate[^u:stringToDate[20140102]]
+# ^aTransactions.add[$hResult]
+
+$result[^previewTransaction[^aTransactions.getHash[];^hash::create[]]]
+
 @processMoneyOut[hParams]
 $hParams[^hash::create[$hParams]]
 ^if(!def $hParams.isAjax){
