@@ -1,5 +1,6 @@
 @auto[]
-$hStat[^hash::create[]]
+^use[/../classes/utils.p]
+$hRusageStat[^hash::create[]]
 $MAIN:CLASS_PATH[sql]
 $dtNow[^date::now[]]
 $hPage[^hash::create[]]
@@ -12,11 +13,12 @@ $oAction[]
 $MONEY[
 	$.SERVER_HOST[http://$env:SERVER_NAME]
 ]
-$isOperaMiniBrowser(^env:HTTP_USER_AGENT.pos[Opera Mini]>=0 ||
- 	^env:HTTP_USER_AGENT.pos[NokiaC3-0]>=0)
-$isIEMobileBrowser(^env:HTTP_USER_AGENT.pos[IEMobile] >= 0)
+$isOperaMiniBrowser(^u:contains[$env:HTTP_USER_AGENT;Opera Mini] || 
+	^u:contains[$env:HTTP_USER_AGENT;NokiaC3-0])
+$isIEMobileBrowser(^u:contains[$env:HTTP_USER_AGENT;IEMobile])
 
 @initAuthDBObjects[]
+^rusage[initAuthDBObjects]
 ^use[/../classes/sql/MySqlComp.p]
 ^use[/../classes/auth2.p]
 $oSql[^MySqlComp::create[$SQL.connect-string;
@@ -39,12 +41,12 @@ $USERID($oAuth.user.id)
 $dbo:oSql[$oSql]
 $dbo:USERID($USERID)
 $dbo:IS_LOCAL($IS_LOCAL)
+^rusage[initAuthDBObjects]
 
 @initObjects[]
+^rusage[initObjects]
 ^use[/../classes/dbo.p]
 ^use[/../classes/common/dtf.p]
-^use[/../classes/update.p]
-^use[/../classes/utils.p]
 ^use[/../classes/calendar.p]
 ^use[/../classes/action.p]
 ^use[/../classes/transaction.p]
@@ -55,13 +57,12 @@ $oCalendar[^calendar::create[$.USERID($USERID)]]
 $oTransactions[^transactionlist::create[$.hPage[$hPage]$.USERID($USERID)]]
 $oAction[^action::create[$.hPage[$hPage]$.USERID($USERID)]]
 
-
-$update:oSql[$oSql]
 $calendar:oSql[$oSql]
 $action:oSql[$oSql]
 $transactionlist:oSql[$oSql]
 $transactionlist:oCalendar[$oCalendar]
 $transaction:oCalendar[$oCalendar]
+^rusage[initObjects]
 
 @postprocess[sBody][oSqlLog]
 $result[$sBody]
@@ -124,12 +125,15 @@ $result[$sBody]
 </div>
 <div class="body">$sBody</div>
 # </div>
-^if(!$IS_LOCAL){^counter[]}
+^counter[]
 </body>
 </html>
 
 @counter[]
-<!-- Yandex.Metrika counter --><script type="text/javascript">^(function ^(d, w, c^) ^{ ^(w^[c^] = w^[c^] || [^]^).push^(function^(^) ^{ try ^{ w.yaCounter19035334 = new Ya.Metrika^(^{id:19035334, clickmap:true, trackLinks:true, ut:"noindex"^}^)^; ^} catch^(e^) ^{ ^} ^}^)^; var n = d.getElementsByTagName^("script"^)^[0^], s = d.createElement^("script"^), f = function ^(^) ^{ n.parentNode.insertBefore^(s, n^); ^}; s.type = "text/javascript"^; s.async = true; s.src = ^(d.location.protocol == "https:" ? "https:" : "http:"^) + "//mc.yandex.ru/metrika/watch.js"^; if ^(w.opera == "^[object Opera^]"^) ^{ d.addEventListener^("DOMContentLoaded", f, false^); ^} else ^{ f^(^)^; ^} ^}^)^(document, window, "yandex_metrika_callbacks"^)^;</script><noscript><div><img src="//mc.yandex.ru/watch/19035334?ut=noindex" style="position:absolute^; left:-9999px^;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
+^if($env:SERVER_NAME eq 'kudaskolko.ru'){
+	^rem{ код счетчика для kudaskolko.ru }	
+	<!-- Yandex.Metrika counter --><script type="text/javascript">^(function ^(d, w, c^) ^{ ^(w^[c^] = w^[c^] || ^[^]^).push^(function^(^) ^{ try ^{ w.yaCounter19035334 = new Ya.Metrika^(^{id:19035334, clickmap:true, trackLinks:true, ut:"noindex"^}^)^; ^} catch^(e^) ^{ ^} ^}^)^; var n = d.getElementsByTagName^("script"^)^[0^], s = d.createElement^("script"^), f = function ^(^) ^{ n.parentNode.insertBefore^(s, n^)^; ^}^; s.type = "text/javascript"^; s.async = true^; s.src = ^(d.location.protocol == "https:" ? "https:" : "http:"^) + "//mc.yandex.ru/metrika/watch.js"^; if ^(w.opera == "^[object Opera^]"^) ^{ d.addEventListener^("DOMContentLoaded", f, false^)^; ^} else ^{ f^(^)^; ^} ^}^)^(document, window, "yandex_metrika_callbacks"^)^;</script><noscript><div><img src="//mc.yandex.ru/watch/19035334?ut=noindex" style="position:absolute^; left:-9999px^;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
+}
 
 
 @test[]
@@ -147,10 +151,9 @@ $result[$sBody]
 }
 ^rusage[main]
 
-^rem{
-	используется для ускорения ajax-запросов, не требующих работы с бд и авторизации
-}
+
 @anonymousLauncher[]
+^rem{ используется для ускорения ajax-запросов, не требующих работы с бд и авторизации }
 ^switch[$form:action]{
 	^case[out]{
 		^use[/../classes/transaction.p]
@@ -167,7 +170,6 @@ $result[$sBody]
 ^initAuthDBObjects[]
 ^oSql.server{
 	^if(!$oAuth.is_logon){
-
 		^if(def $form:action && $form:action eq 'signup'){
 			$hPage.sTitle[Регистрация]
 			^makeHTML[test][
@@ -182,11 +184,9 @@ $result[$sBody]
 # 					$.action_name[Войти 2]
 					$.target_url[/]
 				]
-
 			]
 		}
 	}{
-
 		^if(def $form:action){
 			^processing[]
 		}{
@@ -194,7 +194,6 @@ $result[$sBody]
 			^makeHTML[test][
 			<div id="top">
 				^transaction:htmlMoneyOutForm[$cookie:draft]
-#				^remains:printRemains[]
 			</div>
 				^oCalendar.showCalendar[]
 				^oTransactions.anotherWayToMakeTrees[]
@@ -204,256 +203,65 @@ $result[$sBody]
 	}
 }
 
-@changeKeyboard[sTranslit]
-$result[^sTranslit.replace[^table::create{from	to
-q	й
-w	ц
-e	у
-r	к
-t	е
-y	н
-u	г
-i	ш
-o	щ
-p	з
-^[	х
-^]	ъ
-a	ф
-s	ы
-d	в
-f	а
-g	п
-h	р
-j	о
-k	л
-l	д
-^;	ж
-'	э
-z	я
-x	ч
-c	с
-v	м
-b	и
-n	т
-m	ь
-,	б
-.	ю
-`	ё
-}]]
-
-@getMonthsByFirstCharacters[sFirst][locals]
-$months[^table::create{value
-августа
-апреля
-декабря
-июля
-июня
-марта
-мая
-ноября
-октября
-сентября
-февраля
-января}]
-$result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
-
-@getFuzzyDatesByFirst[sFirst][locals]
-$months[^table::create{value
-вчера
-позавчера
-сегодня
-завтра
-послезавтра}]
-$result[^months.select(^months.value.left(^sFirst.length[]) eq ^sFirst.lower[])]
-
-@returnCategories[][locals]
-# ^cache[/../data/cache/json/^math:md5[$form:term]](10){
-$sInput[^form:term.lower[]]
-$sFirst[^sInput.left(1)]
-$isCheque(false)
-$isSubItem(false)
-$isSearchRequest(false)
-^if($sFirst eq "@" || $sFirst eq "^""){
-	$isCheque(true)
-	$sInput[^sInput.trim[left;@"]]
-}
-^if($sFirst eq "-"){
-	$isSubItem(true)
-	$sInput[^sInput.trim[left;- ]]
-}
-^if($sFirst eq "?"){
-	$isSearchRequest(true)
-	$sInput[^sInput.trim[left;? ]]
-}
-# ^if(def $sInput && (^sInput.length[] > 2 || $isCheque)){
-^if(def $sInput && (true || $isCheque)){
-# 		^if(^sInput.left(1) eq "@"){
-# 			$isCheque(true)
-# 			$sInput[^sInput.trim[left;@]]
-# 		}
-		$sChangedInput[^changeKeyboard[$sInput]]
-# 		$tResult[^table::create[nameless]{}]
-		$tResult[^table::create{value	label	iid}]
-# 		^tResult.append{$sInput	Найти все записи '$sInput'}
-		$sDates[свп]
-		^if(^sDates.pos[$sFirst] != -1){
-			^tResult.join[^getFuzzyDatesByFirst[$sInput]]
-		}{
-			^if(^sDates.pos[^sChangedInput.left(1)] != -1){
-				^tResult.join[^getFuzzyDatesByFirst[$sChangedInput]]
-			}
-		}
-		$tSplitted[^sInput.split[ ;h]]
-		^if(def $tSplitted.0){
-			$day(^tSplitted.0.int(-1))
-			^if($day >= 1 && $day <= 32){
-				^if(def $tSplitted.1){
-					$months[^getMonthsByFirstCharacters[$tSplitted.1]]
-					^if(^months.count[] == 0){
-						^months.join[^getMonthsByFirstCharacters[^changeKeyboard[$tSplitted.1]]]
-					}
-					^months.menu{
-						^tResult.append{$day $months.value}
-					}
-				}{
-					^tResult.append{$day ^dtf:format[%h;^date::now[];$dtf:rr-locale]}
-				}
-			}
-		}
-
-
-		$tResultFromDB[^oSql.table{
-		SELECT
-
-		^if($isSubItem){
-			CONCAT('- ',i.name)
-		}{
-			CONCAT(IF(t.type & $dbo:TYPES.CHEQUE <> 0,'@',''), i.name)
-		} AS value,
-		i.iid
-
-		FROM items i
-# 		^if($isCheque){
-# 			JOIN transactions t ON i.iid = t.ctid
-# 		}{
-			LEFT JOIN transactions t ON i.iid = t.iid
-# 		}
-		
-		WHERE
-		i.user_id = $USERID AND
-		^if($isCheque){
-			t.type & $dbo:TYPES.CHEQUE = $dbo:TYPES.CHEQUE
-			AND
-		}
-		(
-			(i.name like "$sInput%"
-			OR i.name like "% $sInput%"
-			OR i.name like "%-$sInput%"
-			)
-		^if($sChangedInput ne $sInput){
-			OR
-			(i.name like "$sChangedInput%" 
-				OR i.name like "% $sChangedInput%"
-				OR i.name like "%-$sChangedInput%"
-			)
-		}
-		)
-		GROUP BY i.name
-		ORDER BY
-		i.type DESC,
-		ABS(STRCMP(i.name,"$sInput")),
-		ABS(STRCMP(LEFT(i.name, CHAR_LENGTH("$sInput")),"$sInput")),
-#		CHAR_LENGTH(i.name),
-		COUNT(t.tid) DESC,t.operday DESC,i.name
-		}[$.limit(20)]
-#		[$.sFile[^math:md5[$form:term]]$.dInterval(1/24/60/60*10)]
-	]
-		^tResult.join[$tResultFromDB]
-		$result[^json:string[$tResult;$.table[object]]]
-# 		^result.save[r.txt]
-
-}{
-	$result[^json:string[^table::create{};$.table[object]]]
-}
-# }
-
 @processing[]
 ^if($form:action eq json){
 	^use[../classes/dbo.p]
+	^use[../classes/autocomplete.p]
+	$autocomplete:oSql[$oSql]
+	^rusage[returnCategories]
+	^autocomplete:returnCategories[]
+	^rusage[returnCategories]
 }{
-
 	^initObjects[]
-}
-
-^switch[$form:action]{
-	^case[out]{
-		^transaction:processMoneyOut[
-			$.sData[$form:transactions]
-			$.isPreview(def $form:preview)
-			$.sReturnURL[$MONEY.SERVER_HOST]
-		]
-	}
-	^case[json]{
-		^rusage[returnCategories]
-		^returnCategories[]
-		^rusage[returnCategories]
-	}
-	^case[rebuild]{
-		^dbo:rebuildNestingData[]
-
-	}
-	^case[update]{
-		^update:update[]
-	}
-	^case[DEFAULT]{
-		^oAction.action[$form:action]
+	^switch[$form:action]{
+		^case[out]{
+			^transaction:processMoneyOut[
+				$.sData[$form:transactions]
+				$.isPreview(def $form:preview)
+				$.sReturnURL[$MONEY.SERVER_HOST]
+			]
+		}
+		^case[rebuild]{
+			^dbo:rebuildNestingData[]
+		}
+		^case[DEFAULT]{
+			^oAction.action[$form:action]
+		}
 	}
 }
-
-
-
-# @htmlMoneyOut[]
-# <div class="calendar">^oCalendar.showCalendar[]</div>
-# ^oTransactions.anotherWayToMakeTrees[]
-
-
-
 
 @rusage[comment][v;now;prefix;message;line;usec]
 ^if($IS_LOCAL){
 	$v[$status:rusage]
 
-	^if(^hStat.contains[$comment]){
-		$hStat.[$comment].afterSec($v.tv_sec)
-		$hStat.[$comment].afterMSec($v.tv_usec)
+	^if(^hRusageStat.contains[$comment]){
+		$hRusageStat.[$comment].afterSec($v.tv_sec)
+		$hRusageStat.[$comment].afterMSec($v.tv_usec)
 
-		$hStat.[$comment].totalSec(
-			$hStat.[$comment].afterSec - $hStat.[$comment].beforeSec
+		$hRusageStat.[$comment].totalSec(
+			$hRusageStat.[$comment].afterSec - $hRusageStat.[$comment].beforeSec
 			)
-		$hStat.[$comment].totalMSec(
-			$hStat.[$comment].afterMSec - $hStat.[$comment].beforeMSec
+		$hRusageStat.[$comment].totalMSec(
+			$hRusageStat.[$comment].afterMSec - $hRusageStat.[$comment].beforeMSec
 			)
 
 		$now[^date::now[]]
 		$usec(^v.tv_usec.double[]) 
 		$prefix[[^now.sql-string[].^usec.format[%06.0f]]	$env:REMOTE_ADDR	$comment] 
-		$message[^eval(($hStat.[$comment].totalSec*1000000 + $hStat.[$comment].totalMSec)/1000)	$request:uri]
+		$message[^eval(($hRusageStat.[$comment].totalSec*1000000 + $hRusageStat.[$comment].totalMSec)/1000)	$request:uri]
 		$line[$prefix	$message^#0A]
 		^line.save[append;../logs/rusage.log]
 
 	}{
-		^hStat.add[
+		^hRusageStat.add[
 			$.[$comment][^hash::create[]]
 		]
-		$hStat.[$comment].beforeSec($v.tv_sec)
-		$hStat.[$comment].beforeMSec($v.tv_usec)
+		$hRusageStat.[$comment].beforeSec($v.tv_sec)
+		$hRusageStat.[$comment].beforeMSec($v.tv_usec)
 	}
 
 }
-
 $result[]
-
-
 
 @log[sLogData][locals]
 ^if($IS_LOCAL){

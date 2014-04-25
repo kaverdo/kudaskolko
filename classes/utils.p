@@ -147,29 +147,39 @@ $result[^date::create($date.year;$date.month;1)]
 @getOperdayByDate[dtDate]
 $result[${dtDate.year}^dtDate.month.format[%02d]^dtDate.day.format[%02d]]
 
-@stringToDate[sDateTime;defaultDate][dtNow]
-$dtNow[^u:getJustDate[^date::now[]]]
+@getDateByShortName[sDateTime][locals]
+$iShift[]
 ^switch[^sDateTime.upper[]]{
 	^case[СЕГОДНЯ]{
-		$result[^date::create[$dtNow]]
+		$iShift(0)
 	}
 	^case[ВЧЕРА]{
-		^dtNow.roll[day](-1)
-		$result[^date::create[$dtNow]]
+		$iShift(-1)
 	}
 	^case[ПОЗАВЧЕРА]{
-		^dtNow.roll[day](-2)
-		$result[^date::create[$dtNow]]
+		$iShift(-2)
 	}
 	^case[ЗАВТРА]{
-		^dtNow.roll[day](+1)
-		$result[^date::create[$dtNow]]
+		$iShift(+1)
 	}
 	^case[ПОСЛЕЗАВТРА]{
-		^dtNow.roll[day](+2)
-		$result[^date::create[$dtNow]]
+		$iShift(+2)
 	}
-	^case[DEFAULT]{
+}
+^if(def $iShift){
+	$dtNow[^u:getJustDate[^date::now[]]]
+	^dtNow.roll[day]($iShift)
+	$result[^date::create[$dtNow]]
+}{
+	$result[]
+}
+
+@stringToDate[sDateTime;defaultDate][locals]
+$dtNow[^u:getJustDate[^date::now[]]]
+$resultDate[^getDateByShortName[$sDateTime]]
+^if(def $resultDate){
+	$result[$resultDate]
+}{
 # 				^u:p[$sDateTime]
 # 		$t[^sDateTime.match[(?:(\d\d)\.(\d\d)(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
 # 		$t[^sDateTime.match[(?:(\d\d)\.((?:0?[123456789]|[12][0-9]|3[01]))(?:\.(\d\d(?:\d\d)?))?)(?:\s+(\d\d)\:(\d\d)(?:\:(\d\d))?)?][g]]
