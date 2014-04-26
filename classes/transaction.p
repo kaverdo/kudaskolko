@@ -322,22 +322,22 @@ $dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
 
 @searchTransactions[hParams]
 $hParams[^hash::create[$hParams]]
-$sTransaction[^hParams.sData.trim[]]
+$sTransaction[^hParams.sData.trim[right;.]]
 
 $tTransactions[^dbo:searchEntries[
 $.name[$sTransaction]
 $.detailed(true)
 $.limit(10)
-# $.orderByDesc(true)
 ]]
 $aTransactions[^array::new[]]
 
 ^tTransactions.menu{
 $hResult[^hash::create[]]
 $hResult.sName[$tTransactions.name]
+$hResult.operday[$tTransactions.operday]
 $hResult.dQuantity($tTransactions.quantity)
-$hResult.dAmount($tTransactions.sum)
-$hResult.dAmountWithoutDisc($tTransactions.sum)
+$hResult.dAmount($tTransactions.amount)
+$hResult.dAmountWithoutDisc($tTransactions.amount)
 $hResult.dtTransDate[^u:stringToDate[$tTransactions.operday]]
 ^aTransactions.add[$hResult]
 }

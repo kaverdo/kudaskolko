@@ -351,7 +351,7 @@ var saveDraftTimer;
 function ajaxPreview(text){
 	clearTimeout(previewTimer);
 	var value;
-	if(text == null)
+	if (text == null)
 		value = transactionsID.val().trim();
 	else
 		value = text.trim();
@@ -361,7 +361,7 @@ function ajaxPreview(text){
 		$("#IDAjaxPreview .dataContainer").html("");
 		return;
 	}
-	var re = new RegExp(".+?\\D$", "ig" );
+	var re = new RegExp(".?\\.$", "ig" );
 	var isSingleLine = (value.split("\n").length == 1) 
 	&& re.test($.ui.autocomplete.escapeRegex(value))
 	;
@@ -390,6 +390,7 @@ function ajaxPreview(text){
 	}).done(function( html ) {
 		if (isSingleLine) {
 			controlsSubmit.attr("disabled",true);
+			$.cookie("draft", null);
 		}
 		hasAjaxPreviewHTTPError = false;
 		$("#IDAjaxPreview .dataContainer").html(html);
