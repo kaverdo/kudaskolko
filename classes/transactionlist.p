@@ -106,7 +106,7 @@ $entryName[$tEntries.name]
  	^if(^form:ciid.int(^form:p.int(0))){
 		iid = ^form:ciid.int(^form:p.int(0))
 	}{
-		type & $hParams.type = $hParams.type
+		type = $hParams.type
 	}
 	}[	$.limit(1)$.default[default]]]
 }

@@ -589,21 +589,14 @@ $hTransaction[]
 			$.is_displayed(0)
 			$.type($dbo:TYPES.CHEQUE | $dbo:TYPES.CHARGE)
 			$.user_id(1)
-			$.account_id(1)
 			$.adate[$dtNow]
 		]]
 	}{
 		$hItem[^dbo:createItem[
 			$.name[$v.sName]
-		^if(def $v.sUnitName){
-			$.unit[$v.sUnitName]
-		}
-		^if(def $v.sQuantityFactor){
-			$.quantity_factor[$v.sQuantityFactor]
-		}
-		^if($v.iType){
-			$.type($v.iType)
-		}
+			^if($v.iType){
+				$.type($v.iType)
+			}
 		]]
 		$hTransaction[^dbo:createTransaction[
 			$.iid[$hItem.tValues.iid]
@@ -616,7 +609,6 @@ $hTransaction[]
 			$.amount($v.dAmount)
 			$.quantity($v.dQuantity)
 			$.user_id(1)
-			$.account_id(1)
 			$.adate[$dtNow]
 		]]
 	}
@@ -713,16 +705,12 @@ $result[^regex::create[
 
 		(?:
 			([\d\.,]+)  # 7 dQuantity || || sPrice || quantity
-#			(?:/([\d\.,]+))? # 8 dQuantityFactor
-			(?:\s*(\D+?))? # 9 sUnitName
 		)
 	\s*)?
 	|
 # вариант Молоко 2 по 300, 3 за 100
 	(?:
 		([\d\.,]+)  # 10 dQuantity2
-#			(?:/([\d\.,]+))? # 8 dQuantityFactor
-		(?:\s*(\D+?))? # 11 sUnitName2
 	)
 	\s*
 	(\x{043f}\x{043e}|\x{0437}\x{0430}) # 12 sAmountOrPrice2 (sAmount2)( по - price, за - amount)
@@ -749,11 +737,7 @@ $hStr[
 	$.sAmount(1)
 	$.sAmountOrPrice(1)
 	$.dQuantity(1)
-#	$.dQuantityFactor(1)
-	$.sUnitName(1)
 	$.dQuantity2(1)
-# 	$.dQuantityFactor(1)
-	$.sUnitName2(1)
 	$.sAmountOrPrice2(1)
 	$.type2(1)
 	$.sAmountOrsPrice2(1)
@@ -774,7 +758,6 @@ $i(1)
 
 $hResult.sName[^u:capitalizeString[^h.sName.left(255)]]
 ^if(def $h.sAmountOrPrice2){
-	$h.sUnitName[$h.sUnitName2]
 	$h.dQuantity[$h.dQuantity2]
 	$h.type[$h.type2]
 	$h.sAmount[$h.sAmountOrsPrice2]
@@ -783,7 +766,6 @@ $hResult.sName[^u:capitalizeString[^h.sName.left(255)]]
 	}
 }
 
-$hResult.sUnitName[$h.sUnitName]
 $hResult.sAmount[$h.sAmount]
 ^if(def $hResult.sAmount){
 	^if(^hResult.sAmount.left(1) eq "(" && ^hResult.sAmount.right(1) eq ")"){
@@ -807,9 +789,6 @@ $hResult.sAmount[$h.sAmount]
 		}
 	}{
 		$hResult.dQuantity(^u:stringToDouble[$h.dQuantity](1))
-		^if(def $h.dQuantityFactor){
-			$hResult.dQuantityFactor(^u:stringToDouble[$h.dQuantityFactor])
-		}
 		$hResult.dAmount(^u:stringToDouble[$hResult.sAmount])
 		^if($hResult.dQuantity != 0 && $h.sAmountOrPrice eq "*"){
 			$hResult.dAmount($hResult.dAmount * $hResult.dQuantity)

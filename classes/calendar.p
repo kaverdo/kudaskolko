@@ -119,6 +119,7 @@ i - iMountCount + 1
 # <br/>
 # # $sCurrentDate[^data.currentDate.sql-string[]]
 $hMonthsSum[^oSql.table{
+	/* Суммы по месяцам */
 SELECT 
 # IFNULL(nd.type,^form:type.int(1)) AS type,
 nd.type AS type,
@@ -155,15 +156,10 @@ WHERE
 			AND cheque.iid = $data.ciid
 		}
 # 		^if(^form:type.int(0)){
-# 			AND nd.type & ^form:type.int(0) = ^form:type.int(0)
-# 		}{
- 			AND (nd.type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE 
- 				 OR nd.type & $dbo:TYPES.INCOME = $dbo:TYPES.INCOME)
+# 			AND nd.type = ^form:type.int(0)
 # 		}
 		AND nd.iid = nd.pid
-#		AND nd.pid IN ( SELECT iid FROM items WHERE type & 1 = 1 OR type & 2 = 2)
 	}
-# 	AND nd.iid = nd.pid
 GROUP BY ym,nd.type
 }
 #[$.type[table]]
@@ -416,38 +412,20 @@ SELECT
 	SUM(t.amount) sum,
 	nd.type
 FROM transactions t
-#operdays o
-#LEFT JOIN transactions t ON t.operday = o.operday
-# ^if($data.pid){
 	LEFT JOIN nesting_data nd ON nd.iid = t.iid
-# 	LEFT JOIN nesting_data parent ON parent.iid = nd.pid
-# }{
 	LEFT JOIN items i ON nd.pid = i.iid
-# }
 	^if($data.ciid){
 		LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 	}
-
 WHERE	
-^if($data.pid){
-	 nd.pid = $data.pid
-	}{
-
-	(i.type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
-	OR i.type & $dbo:TYPES.INCOME = $dbo:TYPES.INCOME)
-}
-	AND t.is_displayed = 1
+	^if($data.pid){
+		nd.pid = $data.pid AND
+	}
+	t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
 	AND nd.pid <> nd.iid
-# 	^if($data.pid){
-# 		AND parent.iid = $data.pid
-# # 	}{
-# # 		AND nd.pid = (SELECT iid FROM items 
-# # 			WHERE type & $dbo:TYPES.CHARGE = $dbo:TYPES.CHARGE
-# # 			AND user_id = $USERID)
-# 	}
 	^if($data.ciid){
 		AND cheque.iid = $data.ciid
 	}

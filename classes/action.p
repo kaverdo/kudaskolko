@@ -552,9 +552,6 @@ $iFinalItemID(0)
 
 	}
 
-# ^dbo:collapseChequeTransactions[$.iid(^form:i.int(0))]
-
-
 $response:location[^goBack[
 ^if(!(^form:expanded.int(0) || ^form:detailed.int(0))){
 	^if(!^tParent.is_root.int(0)){
