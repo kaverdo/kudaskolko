@@ -17,28 +17,21 @@ $USERID(^hParams.USERID.int(0))
 <ul class="breadscrumbs">
 $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
 ^if(!$tParents && (^form:p.int(0) || ^form:ciid.int(0))){
-# && (^form:type.int(0) && !^form:pid.int(0))){
 <li><a href="^makeQueryString[
 				$.groupid[$form:groupid]
 				$.operday[$form:operday]
 			]">Расходы и доходы</a></li>
 }
 ^tParents.menu{
-^if(^tParents.line[] == ^tParents.count[]){
-	
-#<h2>$tParents.name</h2>
-}{
-
-	<li><a href="^makeQueryString[
-				$.groupid[$form:groupid]
-				$.operday[$form:operday]
-				^if($tParents.level != 0){
-					$.p[$tParents.iid]
-# 					$.type[$form:type]
-				}
-			]">$tParents.name</a></li>
-#^if(^tParents.line[] < (^tParents.count[]-1)){→}
-}
+	^if(^tParents.line[] != ^tParents.count[]){
+		<li><a href="^makeQueryString[
+					$.groupid[$form:groupid]
+					$.operday[$form:operday]
+					^if($tParents.level != 0){
+						$.p[$tParents.iid]
+					}
+				]">$tParents.name</a></li>
+	}
 }
 </ul>
 
@@ -55,13 +48,8 @@ $iType(^form:type.int(0))
 }{
 	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[]]
 }
-# ^if(^form:p.int(0) == 0 && ^form:type.int(0) == 0){
-# 	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[]]
-# # ^oCalendar.printDateRange[]]
-# }
 
 <div class="transactions">
-# ^if(^form:type.int($dbo:TYPES.CHARGE) == $dbo:TYPES.CHARGE){
 ^if($iType == 0 || $iType == $dbo:TYPES.CHARGE){
 <div id="charges">^printTransactionByType[
 	$.type[$dbo:TYPES.CHARGE]
@@ -69,7 +57,6 @@ $iType(^form:type.int(0))
 	$.title2[расходов]
 ]</div>
 }
-# ^if(^form:type.int($dbo:TYPES.INCOME) == $dbo:TYPES.INCOME){
 ^if(($iType == 0 && !^form:ctid.int(0)) || $iType == $dbo:TYPES.INCOME){
 <div id="incomes">^printTransactionByType[
 	$.type[$dbo:TYPES.INCOME]
@@ -411,25 +398,8 @@ $lastOperday[]
 			<td class="actions">^if(!def $v.no_entries && !$v.isRest){^actions[$v.tEntries; ]}</td>
 		</tr>
 	}
-
-
 }
-
-
-
 </table>
-
-@getClassByType[iType]
-^if(($iType & $dbo:TYPES.INCOME) == $dbo:TYPES.INCOME){
-	$result[class="income"]
-}{
-^if(($iType & $dbo:TYPES.TRANSFER) == $dbo:TYPES.TRANSFER){
-	$result[class="transfer"]
-}{
-	$result[]
-}
-
-}
 
 
 @makeQueryString[hUrlParts][sResult;hUrlParts;k;v]
@@ -440,8 +410,6 @@ $sResult[^hUrlParts.foreach[k;v]{^if(def $v){$k=$v}{^if($k eq operday){$k=$oCale
 }{
 	$result[]	
 }
-
-
 
 @actions[tEntries;sValue;sClass][sUrl]
 $sUrl[^makeQueryString[
@@ -462,54 +430,5 @@ $sUrl[^makeQueryString[
 <a href="$sUrl" class="$sClass">$sValue</a>
 
 
-
-
-@getTransferDescription[]
-
-$hDescription[
-
-	$.[$dbo:TYPES.CHARGE][
-		$.0[
-			$.0[Передача денег в кошелек X]
-			$.1[Зачисление денег на карту]	
-		]
-		$.1[
-			$.0[Снятие наличных]
-			$.1[Перевод на карту (ушло)]	
-		]
-	]
-	$.[$dbo:TYPES.CHARGE][
-		$.0[
-			$.0[Получение денег из кошелька Y]
-			$.1[Пополнение карты наличными]	
-		]
-		$.1[
-			$.0[Снятие наличных (пришло!)]
-			$.1[Перевод с карты (пришло!)]	
-		]
-	]
-]
-
-^rem{
-	0 списание
-	1 начисление
-	0 нал
-	1 карта
-	
-	
-	000 списание нал нал 
-	001 списание нал на карту Зачисление наличных на карту (минус)
-	010 списание карта на нал Снятие наличных (-)
-	011 списание карта на карту Перевод на карту 2 (с карты 1)
-	100 пополнение нал на нал
-	101 нал на карту Пополнение наличными
-	110 карта на нал Пополнение наличных (+)
-	111 карта на карту Перевод с карты 1 (на карту 2)
-	
-	
-	0 0 - Передача наличных
-	1 0 - снятие наличных
-	0 1 пополнение карты
-}
 
 
