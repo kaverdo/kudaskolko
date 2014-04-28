@@ -112,7 +112,7 @@ $(function() {
 					// if(ui.item.label != ''){
 					// 	return false;
 					// }
-					var result = makeTextareaData(ui.item.value + " ");
+					var result = makeTextareaData(ui.item.value + " " + (ui.item.with_price == 1 ? "\n" : ""));
 					this.value = result.before + result.val + result.after;
 					setCursorAt(result.newCaretPos);
 

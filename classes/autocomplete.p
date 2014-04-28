@@ -31,7 +31,7 @@ $isSearchRequest(false)
 }
 ^if(def $sInput){
 	$sChangedInput[^changeKeyboard[$sInput]]
-	$tResult[^table::create{value	label	iid}]
+	$tResult[^table::create{value	label	iid	with_price}]
 
 	^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
 
@@ -90,7 +90,8 @@ $isSearchRequest(false)
 			SELECT
 			CONCAT(^if($isSubItem){'- ',}i.name, ' ', amount, IF(t.quantity = 1, '',concat(' / ', t.quantity))) AS value,
 					COUNT(t.amount) as cnt,
-					i.iid
+					i.iid,
+					1 AS with_price
 					FROM items i
 			LEFT JOIN transactions t ON i.iid = t.iid 
 			where (i.name = "$sInputTop" ^if(^tResultFromDB.count[] != 1 && !^u:isEqualIgnoreCase[$sInputTop;$sChangedInput]){ OR i.name = "$sChangedInput"  })
