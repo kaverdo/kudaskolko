@@ -12,6 +12,7 @@ locals
 @returnCategories[][locals]
 # ^cache[/../data/cache/json/^math:md5[$form:term]](10){
 $sInput[^form:term.lower[]]
+$sInput[^sInput.trim[]]
 $sFirst[^sInput.left(1)]
 $isCheque(false)
 $isSubItem(false)
@@ -76,6 +77,32 @@ $isSearchRequest(false)
 		COUNT(t.tid) DESC,t.operday DESC,i.name
 		}[$.limit(20)]
 	]
+	^if(!$isCheque && (^tResultFromDB.count[] == 1
+		|| ^u:isEqualIgnoreCase[$tResultFromDB.value;$sInput]
+		|| ^u:isEqualIgnoreCase[$tResultFromDB.value;$sChangedInput])){
+
+		$sInputTop[$sInput]
+		^if(^tResultFromDB.count[] == 1){
+			$sInputTop[$tResultFromDB.value]
+		}
+
+		$tTopPrices[^oSql.table{
+			SELECT
+			CONCAT(^if($isSubItem){'- ',}i.name, ' ', amount, IF(t.quantity = 1, '',concat(' / ', t.quantity))) AS value,
+					COUNT(t.amount) as cnt,
+					i.iid
+					FROM items i
+			LEFT JOIN transactions t ON i.iid = t.iid 
+			where (i.name = "$sInputTop" ^if(^tResultFromDB.count[] != 1 && !^u:isEqualIgnoreCase[$sInputTop;$sChangedInput]){ OR i.name = "$sChangedInput"  })
+			AND t.tdate > DATE_SUB(NOW(),INTERVAL 6 MONTH)
+			AND amount <> 0
+			GROUP BY t.amount
+			ORDER BY cnt desc
+			}[$.limit(3)]
+		]
+		^tResult.join[$tTopPrices]
+	}
+
 	^tResult.join[$tResultFromDB]
 	$result[^json:string[$tResult;$.table[object]]]
 
