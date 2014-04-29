@@ -77,14 +77,35 @@ $isSearchRequest(false)
 		COUNT(t.tid) DESC,t.operday DESC,i.name
 		}[$.limit(20)]
 	]
-	^if(!$isCheque && (^tResultFromDB.count[] == 1
-		|| ^u:isEqualIgnoreCase[$tResultFromDB.value;$sInput]
-		|| ^u:isEqualIgnoreCase[$tResultFromDB.value;$sChangedInput])){
+	^if(^tResultFromDB.count[] == 1
+		|| ^u:isEqualIgnoreCase[^tResultFromDB.value.trim[left;^@];$sInput]
+		|| ^u:isEqualIgnoreCase[^tResultFromDB.value.trim[left;^@];$sChangedInput]){
 
 		$sInputTop[$sInput]
 		^if(^tResultFromDB.count[] == 1){
 			$sInputTop[$tResultFromDB.value]
 		}
+
+		^if($isCheque || ^tResultFromDB.value.left(1) eq ^@){
+
+		$tCheckTemplate[^oSql.table{
+			SELECT
+			CONCAT('@', cti.name, ' — Повторить чек') AS label,
+			CONCAT('@', cti.name,  '\n', 
+				GROUP_CONCAT(CONCAT(ti.name, ' ',
+
+				 IF(t.quantity = 1, t.amount, ROUND(t.amount/t.quantity, 2)), ' * ') SEPARATOR '\n')) AS value
+			FROM transactions t 
+			LEFT JOIN transactions ct ON ct.tid = t.ctid
+			LEFT JOIN items ti ON ti.iid = t.iid
+			LEFT JOIN items cti ON cti.iid = ct.iid
+			WHERE ct.iid = $tResultFromDB.iid AND ct.type = 65
+			GROUP BY t.ctid
+			ORDER BY t.operday DESC
+			}[$.limit(1)]
+		]
+		^tResult.join[$tCheckTemplate]
+		}{
 
 		$tTopPrices[^oSql.table{
 			SELECT
@@ -102,6 +123,10 @@ $isSearchRequest(false)
 			}[$.limit(3)]
 		]
 		^tResult.join[$tTopPrices]
+		^tResult.join[^table::create{label	value
+$tResultFromDB.value — Найти записи	$tResultFromDB.value .}
+		]
+		}
 	}
 
 	^tResult.join[$tResultFromDB]

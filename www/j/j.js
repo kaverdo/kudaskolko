@@ -115,7 +115,9 @@ $(function() {
 					var result = makeTextareaData(ui.item.value + " " + (ui.item.with_price == 1 ? "\n" : ""));
 					this.value = result.before + result.val + result.after;
 					setCursorAt(result.newCaretPos);
-
+					if (ui.item.label && ui.item.label != 'undefined' && ui.item.value != ui.item.label) {
+						ajaxPreview();
+					}
 					return false;
 				}
 		})
@@ -140,29 +142,22 @@ $(function() {
 							}
 							window.location.href = '/?p=' + item.iid;
 								return false;
-					 		// e.preventDefault();
-							// cache = {};
-							// markAsNotListed(1234);
-					 		// $(this).hide();
 					 });
 					var $anchor2 = $( "<div ><u>1</u></div>" )
-						// .addClass("search-link")
 						.attr("href", '/?iid=' + item.iid )
 						.hover(function(e){
-							// $(this).parent().css("background","red");
 						})
 						.click(function(e){
-							// window.location.href = '/?p=test' + item.iid;
-								return false;
-
-					 		// e.preventDefault();
-							// cache = {};
-							// markAsNotListed(1234);
-					 		// $(this).hide();
+						return false;
 					 });
-						var t = extractCurrent( $( "#transactions" ).val() );
-						var matcher = new RegExp("(\\s+|^|@)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
-  						var resultValue = item.value.replace(matcher, "$1<i>$2</i>");
+					var t = extractCurrent( $( "#transactions" ).val() );
+					var matcher = new RegExp("(\\s+|^|@)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
+						
+				 	var resultValue = item.value;
+					if (item.label && item.label != 'undefined') {
+						resultValue = item.label;
+					} 
+					resultValue = resultValue.replace(matcher, "$1<i>$2</i>");
 					return $( "<li>" )
 					.append( $( "<a>" )
 						.append($anchor)
@@ -171,8 +166,14 @@ $(function() {
 						 )
 					.appendTo( ul );
 				} else {
+				 	var resultValue = item.value;
+					if (item.label && item.label != 'undefined') {
+						resultValue = item.label;
+					} 
+					resultValue = resultValue.replace(matcher, "$1<i>$2</i>");
+
 					return $( "<li>" )
-					.append( "<a><div class='value'>" + item.value + "</div></a>" )
+					.append( "<a><div class='value'>" + resultValue + "</div></a>" )
 					.appendTo( ul );
 				}
 

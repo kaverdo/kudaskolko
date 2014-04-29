@@ -704,7 +704,7 @@ $result[^regex::create[
 		\s*
 
 		(?:
-			([\d\.,]+)  # 7 dQuantity || || sPrice || quantity
+			([\d\.,]+)?  # 7 dQuantity || || sPrice || quantity
 		)
 	\s*)?
 	|
