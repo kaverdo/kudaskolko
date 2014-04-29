@@ -88,6 +88,7 @@ $isSearchRequest(false)
 
 		^if($isCheque || ^tResultFromDB.value.left(1) eq ^@){
 
+		^oSql.void{SET SESSION group_concat_max_len = 1000000}
 		$tCheckTemplate[^oSql.table{
 			SELECT
 			CONCAT('@', cti.name, ' — Повторить чек') AS label,
