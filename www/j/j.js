@@ -123,17 +123,24 @@ $(function() {
 		})
 		if($( "#transactions" ) && $( "#transactions" ).data( "ui-autocomplete" )) {
 			$( "#transactions" ).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+				var t = extractCurrent( $( "#transactions" ).val() );
+				var splitted = t.split( /\s+/ );
+				var result = "";
+				for (var i = splitted.length - 1; i >= 0; i--) {
+						result += "|";
+					result += $.ui.autocomplete.escapeRegex(splitted[i]);
+				};
 
+				var matcher = new RegExp("(\\s+|^|@|\\(|\\-)(" + $.ui.autocomplete.escapeRegex(t) + result+")", "ig" );
+						
 				if(item.iid && item.iid != 'undefined'){
 					var $anchor = $( "<div ><u>Все записи</u></div>" )
 						.addClass("search-link")
 						// .attr("href", '/?iid=' + item.iid )
 						.hover(function(e){
 							$(this).parent().addClass("hover-search");
-							// $(this).parent().css("background","red");
 						},function(e){
 							$(this).parent().removeClass("hover-search");
-							// $(this).parent().css("background","red");
 						}).click(function(e){
 							var result = makeTextareaData("");
 							if(!result.before && !result.after){
@@ -150,9 +157,7 @@ $(function() {
 						.click(function(e){
 						return false;
 					 });
-					var t = extractCurrent( $( "#transactions" ).val() );
-					var matcher = new RegExp("(\\s+|^|@)("+$.ui.autocomplete.escapeRegex(t)+")", "ig" );
-						
+
 				 	var resultValue = item.value;
 					if (item.label && item.label != 'undefined') {
 						resultValue = item.label;

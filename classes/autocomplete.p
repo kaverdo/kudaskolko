@@ -8,141 +8,148 @@ dbo.p
 @OPTIONS
 locals
 
-
 @returnCategories[][locals]
-# ^cache[/../data/cache/json/^math:md5[$form:term]](10){
-$sInput[^form:term.lower[]]
-$sInput[^sInput.trim[]]
+$sOriginalInput[$form:term]
+$sInput[^sOriginalInput.lower[]]
 $sFirst[^sInput.left(1)]
-$isCheque(false)
-$isSubItem(false)
-$isSearchRequest(false)
-^if($sFirst eq "@" || $sFirst eq "^""){
-	$isCheque(true)
-	$sInput[^sInput.trim[left;@"]]
-}
-^if($sFirst eq "-"){
-	$isSubItem(true)
-	$sInput[^sInput.trim[left;- ]]
-}
-^if($sFirst eq "?"){
-	$isSearchRequest(true)
-	$sInput[^sInput.trim[left;? ]]
-}
+$isCheque($sFirst eq "@" || $sFirst eq "^"")
+$isSubItem($sFirst eq "-")
+$sInput[^trimPrefixes[$sInput]]
+
 ^if(def $sInput){
-	$sChangedInput[^changeKeyboard[$sInput]]
 	$tResult[^table::create{value	label	iid	with_price}]
+	$sChangedInput[^changeKeyboard[$sInput]]
 
 	^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
 
 	^addDates[$tResult;$sInput]
 	
-	$tResultFromDB[^oSql.table{
-		SELECT
+	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput]]
 
-		^if($isSubItem){
-			CONCAT('- ',i.name)
-		}{
-			CONCAT(IF(t.type & $dbo:TYPES.CHEQUE <> 0,'@',''), i.name)
-		} AS value,
-		i.iid
+	^if($tResultFromDB){
 
-		FROM items i
-		LEFT JOIN transactions t ON i.iid = t.iid
-		
-		WHERE
-		i.user_id = $dbo:USERID AND
-		^if($isCheque){
-			t.type & $dbo:TYPES.CHEQUE = $dbo:TYPES.CHEQUE
-			AND
-		}
-		(
-			(i.name like "$sInput%"
-			OR i.name like "% $sInput%"
-			OR i.name like "%-$sInput%"
-			)
-		^if($sChangedInput ne $sInput){
-			OR
-			(i.name like "$sChangedInput%" 
-				OR i.name like "% $sChangedInput%"
-				OR i.name like "%-$sChangedInput%"
-			)
-		}
-		)
-		GROUP BY i.name
-		ORDER BY
-		i.type DESC,
-		ABS(STRCMP(i.name,"$sInput")),
-		ABS(STRCMP(LEFT(i.name, CHAR_LENGTH("$sInput")),"$sInput")),
-		COUNT(t.tid) DESC,t.operday DESC,i.name
-		}[$.limit(20)]
-	]
-	^if(^tResultFromDB.count[] == 1
-		|| ^u:isEqualIgnoreCase[^tResultFromDB.value.trim[left;^@];$sInput]
-		|| ^u:isEqualIgnoreCase[^tResultFromDB.value.trim[left;^@];$sChangedInput]){
-
-		$sInputTop[$sInput]
-		^if(^tResultFromDB.count[] == 1){
-			$sInputTop[$tResultFromDB.value]
+		$isFirstEntryFullTyped(^sOriginalInput.trim[] eq $tResultFromDB.value)
+		^if(!$isFirstEntryFullTyped){
+			^tResult.join[$tResultFromDB;$.limit(1)]
 		}
 
-		^if($isCheque || ^tResultFromDB.value.left(1) eq ^@){
+		$sTrimmedFirstEntry[^trimPrefixes[$tResultFromDB.value]]
 
-		^oSql.void{SET SESSION group_concat_max_len = 1000000}
-		$tCheckTemplate[^oSql.table{
-			SELECT
-			CONCAT('@', cti.name, ' — Повторить чек') AS label,
-			CONCAT('@', cti.name,  '\n', 
-				GROUP_CONCAT(CONCAT(ti.name, ' ',
-
-				 IF(t.quantity = 1, t.amount, ROUND(t.amount/t.quantity, 2)), ' * ') SEPARATOR '\n')) AS value
-			FROM transactions t 
-			LEFT JOIN transactions ct ON ct.tid = t.ctid
-			LEFT JOIN items ti ON ti.iid = t.iid
-			LEFT JOIN items cti ON cti.iid = ct.iid
-			WHERE ct.iid = $tResultFromDB.iid AND ct.type = 65
-			GROUP BY t.ctid
-			ORDER BY t.operday DESC
-			}[$.limit(1)]
-		]
-		^tResult.join[$tCheckTemplate]
-		}{
-
-		$tTopPrices[^oSql.table{
-			SELECT
-			CONCAT(^if($isSubItem){'- ',}i.name, ' ', amount, IF(t.quantity = 1, '',concat(' / ', t.quantity))) AS value,
-					COUNT(t.amount) as cnt,
-					i.iid,
-					1 AS with_price
-					FROM items i
-			LEFT JOIN transactions t ON i.iid = t.iid 
-			where (i.name = "$sInputTop" ^if(^tResultFromDB.count[] != 1 && !^u:isEqualIgnoreCase[$sInputTop;$sChangedInput]){ OR i.name = "$sChangedInput"  })
-			AND t.tdate > DATE_SUB(NOW(),INTERVAL 6 MONTH)
-			AND amount <> 0
-			GROUP BY t.amount
-			ORDER BY cnt desc
-			}[$.limit(3)]
-		]
-		^tResult.join[$tTopPrices]
-		^tResult.join[^table::create{label	value
-$tResultFromDB.value — Найти записи	$tResultFromDB.value .}
-		]
+		^if(^tResultFromDB.count[] == 1 || ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sInput.trim[]]
+			|| ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sChangedInput.trim[]]){
+			^if(^tResultFromDB.value.left(1) eq ^@){
+				^tResult.join[^getChecks[$tResultFromDB.iid]]
+			}{
+				^tResult.join[^getTopPrices[$isSubItem;$tResultFromDB.iid]]
+				^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
+			}
 		}
+		^tResult.join[$tResultFromDB;$.offset(1)]
 	}
-
-	^tResult.join[$tResultFromDB]
 	$result[^json:string[$tResult;$.table[object]]]
-
 }{
 	$result[^json:string[^table::create{};$.table[object]]]
 }
 
+
+@getEntries[isSubItem;isCheque;sInput;sChangedInput]
+$result[^oSql.table{
+	SELECT
+
+	^if($isSubItem){
+		CONCAT('- ',i.name)
+	}{
+		CONCAT(IF(t.type & $dbo:TYPES.CHEQUE <> 0,'@',''), i.name)
+	} AS value,
+	i.iid
+
+	FROM items i
+	LEFT JOIN transactions t ON i.iid = t.iid
+	
+	WHERE
+	i.user_id = $dbo:USERID AND
+	^if($isCheque){
+		t.type & $dbo:TYPES.CHEQUE = $dbo:TYPES.CHEQUE
+		AND
+	}
+	(
+		(
+			^splitInput[$sInput;i.name]
+		)
+		^if($sChangedInput ne $sInput){
+			OR
+			(
+				^splitInput[$sChangedInput;i.name]
+			)
+		}
+	)
+	GROUP BY i.name
+	ORDER BY
+	i.type DESC,
+	ABS(STRCMP(i.name,"$sInput")),
+	ABS(STRCMP(LEFT(i.name, CHAR_LENGTH("$sInput")),"$sInput")),
+	COUNT(t.tid) DESC,t.operday DESC,i.name
+	}[$.limit(20)]
+]
+
+@getChecks[iid]
+^oSql.void{SET SESSION group_concat_max_len = 1000000}
+$result[^oSql.table{
+	SELECT
+	CONCAT('@', cti.name, ' — Повторить чек') AS label,
+	CONCAT('@', cti.name,  '\n', 
+		GROUP_CONCAT(CONCAT(ti.name, ' ',
+
+		 IF(t.quantity = 1, t.amount, ROUND(t.amount/t.quantity, 2)), ' * ') SEPARATOR '\n')) AS value
+	FROM transactions t 
+	LEFT JOIN transactions ct ON ct.tid = t.ctid
+	LEFT JOIN items ti ON ti.iid = t.iid
+	LEFT JOIN items cti ON cti.iid = ct.iid
+	WHERE
+	ct.iid = $iid
+	AND ct.type = 65
+	GROUP BY t.ctid
+	ORDER BY t.operday DESC
+	}[$.limit(1)]
+]
+
+@getTopPrices[isSubItem;iid]
+$result[^oSql.table{
+	SELECT
+	CONCAT(
+		^if($isSubItem){'- ',}
+		i.name,
+		' ',
+		IF(t.quantity = 1,
+			t.amount,
+			CONCAT(
+					ROUND(t.amount/t.quantity,
+						IF(ROUND(t.amount/t.quantity, 0) = t.amount/t.quantity, 0, 2))
+				, ' * ', t.quantity)
+		)
+	) AS value,
+	COUNT(t.amount) as cnt,
+	i.iid,
+	1 AS with_price
+	FROM items i
+	LEFT JOIN transactions t ON i.iid = t.iid 
+	WHERE 
+	i.user_id = $dbo:USERID
+	AND i.iid = $iid
+	AND t.tdate > DATE_SUB(NOW(),INTERVAL 6 MONTH)
+	AND amount <> 0
+	GROUP BY t.amount
+	ORDER BY cnt desc
+	}[$.limit(3)]
+]
+
+
 @addFuzzyDates[tResult;sFirst;sInput;sChangedInput]
-$sDates[свпз]
-^if(^u:contains[$sDates;$sFirst]){
+$sDatesFirstChars[свпз]
+^if(^u:contains[$sDatesFirstChars;$sFirst]){
 	^tResult.join[^getFuzzyDatesByFirst[$sInput]]
 }{
-	^if(^u:contains[$sDates;^sChangedInput.left(1)]){
+	^if(^u:contains[$sDatesFirstChars;^sChangedInput.left(1)]){
 		^tResult.join[^getFuzzyDatesByFirst[$sChangedInput]]
 	}
 }
@@ -166,6 +173,35 @@ $tSplitted[^sInput.split[ ;h]]
 	}
 }
 
+
+
+@splitInput[sInput;sFieldName]
+$tSplitted[^sInput.split[ ]]
+
+^if(^tSplitted.count[] == 1){
+	$result[
+			(
+			$sFieldName = '^sInput.trim[]'
+			OR $sFieldName like '$sInput%'
+			OR $sFieldName like '% $sInput%'
+			OR $sFieldName like '%-$sInput%'
+			OR $sFieldName like '%($sInput%'
+			)
+	]
+
+}{
+	$result[
+		^tSplitted.menu{
+			(
+			$sFieldName like '$tSplitted.piece%'
+			OR $sFieldName like '% $tSplitted.piece%'
+			OR $sFieldName like '%-$tSplitted.piece%'
+			OR $sFieldName like '%($tSplitted.piece%'
+			)
+		}[AND]
+	]
+	
+}
 
 @changeKeyboard[sTranslit]
 $result[^sTranslit.replace[^table::create{from	to
@@ -229,3 +265,6 @@ $result[^selectFrom[$sFirst;^table::create{value
 сегодня
 завтра
 послезавтра}]]
+
+@trimPrefixes[sInput]
+$result[^sInput.trim[left;^@ -]]
