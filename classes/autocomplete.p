@@ -9,8 +9,8 @@ dbo.p
 locals
 
 @returnCategories[][locals]
-$sOriginalInput[$form:term]
-$sInput[^sOriginalInput.lower[]]
+$sOriginalInput[^form:term.lower[]]
+$sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
 $isCheque($sFirst eq "@" || $sFirst eq "^"")
 $isSubItem($sFirst eq "-")
@@ -28,7 +28,7 @@ $sInput[^trimPrefixes[$sInput]]
 
 	^if($tResultFromDB){
 
-		$isFirstEntryFullTyped(^sOriginalInput.trim[] eq $tResultFromDB.value)
+		$isFirstEntryFullTyped(^sOriginalInput.trim[] eq ^tResultFromDB.value.lower[])
 		^if(!$isFirstEntryFullTyped){
 			^tResult.join[$tResultFromDB;$.limit(1)]
 		}
@@ -180,23 +180,38 @@ $tSplitted[^sInput.split[ ]]
 
 ^if(^tSplitted.count[] == 1){
 	$result[
-			(
-			$sFieldName = '^sInput.trim[]'
-			OR $sFieldName like '$sInput%'
-			OR $sFieldName like '% $sInput%'
-			OR $sFieldName like '%-$sInput%'
-			OR $sFieldName like '%($sInput%'
-			)
+		(
+		$sFieldName = '^sInput.trim[]'
+		OR $sFieldName like '$sInput%'
+		OR $sFieldName like '% $sInput%'
+		OR $sFieldName like '%-$sInput%'
+		OR $sFieldName like '%($sInput%'
+		)
 	]
 
 }{
+	$tReSplitted[^table::create{piece}]
+	$sTemp[]
+	^tSplitted.menu{
+		^if(^tSplitted.line[] == 1){
+			$sTemp[$tSplitted.piece]
+		}{
+			^if(^tSplitted.piece.int(0)){
+				$sTemp[$sTemp $tSplitted.piece]
+			}{
+				^tReSplitted.append{$sTemp}
+				$sTemp[$tSplitted.piece]
+			}
+		}
+	}
+	^tReSplitted.append{$sTemp}
 	$result[
-		^tSplitted.menu{
+		^tReSplitted.menu{
 			(
-			$sFieldName like '$tSplitted.piece%'
-			OR $sFieldName like '% $tSplitted.piece%'
-			OR $sFieldName like '%-$tSplitted.piece%'
-			OR $sFieldName like '%($tSplitted.piece%'
+			$sFieldName like '$tReSplitted.piece%'
+			OR $sFieldName like '% $tReSplitted.piece%'
+			OR $sFieldName like '%-$tReSplitted.piece%'
+			OR $sFieldName like '%($tReSplitted.piece%'
 			)
 		}[AND]
 	]
