@@ -212,7 +212,7 @@ $(function() {
 				position: { my : "left top", at: "left bottom" },
 
 				source: function( request, response ) {
-					$.getJSON( "/?action=json", {
+					$.getJSON( "/?action=json&move=true", {
 						term: extractLast( request.term )
 					}, response );
 
@@ -236,6 +236,9 @@ $(function() {
 					// add placeholder to get the comma-and-space at the end
 					// terms.push( "" );
 					this.value = terms.join( ", " );
+					enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"),'');
+					enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"), $('#IDNewCategoryName').attr('oldValue'));
+
 					return false;
 				}
 			});
@@ -332,9 +335,9 @@ function enableDisableControl2(control,isDisabled) {
 }
 
 function enableDisableControl(input,control,originValue) {
-	var inputVal = input.val();
+	var inputVal = input.val().trim();
 	var isEmpty = inputVal == '';
-	var isNotModified = inputVal == originValue;
+	var isNotModified = inputVal == originValue.trim();
 	if(isEmpty || isNotModified)
 		control.attr("disabled",true);
 	else
@@ -344,6 +347,9 @@ function enableDisableControl(input,control,originValue) {
 function enableDisableControlAll(input,control,originValue) {
 	enableDisableControl(input,control,originValue);
 	input.keyup(function(){
+		enableDisableControl(input,control,originValue);
+	});
+	input.change(function(){
 		enableDisableControl(input,control,originValue);
 	});
 }
@@ -597,6 +603,7 @@ $(function() {
 	// });
 
 	enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"),'');
+	enableDisableControlAll($('#IDNewCategory'),$("#actionMove input[type='submit']"), $('#IDNewCategoryName').attr('oldValue'));
 
 	enableDisableControlAll($('#IDNewCategoryName'),
 		$("#actionRename input[type='submit']"),

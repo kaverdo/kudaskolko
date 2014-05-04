@@ -126,57 +126,89 @@ $iLastInsert	^hParams.pid.int(0)		^hParams.type.int($dbo:TYPES.CHARGE)}]
 }
 $result[^hash::create[$hResult]]
 
+@deleteCategoriesIfEmpty[hParams][locals]
+$hParams[^hash::create[$hParams]]
+
+^if($hParams.tData && $hParams.tData is table){
+	^hParams.tData.menu{
+		^deleteCategoryIfEmpty[
+			$.iid(^hParams.tData.iid.int(0))
+		]
+	}
+}
+
+
+@deleteCategoryIfEmpty[hParams][locals]
+$hParams[^hash::create[$hParams]]
+
+$iCountOfEntriesWithSameCategory[^oSql.int{
+	SELECT COUNT(*)
+	FROM transactions t 
+	LEFT JOIN nesting_data nd ON nd.iid = t.iid
+	WHERE nd.pid = ^hParams.iid.int(0)
+		AND t.user_id = $USERID
+		AND nd.user_id = $USERID
+}]
+
+^if($iCountOfEntriesWithSameCategory == 0){
+	^dbo:deleteItem[$.iid(^hParams.iid.int(0))]
+}
+
+
 @deleteTransaction[hParams][locals]
 $hParams[^hash::create[$hParams]]
-^if(^hParams.isDeleteEmptyCategories.int(0)){
-
-# удаление опустошенной категории	
-# 	$tItemData[^oSql.int{
-# 		SELECT iid,alias_id FROM transactions WHERE tid = ^hParams.tid.int(0)
-# 	}]
-
-# 	^dbo:rebuildNestingDataLocal[
-# 		$.iid()
-# 	]
-}
 
 ^if(^hParams.isDeleteCheque.int(0)){
 
-	$iChequeTid(^oSql.int{SELECT ctid FROM transactions WHERE tid = ^hParams.tid.int(0)}[
+	$tCheck[^oSql.table{SELECT
+		t.ctid,
+		ct.iid
+		FROM transactions t
+		LEFT JOIN transactions ct ON ct.tid = t.ctid
+		WHERE t.tid = ^hParams.tid.int(0)
+		AND t.user_id = $USERID}[
 		$.limit(1)
-		$.default(0)
-		])
-	^if($iChequeTid != 0){
-		^oSql.void{
-		DELETE FROM transactions 
-		WHERE 
-			(ctid = $iChequeTid OR tid = $iChequeTid)
+	]]
+	^if($tCheck && ^tCheck.ctid.int(0)){
+
+		$tItemsToDelete[^oSql.table{
+			SELECT DISTINCT iid
+			FROM transactions 
+			WHERE 
+			(ctid = ^tCheck.ctid.int(0) OR tid = ^tCheck.ctid.int(0))
 			AND user_id = $USERID
-		}
+			}]
+
+		^dbo:_deleteTransactions[$.ctid(^tCheck.ctid.int(0))]
+		^dbo:deleteCategoriesIfEmpty[$.tData[^table::create[$tItemsToDelete]]]
 	}{
-		^oSql.void{
-		DELETE FROM transactions 
-		WHERE 
-			tid = ^hParams.tid.int(0)
-			AND user_id = $USERID
-		}
+		^dbo:_deleteTransactions[$.tid(^hParams.tid.int(0))]
+		^dbo:deleteCategoryIfEmpty[$.iid(^hParams.iid.int(0))]
 	}
-
-
 }{
-	^oSql.void{
-	DELETE FROM transactions 
-	WHERE 
-		tid = ^hParams.tid.int(0)
-		AND user_id = $USERID
+	^dbo:_deleteTransactions[$.tid(^hParams.tid.int(0))]
+	^dbo:deleteCategoryIfEmpty[$.iid(^hParams.iid.int(0))]
+}
+
+@_deleteTransactions[hParams]
+$hParams[^hash::create[$hParams]]
+^oSql.void{
+DELETE FROM transactions 
+WHERE 
+	(
+	^if(^hParams.ctid.int(0)){
+		ctid = ^hParams.ctid.int(0)
+		OR 
 	}
+	tid = ^hParams.tid.int(^hParams.ctid.int(0))
+	)
+	AND user_id = $USERID
 }
 
 
 @deleteItem[hParams]
 $hParams[^hash::create[$hParams]]
 ^if(^hParams.iid.int(0)){
-
 	^oSql.void{
 		DELETE FROM items 
 		WHERE iid = ^hParams.iid.int(0)
@@ -184,6 +216,39 @@ $hParams[^hash::create[$hParams]]
 	}
 
 	^rebuildNestingDataLocal[$.iid(^hParams.iid.int(0))]
+}
+
+@moveCategory[hParams][locals]
+$hParams[^hash::create[$hParams]]
+$isParentConflict(^oSql.int{
+	SELECT COUNT(*) FROM nesting_data
+	WHERE pid = ^hParams.iid.int(0)
+	AND iid = ^hParams.pid.int(0)
+	AND user_id = $USERID
+})
+
+^if($isParentConflict == 0){
+	$iPreviousPID(^oSql.int{
+		SELECT pid
+		FROM items
+		WHERE iid = ^hParams.iid.int(0)
+		AND user_id = $USERID
+		})
+
+	^oSql.void{
+		UPDATE items SET pid = ^hParams.pid.int(0)
+		WHERE iid = ^hParams.iid.int(0)
+		AND user_id = $USERID
+	}
+
+	^dbo:rebuildNestingDataLocal[
+		$.iid(^hParams.iid.int(0))
+		$.pid(^hParams.pid.int(0))
+	]
+
+	^dbo:deleteCategoryIfEmpty[
+		$.iid($iPreviousPID)
+	]
 }
 
 

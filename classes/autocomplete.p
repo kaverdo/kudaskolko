@@ -9,6 +9,7 @@ dbo.p
 locals
 
 @returnCategories[][locals]
+$isMove(def $form:move)
 $sOriginalInput[^form:term.lower[]]
 $sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
@@ -20,9 +21,10 @@ $sInput[^trimPrefixes[$sInput]]
 	$tResult[^table::create{value	label	iid	with_price}]
 	$sChangedInput[^changeKeyboard[$sInput]]
 
-	^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
-
-	^addDates[$tResult;$sInput]
+	^if(!$isMove){
+		^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
+		^addDates[$tResult;$sInput]
+	}
 	
 	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput]]
 
@@ -33,15 +35,17 @@ $sInput[^trimPrefixes[$sInput]]
 			^tResult.join[$tResultFromDB;$.limit(1)]
 		}
 
-		$sTrimmedFirstEntry[^trimPrefixes[$tResultFromDB.value]]
+		^if(!$isMove){
+			$sTrimmedFirstEntry[^trimPrefixes[$tResultFromDB.value]]
 
-		^if(^tResultFromDB.count[] == 1 || ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sInput.trim[]]
-			|| ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sChangedInput.trim[]]){
-			^if(^tResultFromDB.value.left(1) eq ^@){
-				^tResult.join[^getChecks[$tResultFromDB.iid]]
-			}{
-				^tResult.join[^getTopPrices[$isSubItem;$tResultFromDB.iid]]
-				^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
+			^if(^tResultFromDB.count[] == 1 || ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sInput.trim[]]
+				|| ^u:isEqualIgnoreCase[$sTrimmedFirstEntry;^sChangedInput.trim[]]){
+				^if(^tResultFromDB.value.left(1) eq ^@){
+					^tResult.join[^getChecks[$tResultFromDB.iid]]
+				}{
+					^tResult.join[^getTopPrices[$isSubItem;$tResultFromDB.iid]]
+					^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
+				}
 			}
 		}
 		^tResult.join[$tResultFromDB;$.offset(1)]
