@@ -125,7 +125,7 @@ $result[$sBody]
 </div>
 <div class="body">$sBody</div>
 # </div>
-^counter[]
+# ^counter[]
 </body>
 </html>
 
