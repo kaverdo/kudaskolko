@@ -335,9 +335,10 @@ function enableDisableControl2(control,isDisabled) {
 }
 
 function enableDisableControl(input,control,originValue) {
-	var inputVal = input.val().trim();
+	var inputVal = ((input.val() && input.val() != 'undefined') ? input.val().trim() : '');
+	var originVal = ((originVal && originVal != 'undefined') ? originVal.trim() : '');
 	var isEmpty = inputVal == '';
-	var isNotModified = inputVal == originValue.trim();
+	var isNotModified = inputVal == originVal;
 	if(isEmpty || isNotModified)
 		control.attr("disabled",true);
 	else
