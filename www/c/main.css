@@ -455,8 +455,11 @@ a.day {
   .transactions #incomes,
   .transactions #charges {
     float: left;
-    margin: 0 4em 2em 0;
-    max-width: 50%; }
+    padding: 0 4em 2em 0;
+    width: 50%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -box-sizing: border-box; }
     .iemobile .transactions #incomes, .iemobile
     .transactions #charges {
       float: none;
@@ -484,6 +487,14 @@ a.day {
   font-size: 130%;
   /*margin-left: -0.5em;*/
   border-collapse: collapse;
+  /*	tr:hover{
+  //		td{
+  //			background: #EDFAC2;
+  //		}
+  		td.actions div{
+  			visibility: visible;
+  		}
+  	}*/
   /*	tr:hover .date {
   #		visibility: visible;
   		opacity: 1;
@@ -547,7 +558,7 @@ a.day {
         color: #9ebd2e; }
     .grid td .expander {
       color: #999 !important;
-      border: none!important;
+      border: none !important;
       position: absolute;
       left: -0.75em;
       padding: 0 0.1em; }
@@ -555,7 +566,7 @@ a.day {
         color: #666 !important; }
     .grid td .expander_plain {
       color: #999 !important;
-      border: none!important;
+      border: none !important;
       padding: 0 0.1em; }
       .grid td .expander_plain:hover {
         color: #666 !important; }
@@ -614,7 +625,7 @@ a.day {
       padding: 0.1em 0.2em;
       margin: 0.2em; }
     .grid td.quantity {
-      color: #6B6D55;
+      color: #6b6d55;
       padding: 0.5em;
       text-align: right; }
     .grid td.value {
