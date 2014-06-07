@@ -418,7 +418,7 @@ function ajaxPreview(text){
 		hasAjaxPreviewHTTPError = true;
 		$("#IDAjaxPreview .dataContainer").html("Ошибка подключения к серверу, попробуйте повторить ("+textStatus+")");
 		$("#IDAjaxPreview").removeClass("hidden");
-		// controlsPreview.attr("disabled",false);
+		controlsPreview.attr("disabled",false);
 	});
 
 }
