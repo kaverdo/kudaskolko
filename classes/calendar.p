@@ -419,9 +419,11 @@ FROM transactions t
 	}
 WHERE	
 	^if($data.pid){
-		nd.pid = $data.pid AND
+		nd.pid = $data.pid
+	}{
+		(i.type = $dbo:TYPES.CHARGE OR i.type = $dbo:TYPES.INCOME)
 	}
-	t.is_displayed = 1
+	AND t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
