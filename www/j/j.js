@@ -117,6 +117,8 @@ $(function() {
 					setCursorAt(result.newCaretPos);
 					if (ui.item.label && ui.item.label != 'undefined' && ui.item.value != ui.item.label) {
 						ajaxPreview();
+					} else if (ui.item.with_price && ui.item.with_price == 1) {
+						ajaxPreview();
 					}
 					return false;
 				}
@@ -410,8 +412,9 @@ function ajaxPreview(text){
 		$("#IDAjaxPreview").removeClass("hidden");
 		controlsPreview.attr("disabled",true);
 		hasAjaxPreviewFormatError = $("#IDAjaxPreview .dataContainer .grid").hasClass("hasError");
+		
+		controlsSubmit.attr("disabled", hasAjaxPreviewFormatError);
 		if (hasAjaxPreviewFormatError){
-			controlsSubmit.attr("disabled",true);
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
 		}
 	}).fail(function(jqXHR, textStatus) {
