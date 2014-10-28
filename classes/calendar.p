@@ -202,7 +202,7 @@ $isActiveMonth(false)
 $dtPreviousDate[]
 ^hMonths.foreach[k;v]{
 
-^if(def $dtPreviousDate && $v - $dtPreviousDate > 31){
+^if(def $dtPreviousDate && $v - $dtPreviousDate > 32){
 		<div class="month">
  			<div class="bar-container empty">
 #		<div class="bard" style="height: 0"></div>
