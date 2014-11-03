@@ -413,7 +413,6 @@ SELECT
 	nd.type
 FROM transactions t
 	LEFT JOIN nesting_data nd ON nd.iid = t.iid
-	LEFT JOIN items i ON nd.pid = i.iid
 	^if($data.ciid){
 		LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 	}
@@ -427,7 +426,6 @@ WHERE
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
-	AND nd.pid <> nd.iid
 	^if($data.ciid){
 		AND cheque.iid = $data.ciid
 	}
