@@ -413,6 +413,7 @@ SELECT
 	nd.type
 FROM transactions t
 	LEFT JOIN nesting_data nd ON nd.iid = t.iid
+	LEFT JOIN items i ON nd.pid = i.iid
 	^if($data.ciid){
 		LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 	}
