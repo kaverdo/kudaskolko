@@ -886,7 +886,8 @@ SELECT
 	transaction_item.name,
 	t.amount,
 	t.quantity,
-	t.operday
+	t.operday,
+	t.iid
 FROM items parent
 LEFT JOIN nesting_data nd ON nd.pid = parent.iid 
 LEFT JOIN transactions t ON t.iid = nd.iid

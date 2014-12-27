@@ -185,7 +185,14 @@ $hTransactions[^hash::create[$hTransactions]]
 				</tr>
 			}
 			<tr class="date">
-			<td class="name"><h2><span>^u:getDateRange[$v.dtTransDate]</span></h2></td>
+			^if(def $v.iid && def $v.dtTransDate){
+				<td class="name"><h2>
+				<span><a href="/?operday=^u:getOperdayByDate[$v.dtTransDate]&p=${v.iid}&expanded=1"
+				>^u:getDateRange[$v.dtTransDate]</a></span>
+				</h2></td>
+			}{
+				<td class="name"><h2><span>^u:getDateRange[$v.dtTransDate]</span></h2></td>
+			}
 			<td></td>
 			<td></td>
 			<td></td>
@@ -243,6 +250,7 @@ $hTransactions[^hash::create[$hTransactions]]
 					$sClassName[$sClassName subtransaction]
 				}
 				<tr class="$sClassName">
+		
 				<td class="name">^if($v.isSubTransaction){&minus^; }$v.sName</td>
 				<td class="quantity">^if($v.dQuantity != 1){^u:formatQuantity($v.dQuantity)}</td>
 				<td class="oldvalue">
@@ -339,6 +347,7 @@ $hResult.dQuantity($tTransactions.quantity)
 $hResult.dAmount($tTransactions.amount)
 $hResult.dAmountWithoutDisc($tTransactions.amount)
 $hResult.dtTransDate[^u:stringToDate[$tTransactions.operday]]
+$hResult.iid[$tTransactions.iid]
 ^aTransactions.add[$hResult]
 }
 
