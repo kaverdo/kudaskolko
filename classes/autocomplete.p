@@ -121,16 +121,23 @@ $result[^oSql.table{
 @addPopularGoodsForPrices[tResult;sInput]
 $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
 ^if(def $tParts.1 && ^tParts.1.int(0) != 0){
-	$popularPrices[^oSql.table{
+	$tPopularPrices[^oSql.table{
 		SELECT
 		CONCAT(
 			i.name,
 			' ',
-			'$tParts.1'
 			^if(def $tParts.2){
-				,
-			' * ',
-			'$tParts.2'
+				'$tParts.1',
+				' * ',
+				'$tParts.2'
+			}{
+				IF(t.quantity = 1,
+					'$tParts.1',
+					CONCAT(
+						ROUND(t.amount/t.quantity,
+							IF(ROUND(t.amount/t.quantity, 0) = t.amount/t.quantity, 0, 2))
+						, ' * ', t.quantity)
+				)
 			}
 		) AS value,
 		COUNT(t.amount) as cnt,
@@ -142,12 +149,12 @@ $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
 		i.user_id = $dbo:USERID
 		AND t.amount = ^tParts.1.int(0)
 		AND t.tdate > DATE_SUB(NOW(), INTERVAL 4 MONTH)
-		GROUP BY i.iid
+		GROUP BY i.iid, t.quantity
 		ORDER BY cnt desc
 		}[$.limit(5)]
 	]
-	^if($popularPrices){
-		^tResult.join[$popularPrices]
+	^if($tPopularPrices){
+		^tResult.join[$tPopularPrices]
 	}
 }
 
