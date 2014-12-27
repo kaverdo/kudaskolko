@@ -141,10 +141,10 @@ $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
 		WHERE 
 		i.user_id = $dbo:USERID
 		AND t.amount = ^tParts.1.int(0)
-		AND t.tdate > DATE_SUB(NOW(),INTERVAL 4 MONTH)
+		AND t.tdate > DATE_SUB(NOW(), INTERVAL 4 MONTH)
 		GROUP BY i.iid
 		ORDER BY cnt desc
-		}[$.limit(3)]
+		}[$.limit(5)]
 	]
 	^if($popularPrices){
 		^tResult.join[$popularPrices]
