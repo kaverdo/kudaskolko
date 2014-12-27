@@ -883,25 +883,22 @@ i.name
 $hParams[^hash::create[$hParams]]
 $result[^oSql.table{
 SELECT
-	transaction_item.name,
-	t.amount,
-	t.quantity,
+	parent.name,
+	SUM(t.amount) AS amount,
+	SUM(t.quantity) AS quantity,
 	t.operday,
-	t.iid
+	t.iid AS transaction_iid,
+	parent.iid AS found_by_iid
 FROM items parent
 LEFT JOIN nesting_data nd ON nd.pid = parent.iid 
 LEFT JOIN transactions t ON t.iid = nd.iid
-LEFT JOIN items transaction_item ON transaction_item.iid = t.iid
-
 WHERE
 	parent.user_id = $USERID
 	AND t.user_id = $USERID
 	AND parent.name = '$hParams.name'
 	AND t.is_displayed = 1
-ORDER BY 
-operday DESC,
-transaction_item.name,
-t.amount
+GROUP BY found_by_iid, operday
+ORDER BY operday DESC
 }[$.limit(^hParams.limit.int(10))]]
 
 @getParentItems[hParams]
