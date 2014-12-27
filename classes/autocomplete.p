@@ -24,6 +24,7 @@ $sInput[^trimPrefixes[$sInput]]
 	^if(!$isMove){
 		^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
 		^addDates[$tResult;$sInput]
+		^addPopularGoodsForPrices[$tResult;$sInput]
 	}
 	
 	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput]]
@@ -116,6 +117,40 @@ $result[^oSql.table{
 	ORDER BY t.operday DESC
 	}[$.limit(1)]
 ]
+
+@addPopularGoodsForPrices[tResult;sInput]
+$tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
+^if(def $tParts.1 && ^tParts.1.int(0) != 0){
+	$popularPrices[^oSql.table{
+		SELECT
+		CONCAT(
+			i.name,
+			' ',
+			'$tParts.1'
+			^if(def $tParts.2){
+				,
+			' * ',
+			'$tParts.2'
+			}
+		) AS value,
+		COUNT(t.amount) as cnt,
+		i.iid,
+		1 AS with_price
+		FROM items i
+		LEFT JOIN transactions t ON i.iid = t.iid 
+		WHERE 
+		i.user_id = $dbo:USERID
+		AND t.amount = ^tParts.1.int(0)
+		AND t.tdate > DATE_SUB(NOW(),INTERVAL 4 MONTH)
+		GROUP BY i.iid
+		ORDER BY cnt desc
+		}[$.limit(3)]
+	]
+	^if($popularPrices){
+		^tResult.join[$popularPrices]
+	}
+}
+
 
 @getTopPrices[isSubItem;iid]
 $result[^oSql.table{
