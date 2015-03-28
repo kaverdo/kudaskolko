@@ -271,13 +271,13 @@ function setRows(textarea, isEmpty, isFocus){
 		setRowsHeight(textarea, 1);
 	} else {
 		var newLineCount = textarea.val().split("\n").length;
-		if(newLineCount <= 3) {
+		if(newLineCount <= 4) {
 			setRowsHeight(textarea, 5);
 		}
-		else if(newLineCount > 3 && newLineCount <= 7) {
+		else if(newLineCount > 4 && newLineCount <= 9) {
 			setRowsHeight(textarea, 10);
 		}
-		else if(newLineCount > 7) {
+		else if(newLineCount > 9) {
 			setRowsHeight(textarea, 15);
 			textarea.css('overflow','auto');
 		}
