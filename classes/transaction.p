@@ -97,13 +97,11 @@ $dChequeAmount(-1)
 ^recalculate_correctDifference[]
 
 $result[$hTransactions]
-
-
-# если сумма позиций чека после применения скидки стала больше, 
-# чем сумма чека (за счет округления до двух знаков),
-# то разницу нужно записать в виде скидки на самую дорогую позицию
+# если сумма позиций чека после применения скидки стала отличаться от, 
+# суммы чека (за счет округления до двух знаков),
+# то разницу нужно скорректировать на самой дорогой позиции
 @recalculate_correctDifference[]
-^if(def $caller.iMaxTransaction && $caller.dFinalPositionSum < 0){
+^if(def $caller.iMaxTransaction && $caller.dFinalPositionSum != 0){
 	^caller.hTransactions.[$caller.iMaxTransaction].dAmount.inc($caller.dFinalPositionSum)
 	^caller.hTransactions.[$caller.iMaxTransaction].dDiscount.dec($caller.dFinalPositionSum)
 }
@@ -305,7 +303,7 @@ $dPositionSum[$caller.hTransactions.[$caller.iShopTransaction].dPositionSum]
 		<tr class="chequefooter ^if($dChequeAmount > $dPositionSum){partial}">
 			<td class="name">^if($dChequeAmount > $dPositionSum){Наценка}{Скидка}</td>
 			<td></td><td></td>
-			<td class="value">^u:formatValueWithoutCeiling(^eval(^math:abs($dPositionSum - $dChequeAmount)))</td>
+			<td class="value">^u:formatValueWithoutCeiling(^math:abs($dPositionSum - $dChequeAmount))</td>
 		</tr>
 	}
 # 	<tr class="chequefooter last">
