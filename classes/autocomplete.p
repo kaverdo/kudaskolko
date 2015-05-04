@@ -73,6 +73,7 @@ $result[^oSql.table{
 	
 	WHERE
 	i.user_id = $dbo:USERID AND
+	i.is_auto_generated = 0 AND
 	^if($isCheque){
 		t.type & $dbo:TYPES.CHEQUE = $dbo:TYPES.CHEQUE
 		AND
@@ -147,6 +148,7 @@ $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
 		LEFT JOIN transactions t ON i.iid = t.iid 
 		WHERE 
 		i.user_id = $dbo:USERID
+		AND i.is_auto_generated = 0
 		AND t.amount = ^tParts.1.int(0)
 		AND t.tdate > DATE_SUB(NOW(), INTERVAL 4 MONTH)
 		GROUP BY i.iid, t.quantity
@@ -182,6 +184,7 @@ $result[^oSql.table{
 	WHERE 
 	i.user_id = $dbo:USERID
 	AND i.iid = $iid
+	AND i.is_auto_generated = 0
 	AND t.tdate > DATE_SUB(NOW(),INTERVAL 6 MONTH)
 	AND amount <> 0
 	GROUP BY t.amount
