@@ -255,7 +255,7 @@ $result[$sBody]
 		$prefix[[^now.sql-string[].^usec.format[%06.0f]]	$env:REMOTE_ADDR	$comment] 
 		$message[^eval(($hRusageStat.[$comment].totalSec*1000000 + $hRusageStat.[$comment].totalMSec)/1000)	$request:uri]
 		$line[$prefix	$message^#0A]
-		^line.save[append;../logs/rusage.log]
+		^line.save[append;../plogs/rusage.log]
 
 	}{
 		^hRusageStat.add[
@@ -305,6 +305,6 @@ $line[$prefix $message
 ----------------------------------------------------------------------------
 ]
 #^#0A]
-^line.save[append;/../logs/parser_${now.year}^now.month.format[%02d].log]
+^line.save[append;/../plogs/parser_${now.year}^now.month.format[%02d].log]
 
 }

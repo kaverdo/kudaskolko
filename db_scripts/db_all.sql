@@ -93,12 +93,14 @@ CREATE TABLE IF NOT EXISTS `items` (
   `type` tinyint(3) unsigned default NULL,
   `alias_id` int(10) unsigned default NULL,
   `user_id` smallint(5) unsigned NOT NULL,
+  `is_auto_generated` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`iid`),
   KEY `pid` (`pid`),
   KEY `name` (`name`),
   KEY `level` (`level`),
-  KEY `user_id__type` (`user_id`, `type`)
-  KEY `type` (`type`)
+  KEY `user_id__type` (`user_id`, `type`),
+  KEY `type` (`type`),
+  KEY `auto_generated` (`is_auto_generated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `items_in_groups` (

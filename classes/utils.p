@@ -288,7 +288,7 @@ $iYear(^sOperday.left(4))
 }
 
 @formatValueWithoutCeiling[dValue]
-$result[^numberFormat[$dValue;$.sThousandDivider[ ]$.sDecimalDivider[,]]]
+$result[^numberFormat[^eval(^math:round($dValue * 1000) / 1000);$.sThousandDivider[ ]$.sDecimalDivider[,]]]
 
 
 @formatValue[dValue;isOmitZeroes]
@@ -397,7 +397,7 @@ $result($dDefault)
 		^case(3){$result(0.001)}
 		^case(4){$result(0.0001)}
 		^case(5){$result(0.00001)}
-		^case[DEFAULT]{$result(1)}
+		^case[DEFAULT]{$result(0.001)}
 }
 
 @round[dDouble;iFracLength]

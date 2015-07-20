@@ -202,7 +202,7 @@ $isActiveMonth(false)
 $dtPreviousDate[]
 ^hMonths.foreach[k;v]{
 
-^if(def $dtPreviousDate && $v - $dtPreviousDate > 31){
+^if(def $dtPreviousDate && $v - $dtPreviousDate > 32){
 		<div class="month">
  			<div class="bar-container empty">
 #		<div class="bard" style="height: 0"></div>
@@ -419,13 +419,14 @@ FROM transactions t
 	}
 WHERE	
 	^if($data.pid){
-		nd.pid = $data.pid AND
+		nd.pid = $data.pid
+	}{
+		(i.type = $dbo:TYPES.CHARGE OR i.type = $dbo:TYPES.INCOME)
 	}
-	t.is_displayed = 1
+	AND t.is_displayed = 1
 	AND t.user_id = $USERID
 	AND t.operday >= $mondayOperday 
 	AND t.operday <= $sundayOperday
-	AND nd.pid <> nd.iid
 	^if($data.ciid){
 		AND cheque.iid = $data.ciid
 	}

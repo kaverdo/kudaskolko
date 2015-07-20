@@ -24,6 +24,7 @@ $sInput[^trimPrefixes[$sInput]]
 	^if(!$isMove){
 		^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
 		^addDates[$tResult;$sInput]
+		^addPopularGoodsForPrices[$tResult;$sInput]
 	}
 	
 	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput]]
@@ -72,6 +73,7 @@ $result[^oSql.table{
 	
 	WHERE
 	i.user_id = $dbo:USERID AND
+	i.is_auto_generated = 0 AND
 	^if($isCheque){
 		t.type & $dbo:TYPES.CHEQUE = $dbo:TYPES.CHEQUE
 		AND
@@ -117,6 +119,48 @@ $result[^oSql.table{
 	}[$.limit(1)]
 ]
 
+@addPopularGoodsForPrices[tResult;sInput]
+$tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
+^if(def $tParts.1 && ^tParts.1.int(0) != 0){
+	$tPopularPrices[^oSql.table{
+		SELECT
+		CONCAT(
+			i.name,
+			' ',
+			^if(def $tParts.2){
+				'$tParts.1',
+				' * ',
+				'$tParts.2'
+			}{
+				IF(t.quantity = 1,
+					'$tParts.1',
+					CONCAT(
+						ROUND(t.amount/t.quantity,
+							IF(ROUND(t.amount/t.quantity, 0) = t.amount/t.quantity, 0, 2))
+						, ' * ', t.quantity)
+				)
+			}
+		) AS value,
+		COUNT(t.amount) as cnt,
+		i.iid,
+		1 AS with_price
+		FROM items i
+		LEFT JOIN transactions t ON i.iid = t.iid 
+		WHERE 
+		i.user_id = $dbo:USERID
+		AND i.is_auto_generated = 0
+		AND t.amount = ^tParts.1.int(0)
+		AND t.tdate > DATE_SUB(NOW(), INTERVAL 4 MONTH)
+		GROUP BY i.iid, t.quantity
+		ORDER BY cnt desc
+		}[$.limit(5)]
+	]
+	^if($tPopularPrices){
+		^tResult.join[$tPopularPrices]
+	}
+}
+
+
 @getTopPrices[isSubItem;iid]
 $result[^oSql.table{
 	SELECT
@@ -140,6 +184,7 @@ $result[^oSql.table{
 	WHERE 
 	i.user_id = $dbo:USERID
 	AND i.iid = $iid
+	AND i.is_auto_generated = 0
 	AND t.tdate > DATE_SUB(NOW(),INTERVAL 6 MONTH)
 	AND amount <> 0
 	GROUP BY t.amount
