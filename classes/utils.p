@@ -3,7 +3,10 @@ u
 
 @USE
 common/dtf.p
-dbo.p
+transaction/TransactionType.p
+
+@isEqualType[iFullType;iTypeToBeEqual]
+$result(($iFullType & $iTypeToBeEqual) == $iTypeToBeEqual)
 
 @isEqualIgnoreCase[s1;s2]
 $result(^u:upper[$s1] eq ^u:upper[$s2])
@@ -314,7 +317,7 @@ $result[^numberFormat[^eval(^math:round($dValue * 1000) / 1000);$.sThousandDivid
 }
 
 @formatValueByType[dValue;iType;isOmitZeroes]
-^if($iType & $dbo:TYPES.INCOME == $dbo:TYPES.INCOME){
+^if($iType & $TransactionType:INCOME == $TransactionType:INCOME){
 	^formatValueFloor[$dValue;isOmitZeroes]
 }{
 	^formatValue[$dValue;isOmitZeroes]

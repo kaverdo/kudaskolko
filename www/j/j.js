@@ -133,7 +133,7 @@ $(function() {
 					result += $.ui.autocomplete.escapeRegex(splitted[i]);
 				};
 
-				var matcher = new RegExp("(\\s+|^|@|\\(|\\-)(" + $.ui.autocomplete.escapeRegex(t) + result+")", "ig" );
+				var matcher = new RegExp("(\\s+|^|@|\\$|\\(|\\-)(" + $.ui.autocomplete.escapeRegex(t) + result+")", "ig" );
 						
 				if(item.iid && item.iid != 'undefined'){
 					var $anchor = $( "<div ><u>Все записи</u></div>" )
@@ -659,8 +659,7 @@ $(function() {
 	});
 
 	$(".months.pm .bar-container").click(function(e){
-		if($(".months.pm").find(".bar.plus").length == 0 ||
-		   $(".months.pm").find(".bar.minus").length == 0)
+		if($(".months.pm").find(".bar.plus").length == 0 && $(".months.pm").find(".bar.minus").length == 0)
 			return;
 
 		if( ($(".months").hasClass("p") && $(".months").hasClass("m")) ||

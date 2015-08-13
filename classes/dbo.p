@@ -1,32 +1,23 @@
 @CLASS
 dbo
 
-@USE
-utils.p
-
 @auto[]
-$GROUP_TYPES[
-	$.CHEQUE(1)
-]
-$TYPES[
-	$.CHARGE(1)
-	$.INCOME(2)
-	$.CHEQUE(64)
-]
 $oSql[]
-
-$data[^hash::create[]]
 $USERID[]
 
 @initUser[iUserID]
 $USERID($iUserID)
 ^oSql.void{
 	INSERT INTO items (name, type, user_id)
-	VALUES ('Расходы', $TYPES.CHARGE, $USERID)
+	VALUES ('Расходы', $TransactionType:CHARGE, $USERID)
 }
 ^oSql.void{
 	INSERT INTO items (name, type, user_id)
-	VALUES ('Доходы', $TYPES.INCOME, $USERID)
+	VALUES ('Доходы', $TransactionType:INCOME, $USERID)
+}
+^oSql.void{
+	INSERT INTO items (name, type, user_id)
+	VALUES ('Счета', $TransactionType:ACCOUNT, $USERID)
 }
 ^dbo:rebuildNestingData[]
 
@@ -53,8 +44,16 @@ $hResult[^hash::create[]]
 		WHERE 
 		i.user_id = $USERID
 		AND i.name = '$hParams.name'
+		AND nd.type
 		^if(^hParams.type.int(0)){
-			AND nd.type = ^hParams.type.int(0)
+			 = 
+			^if((^hParams.type.int(0) & $TransactionType:ACCOUNT) == $TransactionType:ACCOUNT){
+				$TransactionType:ACCOUNT
+			}{
+				^hParams.type.int(0)
+			}
+		}{
+		  <> $TransactionType:ACCOUNT
 		}
 		AND nd.iid = nd.pid
 		ORDER BY nd.type,nd.level
@@ -88,12 +87,23 @@ $hResult[^hash::create[]]
 		}
 
 		^if(!^hParams.pid.int(0)){
+			^rem{ если родитель не передан, то достанем корневого родителя по типу (Расходы, Доходы или Счета)}
 			$hParams.pid(^oSql.int{
 				SELECT iid
 				FROM items 
 				WHERE 
 				user_id = $USERID AND
-				type = ^hParams.type.int($dbo:TYPES.CHARGE)
+				type =
+
+				^if((^hParams.type.int(0) & $TransactionType:ACCOUNT) == $TransactionType:ACCOUNT){
+					^hParams.type.int($TransactionType:ACCOUNT)
+				}{
+					^if(^hParams.type.int(0) != 0){
+						^hParams.type.int(0)
+					}{
+						$TransactionType:CHARGE
+					}
+				}
 				}[$.default(0)$.limit(1)])
 			}
 
@@ -113,7 +123,7 @@ $hResult[^hash::create[]]
 		$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
 
 		$hResult.tValues[^table::create{iid	pid	alias_id	type
-$iLastInsert	^hParams.pid.int(0)		^hParams.type.int($dbo:TYPES.CHARGE)}]
+$iLastInsert	^hParams.pid.int(0)		^hParams.type.int($TransactionType:CHARGE)}]
 
 	^rebuildNestingDataLocal[
 		$.iid($hResult.tValues.iid)
@@ -317,108 +327,131 @@ $result[^hash::create[$hResult]]
 
 
 
+
 ^rem{ ************************* }
 ^rem{ *** createTransaction *** }
 ^rem{ ************************* }
 @createTransaction[hParams]
-$dtNow[^date::now[]]
 $hParams[^hash::create[$hParams]]
 $hResult[^hash::create[]]
-^if(^hParams.iid.int(0) != 0){
-
-		^if(!def $hParams.operday && def $hParams.tdate){
-			$hParams.operday[$hParams.tdate]
-		}
-		^if($hParams.doNotCreateOperday){
-			$hOperday[$.operday[$hParams.operday]]
-		}{
-			$hOperday[^createOperday[$.operday[$hParams.operday]]]
-		}
-
-
+^if(!def $hParams.operday && def $hParams.tdate){
+	$hParams.operday[$hParams.tdate]
+}
+^if($hParams.doNotCreateOperday){
+	$hOperday[$.operday[$hParams.operday]]
+}{
+	$hOperday[^createOperday[$.operday[$hParams.operday]]]
+}
+$tExistTransaction[]
+^if(^u:isEqualType(^hParams.type.int(0);$TransactionType:ACCOUNT)){
+	$tExistTransaction[^oSql.table{
+		SELECT tid, amount
+		FROM transactions
+		WHERE iid = ^hParams.iid.int(0)
+		AND user_id = $USERID
+		ORDER BY tdate DESC, dateadded DESC
+	}[$.limit(1)]]
+	^if(def $tExistTransaction){
 		^oSql.void{
-		INSERT INTO transactions (
-			operday,
-			iid,
-			alias_id,
-			tdate,
-			dateadded,
-			amount,
-			discount,
-			quantity,
-			user_id,
-			ctid,
-			is_displayed,
-			type)
-		VALUES (
-			$hOperday.operday,
-			^hParams.iid.int(0),
-			^hParams.alias_id.int(0),
-			"^u:getSQLStringDate[$hParams.tdate]",
-#			^if(def $hParams.tdate){
-#				'$hParams.tdate',
-#			}{
-#				'^dtNow.sql-string[]',
-#			}
-			^if(def $hParams.adate){
-				"^u:getSQLStringDate[$hParams.adate]",
+		UPDATE transactions 
+			SET 
+			operday = $hOperday.operday,
+			
+			tdate = "^u:getSQLStringDate[$hParams.tdate]",
+			dateadded = ^if(def $hParams.adate){
+				"^u:getSQLStringDate[$hParams.adate]"
 			}{
-				NOW(),
-			}
-			^math:abs(^hParams.amount.double(0)),
-			^hParams.discount.double(0),
-			^hParams.quantity.double(1.0),
-			$USERID,
-			^hParams.ctid.int(0),
-			^hParams.is_displayed.int(1),
+				NOW()
+			},
+			amount = ^calculateTransactionAmount(
+				^math:abs(^hParams.amount.double(0));
+				^tExistTransaction.amount.double(0);
+				^hParams.type.int(0))
+			WHERE tid = $tExistTransaction.tid
+			
+		}
+		$hResult.tValues[^table::create{tid	iid
+$tExistTransaction.tid	^hParams.iid.int(0)}]
 
-			^if( (^hParams.type.int(0) & $TYPES.CHARGE) == $TYPES.CHARGE ||
-			(^hParams.type.int(0) & $TYPES.INCOME) == $TYPES.INCOME ){
+		$result[^hash::create[$hResult]]
+	}
+}
+^if(!def $tExistTransaction){
+	^oSql.void{
+	INSERT INTO transactions (
+		operday,
+		iid,
+		alias_id,
+		tdate,
+		dateadded,
+		amount,
+		discount,
+		quantity,
+		user_id,
+		ctid,
+		is_displayed,
+		type)
+	VALUES (
+		$hOperday.operday,
+		^hParams.iid.int(0),
+		^hParams.alias_id.int(0),
+		"^u:getSQLStringDate[$hParams.tdate]",
+		^if(def $hParams.adate){
+			"^u:getSQLStringDate[$hParams.adate]",
+		}{
+			NOW(),
+		}
+		^math:abs(^hParams.amount.double(0)),
+		^hParams.discount.double(0),
+		^hParams.quantity.double(1.0),
+		$USERID,
+		^hParams.ctid.int(0),
+		^hParams.is_displayed.int(1),
+		^if(^u:isEqualType(^hParams.type.int(0);$TransactionType:ACCOUNT)){
+			^eval($TransactionType:ACCOUNT | $TransactionType:STATEMENT)
+		}{
+			^if(^hParams.type.int(0) != 0){
 				^hParams.type.int(0)
 			}{
-				^if(^hParams.amount.double(0) < 0){
-					^hParams.type.int(0) | $TYPES.CHARGE
-				}{
-					^hParams.type.int(0) | $TYPES.INCOME
-				}
+				^if(^hParams.amount.double(0) < 0;$TransactionType:CHARGE;$TransactionType:INCOME)
 			}
-		)}
-	
-			$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
-	
-		^if(def $hParams.gid){
-			$tGroupID[^table::create[nameless]{$hParams.gid}]
-			^tGroupID.menu{
-				^if(^tGroupID.0.int(0) != 0){
-					^oSql.void{
-						INSERT INTO transactions_in_groups (
-							tid,
-							gid
-						) values (
-							$iLastInsert,
-							^tGroupID.0.int(0)
-						)}
-				}
-			}
-	
 		}
-	
-# 		$hResult.tValues[^oSql.table{
-# 			SELECT
-# 				tid,
-# 				iid
-# 			FROM transactions
-# 			WHERE tid = $iLastInsert
-# 		}[$.limit(1)]]
+		
+	)}
 
-		$hResult.tValues[^table::create{tid	iid
+		$iLastInsert(^oSql.int{SELECT LAST_INSERT_ID()})
+
+	$hResult.tValues[^table::create{tid	iid
 $iLastInsert	^hParams.iid.int(0)}]
 
-}{
-	$hResult.isError(true)
+	^if(^hParams.iid.int(0) == 0){
+		$result[$.isError(true)]
+	}{
+		$result[^hash::create[$hResult]]
+	}
 }
-$result[^hash::create[$hResult]]
 
+@calculateTransactionAmount[dAmount;dLastStatementSum;iType][result]
+^if(^u:isEqualType($iType;$TransactionType:STATEMENT)){
+	$result($dAmount)
+}{
+	^if(^u:isEqualType($iType;$TransactionType:CHARGE)){
+		$result(^u:max($dLastStatementSum - $dAmount;0))
+	}{
+		$result($dLastStatementSum + $dAmount)
+	}
+}
+
+@calculateTransactionType[iType;dAmount][result]
+^if($iType != 0){
+	$result($iType)
+}{
+	^if($dAmount < 0){
+		$result($iType | $TransactionType:CHARGE)
+	}{
+		$result($iType | $TransactionType:INCOME)
+	}
+}
 
 @getGroupsForTransactions[hParams]
 $hParams[^hash::create[$hParams]]
@@ -665,7 +698,7 @@ LEFT JOIN nesting_data nd ON nd.iid = t.iid
 WHERE
 	ct.iid = ^hParams.ciid.int(0)
 	AND nd.iid = nd.pid
-	AND nd.type = ^hParams.type.int($dbo:TYPES.CHARGE)
+	AND nd.type = ^hParams.type.int($TransactionType:CHARGE)
 	AND t.user_id = $USERID
 ^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0){
 	^if(^hParams.startOperday.int(0) == ^hParams.endOperday.int(0)){
@@ -722,7 +755,7 @@ LEFT JOIN items last_parent ON last_parent.iid = last_parent_nd.iid
 #	 AND last_parent_nd.pid <> nd.pid
 	}
 WHERE
-transaction_for_last_parent_nd.type = ^hParams.type.int($dbo:TYPES.CHARGE)
+transaction_for_last_parent_nd.type = ^hParams.type.int($TransactionType:CHARGE)
 AND t2.user_id = $USERID
  AND i.user_id = $USERID AND
 (transaction_for_last_parent_nd.level = 0 OR last_parent_nd.level = transaction_for_last_parent_nd.level - 1)
@@ -847,7 +880,7 @@ WHERE
 			user_id = $USERID AND type = ^hParams.type.int(0))
 # 		AND parent_item.type & ^hParams.type.int(0) = ^hParams.type.int(0)
 	}
-# 	^if($hParams.type & $TYPES.CHARGE == $TYPES.CHARGE){
+# 	^if($hParams.type & $TransactionType:CHARGE == $TransactionType:CHARGE){
 # 		AND (i.iid = 2058 OR i.pid = 2058)
 # 	}{
 # 		AND (i.iid = 2057 OR i.pid = 2057)
@@ -968,6 +1001,48 @@ $hParams[^hash::create[$hParams]]
 		t.ctid = ^hParams.ctid.int(0)
 	})
 }
+
+
+@getAccounts[hParams][tEntries]
+$hParams[^hash::create[$hParams]]
+$result[^oSql.table{
+SELECT
+	i.name AS name,
+	t.amount AS sum
+FROM transactions t
+LEFT JOIN items i ON i.iid = t.iid
+LEFT JOIN items parent_item ON i.pid = parent_item.iid
+WHERE 
+t.user_id = $USERID AND
+parent_item.type = $TransactionType:ACCOUNT
+AND t.amount <> 0
+GROUP BY i.name
+ORDER BY i.name
+}]
+
+# @getAccounts[hParams][tEntries]
+# $hParams[^hash::create[$hParams]]
+# $result[^oSql.table{
+# SELECT
+# 	i.name AS name,
+# 	t.amount AS sum
+# FROM transactions t
+# LEFT JOIN items i ON i.iid = t.iid
+# LEFT JOIN (
+# 	SELECT MAX(t2.tid) tid 
+# 	FROM transactions t2
+# 	LEFT JOIN items i2 ON i2.iid = t2.iid
+# 	LEFT JOIN items parent_item ON i2.pid = parent_item.iid
+# 	WHERE
+# 		t2.user_id = $USERID AND
+# 		parent_item.type = $TransactionType:ACCOUNT
+# 	GROUP BY t2.iid
+# ) last ON last.tid = t.tid
+# WHERE last.tid IS NOT NULL
+# AND t.amount <> 0
+# ORDER BY
+# 	i.name
+# }]
 
 @rebuildNestingDataLocal[hParams][locals]
 $hParams[^hash::create[$hParams]]
