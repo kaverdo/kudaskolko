@@ -173,20 +173,22 @@ $sExpression[]
 	$tSplittedSum[^sExpression.split[+]]
 	$hResult.dQuantity(0)
 	$hResult.dAmount(0)
-	
+
 	^tSplittedSum.menu{
 		^if(^u:contains[$tSplittedSum.piece;*]){
 			$tSplittedMultiple[^tSplittedSum.piece.split[*;h]]
 			$dCurrentQuantity(^u:stringToDouble[$tSplittedMultiple.1](1))
 			$dCurrentAmount(^u:stringToDouble[$tSplittedMultiple.0](0) * $dCurrentQuantity)
-		}
-		^if(^u:contains[$tSplittedSum.piece;/]){
-			$tSplittedDivision[^tSplittedSum.piece.split[/;h]]
-			$dCurrentQuantity(^u:stringToDouble[$tSplittedDivision.1](1))
-			$dCurrentAmount(^u:stringToDouble[$tSplittedDivision.0](0))
+
 		}{
-			$dCurrentQuantity(1)
-			$dCurrentAmount(^u:stringToDouble[$tSplittedSum.piece](0))
+			^if(^u:contains[$tSplittedSum.piece;/]){
+				$tSplittedDivision[^tSplittedSum.piece.split[/;h]]
+				$dCurrentQuantity(^u:stringToDouble[$tSplittedDivision.1](1))
+				$dCurrentAmount(^u:stringToDouble[$tSplittedDivision.0](0))
+			}{
+				$dCurrentQuantity(1)
+				$dCurrentAmount(^u:stringToDouble[$tSplittedSum.piece](0))
+			}
 		}
 		^hResult.dAmount.inc($dCurrentAmount)
 		^if($dCurrentAmount > 0){
