@@ -114,7 +114,7 @@ $dChequeAmount(-1)
  		$dFinalPositionSum($v.dChequeAmount)
 		$dChequeAmount($v.dChequeAmount)
 	}{
-		^if($dChequeAmount > -1 && ($dPositionSum - $dChequeAmount) > 0 && def $v.sAmount){
+		^if($dChequeAmount > -1 && ($dPositionSum - $dChequeAmount) > 0 && def $v.dAmount){
 			$dDiscAmount(^math:round($v.dAmount*$dChequeAmount / $dPositionSum * 100)/100)
 			$v.dDiscount($v.dAmount - $dDiscAmount)
 			$v.dAmount($dDiscAmount)
