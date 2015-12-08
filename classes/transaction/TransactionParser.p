@@ -203,7 +203,9 @@ $hResult.dAmountWithoutDisc($hResult.dAmount)
 
 $hResult.isSubTransaction(def $h.isSubTransaction && def $hResult.dAmount)
 ^if(def $h.isCheque){
-	$hResult.dChequeAmount($hResult.dAmount)
+	^if(def $hResult.dAmount){
+		$hResult.dChequeAmount($hResult.dAmount)
+	}
 	$hResult.isCheque(true)
 	$hResult.sChequeName[$hResult.sName]
 	$hResult.sName[]
