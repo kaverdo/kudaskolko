@@ -941,10 +941,8 @@ button:focus {
     #controls input[type="submit"]:hover, #controls input[type="submit"]:active, #controls input[type="submit"]:focus, #controls button:hover, #controls button:active, #controls button:focus {
       box-shadow: inset 0px 1px 0px 0px #cce17e;
       border-color: #6e8320; }
-    #controls input[type="submit"].submit, #controls button.submit {
-      width: 14em; }
-      #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active, #controls button.submit:hover, #controls button.submit:focus, #controls button.submit:active {
-        background: #9ebd2e; }
+    #controls input[type="submit"].submit:hover, #controls input[type="submit"].submit:focus, #controls input[type="submit"].submit:active, #controls button.submit:hover, #controls button.submit:focus, #controls button.submit:active {
+      background: #9ebd2e; }
     #controls input[type="submit"].preview, #controls button.preview {
       background: #EEE;
       border-color: #CCC;
