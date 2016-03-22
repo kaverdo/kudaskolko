@@ -1,16 +1,12 @@
 // sass --watch main.scss:main.css
 
+// минус (−) →
+// ↑↓
+// → \2192
+// ← \2190
 
-/*
-
-минус (−) →
-↑↓
-→ \2192
-← \2190
-
-@import url(http://fonts.googleapis.com/css?family=PT+Sans+Caption&subset=cyrillic,latin);
-#@import url(http://fonts.googleapis.com/css?family=Open+Sans:300&subset=latin,cyrillic-ext);
-*/
+// @import url(http://fonts.googleapis.com/css?family=PT+Sans+Caption&subset=cyrillic,latin);
+// @import url(http://fonts.googleapis.com/css?family=Open+Sans:300&subset=latin,cyrillic-ext);
 
 // Colors
 $LightGreen: #E8F6B7;
@@ -26,17 +22,13 @@ $LinkBorder: #ABCDEF;
 $LinkBorderHover: $LinkHover;
 
 $ChargesTextColor: $DarkGreen;
-//6e8320
 
-/*#EBAE42;*/
-$ChargesBGColor:    #CCE17E;
-/*CCE17E;*/
-//F1C16D;
-$ChargesBarColor:   $Green;
+$ChargesBGColor: #CCE17E;
+$ChargesBarColor: $Green;
 
-$IncomesTextColor:  #D77E19;
-$IncomesBGColor:    #F1C16D; 
-$IncomesBarColor:   #F1C16D;
+$IncomesTextColor: #D77E19;
+$IncomesBGColor: #F1C16D; 
+$IncomesBarColor: #F1C16D;
 
 
 // spaces
@@ -52,200 +44,135 @@ $tbMargin: 0.2em;
 	transition: $transition;
 }
 
-@mixin clearfix(){
-	&:after	{
+@mixin clearfix() {
+	&:after {
 		content: "";
 		display: table;
 		clear: both;	
 	}
 }
 
-  .ui-autocomplete {
-  	border-radius: 10px;
-  	font-family: 'PT Sans','Open Sans','Helvetica', sans-serif !important;
-    max-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-width: 700px;
-    & .iemobile{
-    	max-width: none !important;
-    }
+.ui-autocomplete {
+	border-radius: 10px;
+	font-family: 'PT Sans', 'Open Sans', 'Helvetica', sans-serif !important;
+	max-height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-width: 700px;
+	& .iemobile {
+		max-width: none !important;
+	}
 
-    .ui-state-highlight,
-    .ui-state-highlight a,
-    .ui-state-hover,
-    .ui-state-hover a,
-    .ui-state-focus,
-    .ui-state-focus a {
-    	/*background-color: $LightGreen  !important;*/
-    }
-.ui-state-default{
-	color: #000 !important;
-}
-.ui-menu-item:hover{
-	.search-link{
-		visibility: visible;
+	.ui-state-default {
+		color: #000 !important;
 	}
-	/*background-color: inherit !important;*/
-}
-a.ui-state-hover{
-	/*background: $LightGreen !important;*/
-
-/*	&.search-link{
-		float:left !important;
-	}	*/
-}
-.ui-menu-item{
-	border-bottom: 1px inset #F5F5F5;
-	/*padding:0.3em 0  !important;*/
-	&:last-child{
-		border-bottom: 0;
+	.ui-menu-item:hover {
+		.search-link {
+			visibility: visible;
+		}
 	}
-	&:hover, &:hover a{
-		/*background: $LightGreen !important;*/
+	.ui-menu-item {
+		border-bottom: 1px inset #F5F5F5;
+		&:last-child {
+			border-bottom: 0;
+		}
 	}
-}
-	.hover-search{
+	.hover-search {
 		background-color: #ABCDEF !important;
 	}
-    .ui-menu-item a {
-
-	text-decoration:none;
-	display: inline-block;
-	/*float:left;*/
-	overflow:auto;
-	padding:0.5em .4em;
-	line-height:1.2 !important;
-	zoom:1;
-	&:hover{
-		color: #000 !important;
-		/*background: $LightGreen !important;*/
-	}
-	div.value{
-		padding:.2em 0;
-		&:first-line{
-    		color: #000 !important;
-    		font-size: 115%;
-    	}
-
-    	i{
-    		font-style: normal;
-    		background-color: $LightGreen;
-    		border-radius: 2px;
-    		color: $SuperDarkGreen;
-    		//#F4EA86;
-    	}
-
-	}
-	.search-link{
-		cursor: pointer;
-		float: right;
-		visibility: hidden;
-		color: $Link !important;
-		text-decoration: underline;
-		padding:0 .2em;
-		/*background: $LightGreen;*/
-		&:hover{
-			color: $LinkHover !important;
-			/*background: $LinkBorder;*/
-			&+a{
-				/*background: $LinkBorder;*/
+	.ui-menu-item a {
+		text-decoration: none;
+		display: inline-block;
+		overflow: auto;
+		padding: 0.5em .4em;
+		line-height: 1.2 !important;
+		zoom: 1;
+		&:hover {
+			color: #000 !important;
+		}
+		div.value {
+			padding: .2em 0;
+			&:first-line {
+				color: #000 !important;
+				font-size: 115%;
+			}
+			i {
+				font-style: normal;
+				background-color: $LightGreen;
+				border-radius: 2px;
+				color: $SuperDarkGreen;
 			}
 		}
-		u{
-			/*font-size: 80%;*/
+		.search-link {
+			cursor: pointer;
+			float: right;
+			visibility: hidden;
+			color: $Link !important;
+			text-decoration: underline;
+			padding:0 .2em;
+			&:hover {
+				color: $LinkHover !important;
+			}
 		}
 	}
-	}
-  }
+}
 
 
-body{
-	margin:0;//2em;
-	padding:0;
+body {
+	margin: 0;
+	padding: 0;
 	color: #111;
 	background: #FFF;
-	font-family: 'PT Sans','Open Sans','Helvetica',sans-serif;
-	/*margin:0 5% 0 5%;*/
-	/*margin:0em 2em 0em 2em;*/
+	font-family: 'PT Sans', 'Open Sans', 'Helvetica', sans-serif;
 }
 
-input,textarea,button{
-	font-family: 'PT Sans','Open Sans','Helvetica', sans-serif;
+input, textarea, button {
+	font-family: 'PT Sans', 'Open Sans', 'Helvetica', sans-serif;
 }
 
-body.beta .home:after{
+body.beta .home:after {
 	content: ' \03B2';
 }
 
-/*#container{
-		width: 100%;
-	margin-left: auto ;
- 	margin-right: auto ;
- 	max-width: 1000px;
-}
-*/
-.body{
-	/*margin:1em 15% 2em 15%;*/
-	/*float:left;*/
-
+.body {
 	margin:1em 2em 3em 2em;
-
-	/*margin-top: 1em;*/
 }
-.header{
-	/*background: $LightGreen;//#444;*/
-	color: #333;//$DarkGreen;
-	/*padding: 0 0 0 2em;*/
+.header {
+	color: #333;
 	margin-left: 2em;
 
-/*	margin-bottom: 1em;*/
-	/*float:left;*/
-	.home{
+	.home {
 		font-size: 100%;
 		color: #FFF;
 		padding: 0.2em 0.5em;
 		background: $DarkGreen;
-		/*border-radius: 0 0 30px/10px 30px/10px;*/
 		border-radius: 0px 0px 6px 6px;
 		text-decoration: none;
-		u{
+		u {
 			text-decoration: none;
 			line-height: 90%;
 			display: inline-block;
 			border-bottom: solid 1px $Green;
 		}
-
-		/*border-top: 1px solid #000;*/
-		/*border-right: 1px solid $DarkGreen;*/
 	}
 
-	a.home{
+	a.home {
 		background: $LightGreen;
 		color: $DarkGreen;
 			border: none !important;
-			/*border: 1px solid $DarkGreen;*/
-			&:hover{
+			&:hover {
 				color: #FFF !important;
 				background: $DarkGreen;
-			u{
-				border-color: $Green;
+				u {
+					border-color: $Green;
+				}
 			}
-				/*border-bottom: none;*/
-			}
+	}
 
-		}
-
-	#accounts{
-
+	#accounts {
 		margin-left: 2em;
-
 		> span {
 			display: none;
-
-			/*display: inline-block;*/
-			/*color: #999;*/
-			/*padding: 0.2em 0;*/
 		}
 	
 		&.main #main,
@@ -256,75 +183,59 @@ body.beta .home:after{
 			color: #999;
 			border-bottom: dashed 1px $SuperDarkGreen;
 		}
-		#reserve .sum{
+		#reserve .sum {
 			color: $SuperDarkGreen;
 			border-bottom: dashed 1px $SuperDarkGreen;
-			/*background: $LightGreen;*/
-			&:before{
+			&:before {
 				content: ' + ';
 			}
 		}
-		#total  .sum{
+		#total .sum {
 			color: $DarkGreen;
-			&:before{
+			&:before {
 				content: ' = ';
 			}
 		}
-		#main  .sum{
-
+		#main .sum {
 			color: #000;
-			/*font-weight: bold;*/
-			&:after{
+			&:after {
 				content: ' + ';
 			}
 		}
-		.type{
+		.type {
 			display: none;
 		}
 
 	}
 
-
-	.user{
+	.user {
 		float: right;
 		margin-left: 30%;
 		padding-right: 3em;
-/*		a {
-			visibility: hidden;
-		}
-		&:hover a{
-			visibility: visible;
-			color: $LinkHover;
-			border-bottom-color: $LinkBorderHover;
-		}*/
 	}
 
-/*	&+*{
-		clear:both;
-	}*/
 }
 
 
-body .operamini{
-	display:none;
+body .operamini {
+	display: none;
 }
 
-body.operamini{
+body.operamini {
 	.bar-container {
-		display:none;
+		display: none;
 	}
-	span.operamini{
+	span.operamini {
 		display: inline !important;
-		border:none !important;
+		border: none !important;
 
 	}
-	.notoperamini{
-		display:none;
+	.notoperamini {
+		display: none;
 	}
-
 }
 
-h1, h2{
+h1, h2 {
 	padding: 0;
 	margin: 0;
 	font-weight: normal;
@@ -335,12 +246,12 @@ ul, ol, li, p {
 	margin: 0;
 }
 
-a{
-	text-decoration:none;
+a {
+	text-decoration: none;
 	border-bottom:1px solid $LinkBorder;
 	color: $Link;
 
-	&:hover, .hover{
+	&:hover, .hover {
 		color: $LinkHover !important;
 		border-bottom:1px solid $LinkBorderHover;
 	}
@@ -350,111 +261,77 @@ a{
 	clear: both;
 }
 
-.clearfix{
+.clearfix {
 	content: "";
 	display: table;
 	clear: both;
 }
 
-// Specific styles
-
-
-// Accounts
-
-
 // Bars
-.bar-container{
+.bar-container {
 	height: 50px;
-	/*overflow: hidden;*/
 	position: relative;
 	padding: 2px 0;
 	margin: 2em 0 0.5em 0;
 	text-align: center;
-/*	&.empty{
-		height: 0;
-		margin-top: 0;
-	}*/
-
-
 }
 
-/*.bar-average{
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	border-top: 1px dashed #EEE;
-}*/
-
-
-.bar{
+.bar {
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	width: 3em;
-	border-top: 1px solid $ChargesBarColor;//#E9967A;
+	border-top: 1px solid $ChargesBarColor;
 
-	.active &{
-		border-width:2px;
+	.active & {
+		border-width: 2px;
 	}
 
-	&.one{
+	&.one {
 		color: #000 !important;
 	}
-	&.minus+.bar.plus{
-		/*color: $ChargesTextColor;*/
+	&.minus+.bar.plus {
 		color: $IncomesTextColor;
-		left:1.5em;
-		width:1.5em;
-		z-index:1.1;
+		left: 1.5em;
+		width: 1.5em;
+		z-index: 1.1;
 	}
-	&.plus+.bar.minus{
-		/*color: $ChargesTextColor;*/
-		color: #6e8320;//$ChargesTextColor;
+	&.plus+.bar.minus {
+		color: #6e8320;
 	}
-	&.plus{
+	&.plus {
 		border-color: $IncomesBarColor;
 		text-align: right;
 	}
-/*	&:hover{
-		background: #fff;
-	}*/
-	.empty &{
+	.empty & {
 		border: none;
 	}
 
-	.delta{
+	.delta {
 		visibility: hidden;
 	}
 
-	span{
+	span {
 		position: absolute;
 		top: -1.6em;
 		left: 0;
 		font-size: 90%;
-		/*visibility: hidden;*/
 
 	}
-/*	&:hover span{
-		visibility: visible;
-	}*/
-	.month:hover &{
-		z-index:1;
-		border-width:2px;
-		.delta
-		{
+	.month:hover & {
+		z-index: 1;
+		border-width: 2px;
+		.delta {
 			visibility: visible;
 			background: #FFF;
 			color: #555;
 			padding-right: 2px;
 		}
 	}
-
 }
 
 
-.calendar{
-	/*margin-bottom: 0.5em;*/
+.calendar {
 	.iemobile & {
 		display: none !important;
 	}
@@ -462,44 +339,41 @@ a{
 
 
 
-.months{
-	.bar.both{
+.months {
+	.bar.both {
 		visibility: hidden;
 	}
-	&.pm{
-		.bar.both{
+	&.pm {
+		.bar.both {
 			visibility: visible;
 		}
 	}
-	&.p{
+	&.p {
 		.bar.both,
-		.bar.minus{
+		.bar.minus {
 			visibility: hidden;
 		}
-		.bar.plus.one{
+		.bar.plus.one {
 			visibility: visible;
 		}
 	}
-	&.m{
+	&.m {
 		.bar.both,
-		.bar.plus.one
-		{
+		.bar.plus.one {
 			visibility: hidden;
 		}
-		.bar.minus.one{
+		.bar.minus.one {
 			visibility: visible;
 		}
 	}
-	&.p.m{
-		.bar.one{
-			visibility: hidden  !important;
+	&.p.m {
+		.bar.one {
+			visibility: hidden !important;
 		}
-		.bar.both{
+		.bar.both {
 			visibility: visible !important;
 		}
 	}
-
-
 
 	overflow: hidden;
 	padding-bottom: 0.5em;
@@ -511,12 +385,12 @@ a{
 		.active {
 			position: relative;
 		}
-		.date{
+		.date {
 			line-height: 1.2em;
 			font-size: 110%;
 		}
 
-		&.empty{
+		&.empty {
 			a.active,
 			a.date:hover {
 				background-color: #EEE !important;
@@ -524,27 +398,26 @@ a{
 			a span {
 				border-color: #CCC !important;
 			}
-			a.date:hover span{
+			a.date:hover span  {
 				color: #555;
 			}
-			.active{
+			.active {
 				background-color: #CCC !important;
 			}
 		}
-
 	}
-	.today{
+
+	.today {
 		margin-left: 2em;
 		font-style: italic;
 	}
 
-	.year{
+	.year {
 		margin: 0 0 0 $lrMargin*2;
-		.nodata{
+		.nodata {
 			color: $DarkGreen;
 		}
 	}
-
 }
 
 
@@ -553,18 +426,17 @@ a{
 	margin-left: -$lrMargin;
 	overflow: hidden;
 	.week {
-		float:left;
+		float: left;
 		margin: $lrMargin;
 	}
-
 }
 
 
 
 .week,
-.month{
-	.nodata{
-		color: #6B6D55;//#555;
+.month {
+	.nodata {
+		color: #6B6D55;
 	}
 
 	.active  {
@@ -587,39 +459,38 @@ a{
 
 .week a.date,
 .month a.date,
-a.day{
+a.day {
 	border: none;
 
-	span{
+	span {
 		border-bottom: 1px solid $LinkBorder;
 	}
 
 	&:hover {
-		/*border: none;*/
-		span{
+		span {
 			border-color: transparent !important;
 		}
 	}
-	&:hover, &.active{
+	&:hover, &.active {
 		background: $LightGreen;
 		border-radius: 3px;
 	}
-	&.active:hover{
+	&.active:hover {
 		background: $Green;
 	}
 }
 
 
-.week{
-	.date.nodata.active{
+.week {
+	.date.nodata.active {
 		background: #EEE !important;
 	}
-	&.extended .date{
+	&.extended .date {
 		padding-right: 0;
 		overflow: hidden;
-		&.active{
+		&.active {
 			background: $LightGreen;
-			a.day:hover{
+			a.day:hover {
 				background: $Green !important;
 			}
 		}
@@ -633,12 +504,12 @@ a.day{
 	padding: $tbMargin $lrMargin;
 	margin: -#{$tbMargin} 0 -#{$tbMargin} 0;
 
-	.weekend{
+	.weekend {
 		color: #AF321D;
 		border-color: #E9967A !important;
 	}	
 
-	&:first-child{
+	&:first-child {
 		margin-left: -$lrMargin;
 	}
 }
@@ -654,19 +525,13 @@ a.day{
 		padding: 0.2em;
 		overflow: hidden;
 		color: #666;
-/*		a{
-			color: #6e8320;
-		}*/
-		&:after{
+		&:after {
 			content: " \2192";
-			font-family: serif,sans-serif;
+			font-family: serif, sans-serif;
 		}
 	}
 
-/*	& + * {
-		clear: both;
-	}*/
-	&:after{
+	&:after {
 		content: "";
 		display: table;
 		clear: both;
@@ -674,22 +539,21 @@ a.day{
 
 }
 
-.breadscrumbs.inaction{
-	/*font-size: 90%;*/
-	li:last-child{
+.breadscrumbs.inaction {
+	li:last-child {
 		font-weight: bold;
-		&:after{
+		&:after {
 			content: "";
 		}
 	}
 }
 
-.transactions{
+.transactions {
 	overflow: visible;
 	#incomes,
-	#charges{
+	#charges {
 		float: left;
-		padding:0 4em 2em 0;
+		padding: 0 4em 2em 0;
 		max-width: 50%;
 		-webkit-box-sizing: border-box;
 		-moz-box-sizing: border-box;
@@ -700,9 +564,8 @@ a.day{
 		}
 	}
 
-	#incomes{
-		margin-right:0;
-		/*opacity: 0.5;*/
+	#incomes {
+		margin-right: 0;
 	}
 }
 
@@ -711,179 +574,125 @@ a.day{
 	color: $IncomesTextColor !important;
 }
 #incomes .grid .value div {
-	/*color: $Green;*/
 	background-image: url('/i/F1C16D_1x1.gif') !important;
-	/*background-image: url('http://averkov.ru/t/color/1x1/'+$IncomesBGColor+'.gif') !important;*/
 }
 #incomes .dt {
-
 	color: $IncomesTextColor !important;
 }
 
 #charges .dt {
-
 	color: $ChargesTextColor !important;
 }
-.grid{
-
+.grid {
 	font-size: 130%;
-	/*margin-left: -0.5em;*/
 	border-collapse: collapse;
-	.income td{
+	.income td {
 		background: $Green;
 	}
-	.transfer td{
+	.transfer td {
 		color: #BBB;
 	}
-/*	tr:hover{
-//		td{
-//			background: #EDFAC2;
-//		}
-		td.actions div{
-			visibility: visible;
-		}
-	}*/
-
-/*	tr:hover .date {
-#		visibility: visible;
-		opacity: 1;
-	}*/
 	td {
-
-		h2{
-			/*color: #CCC;*/
-			/*color: #CD5C5C;*/
+		h2 {
 			font-size: 150%;
 			position: relative;
 		}
-		h2 span{
+		h2 span {
 			opacity: 0.5;
-			/*color: $DarkGreen;*/
 			color: $ChargesTextColor;
-			/*background-color: $ChargesTextColor;*/
-			/*#F1A76D;*/
-
 		}
 
-
-
-		&.name{
-		padding: 0 0 0 0;//0.5em;
-		height:100%;
-		&>a,
-		&>div{
-			margin-left:-0.5em;
-			padding: 0.5em;
-			display:inline-block;
-			/*height: 100%;*/
-			/*width: 100%;*/
-			border:none;
-		}
-
-		&>a 
-		{
-
-			span{
-				border-bottom: 1px solid $LinkBorder;
+		&.name {
+			padding: 0 0 0 0;
+			height: 100%;
+			&>a, &>div {
+				margin-left: -0.5em;
+				padding: 0.5em;
+				display: inline-block;
+				border: none;
 			}
 
-			&:hover span{
-				border-bottom: 1px solid $LinkBorderHover;
+			&>a {
+				span {
+					border-bottom: 1px solid $LinkBorder;
+				}
+
+				&:hover span {
+					border-bottom: 1px solid $LinkBorderHover;
+				}
 			}
-		}
 			h2 {
 				color: $ChargesTextColor;
 			}
 		}
-		.expander{
+		.expander {
 			color: #999 !important;
-			border: none!important;
-			position:absolute;
-			left:-0.75em;
+			border: none !important;
+			position: absolute;
+			left: -0.75em;
 			padding: 0 0.1em;
-			&:hover{
+			&:hover {
 				color: #666 !important;
 			}
 		}
 
-		.expander_plain{
+		.expander_plain {
 			color: #999 !important;
-			border: none!important;
+			border: none !important;
 			padding: 0 0.1em;
-			&:hover{
+			&:hover {
 				color: #666 !important;
 			}
 		}
-		/*padding: 0.5em 1em 0.5em 0.5em;*/
 		vertical-align: top;
 
 		.date {
-			/*opacity: 0.3;*/
-/*			visibility: hidden;*/
 			font-size: 70%;
 			color: #666;
 
-			.dt{
+			.dt {
 				color: $ChargesTextColor;
-				/*$DarkGreen;*/
 				border: none;
 			}
-			.cheque{
+			.cheque {
 				color: $LinkBorder;
 			}
-			.cheque:before{
-					content: '@\00A0';
+			.cheque:before {
+				content: '@\00A0';
 			}
 			.category {
-	/*			&:after{
-					content: "\2191";
-				}*/
-
-
-			 a
-			 {
-				color: #666;
-				border-color: #CCC;
-				/*border: none;*/
-				&:hover{
-					border-color: $LinkBorderHover;
+				a {
+					color: #666;
+					border-color: #CCC;
+					&:hover {
+						border-color: $LinkBorderHover;
+					}
 				}
-			}
 			}
 		}
 
-		&.actions{
-		padding: 0;//0.5em 0 0.5em 0;
-		 /*div{*/
-
-			 a
-			 {
+		&.actions {
+			padding: 0;
+			a {
 				display: inline-block;
-				height:100%;
-				width:100%; 
+				height: 100%;
+				width: 100%; 
 			 	padding: 0.5em 0 0.5em 1em;
-			 	/*width: 2em;*/
-			 			/*visibility: hidden;*/
-			 			/*background: url('/i/edit3.png') no-repeat center;*/
-			/*font-size: 70%;*/
-			color: #999;
-				/*color: $DarkGreen;*/
-				border:none;
+				color: #999;
+				border: none;
 				border-color: #CCC;
-				/*border: none;*/
-				&:hover, &.hover{
+				&:hover, &.hover {
 					visibility: visible;
 					border-color: $LinkBorderHover;
 					background: url('/i/icon-edit-hover.png') no-repeat !important;
 					background-position: 0.5em 0.8em !important;
 				}
 			}
-			.more{
+			.more {
 				font-size: 150%;
 			}
-		/*}*/
 		}
-		&.group a{
+		&.group a {
 			font-size: 70%;
 			float: left;
 			background: #EEE;
@@ -891,157 +700,108 @@ a.day{
 			margin: 0.2em;
 		}
 
-		&.quantity{
-			color: #6B6D55 ;
+		&.quantity {
+			color: #6B6D55;
 			padding: 0.5em;
 			text-align: right;
 		}
-		&.value{
-			padding: 0;//0.5em 0.5em 0.5em 0.5em;
+		&.value {
+			padding: 0;
 			text-align: right;
-			.bg{
+			.bg {
 				background: no-repeat right;
 				background-image: url('/i/CCE17E_1x1.gif');
-				 /*url('http://averkov.ru/t/color/1x1/F1A76D.gif');*/
-				/*background-image: url('http://averkov.ru/t/color/1x1/'+$ChargesBGColor+'.gif');*/
 			}
-			.date{
+			.date {
 				visibility: hidden;
 			}
-			a,.a-replacer{
+			a, .a-replacer {
 				padding: 0.5em 0;
 				display: inline-block;
-				height:100%; 
-				width:100%;
+				height: 100%; 
+				width: 100%;
 			}
 			a {
 				color: inherit;
 				border-color: transparent;
-				&:hover, &.hover{
+				&:hover, &.hover {
 					color: $LinkHover;
-					span{
-					border-bottom: 1px solid $LinkBorderHover;
+					span {
+						border-bottom: 1px solid $LinkBorderHover;
 					}
 				}
 			}
 		}
-
-		&.name {
-			/*max-width: 400px;*/
-
-
-		}
-
-/*		&:first-child{
-			padding: 0.5em 0 0.5em 0;
-		}*/
-
-
 	}
-	.rest .name{
+	.rest .name {
 		font-style: italic;
 		color: #444;
 	}
-	.i-cheese span {
-		padding-left: 1em;
-		margin-left: -1em;
-		background: no-repeat left url("http://averkov.ru/t/color/16x16/EBE417.gif");
-	}
-	.nodata td{
+	.nodata td {
 		color: #999;
-		/*font-style: italic;*/
 		opacity: 0.5;
 	}
 
-	tr.chequedate{
-		.name{
+	tr.chequedate {
+		.name {
 			font-size: 80%;
-			a span{
+			a span {
 				border: none !important;
 			}
 		}
-		td{
-			padding-top:2em;
-			padding-bottom:-0.5em;
+		td {
+			padding-top: 2em;
+			padding-bottom: -0.5em;
 			font-style: italic;
 		}
 		&.first {
-			td{
-				padding-top:0em !important;
+			td {
+				padding-top: 0em !important;
 			}
 		}
 	}
 
-	tr:first-child td{
+	tr:first-child td {
 		padding: 0.5em 0;
 
-		&.quantity{
+		&.quantity {
 			padding: 0.5em 1em; 
 		}
-		/*border-bottom: 1px solid #999;*/
-		/*$DarkGreen;*/
-		/*#999;*/
-
-		&.actions{
+		&.actions {
 			border-color: transparent;
 		}
 	}
-/*tr:hover td {
-	background: #F5F5F5;
-}*/
-/*tr:hover .actions a,*/
-tr:nth-child(2) td
-{
-	border-top: 1px solid #CCC;
-	&.actions {
-		border-color: transparent !important;
-	 a{
-		background: url('/i/icon-edit.png') no-repeat;
-		background-position: 0.5em 0.8em;
 
-	}
+	tr:nth-child(2) td {
+		border-top: 1px solid #CCC;
+		&.actions {
+			border-color: transparent !important;
+			a {
+				background: url('/i/icon-edit.png') no-repeat;
+				background-position: 0.5em 0.8em;
+			}
+		}
 	}
 
 }
 
-/*	tr:hover .value 
-{
-		a {
-			background: url('/i/edit2.png') no-repeat;
-			background-position: left ;
-		}
-
-}*/
-/*	tr.actions td span{
-		font-size: 70%;
-		color: #666;
-		a, a:visited, a:hover{
-			color: #666 !important;
-			border-color: #666 !important;
-		}
-	}*/
-
-
-
-}
-
-.grid.preview{
+.grid.preview {
 	margin: 0 0 0em -0.5em;
 
-	#IDAjaxPreview &{
+	#IDAjaxPreview & {
 		font-size: 110%;
 	}
-	h2{
+	h2 {
 		font-size: 100%;
 	}
 
-	td.name{
+	td.name {
 		max-width: 600px;
 		.iemobile & {
 			max-width: none !important;
 		}
 	}
-	tr td{
+	tr td {
 		border-color: transparent;
 		padding: 0.1em 0.5em;
 	}
@@ -1049,32 +809,31 @@ tr:nth-child(2) td
 	.spacer td {
 		padding: 0.1em;
 	}
-	.last td{
+	.last td {
 		padding-bottom: 0.25em;
 	}
 
 	.total td,
-	.chequeheader td
-	{
+	.chequeheader td {
 		padding: 0.5em;
 	}
 
-	tr.charge td.value{
+	tr.charge td.value {
 		background: $ChargesBGColor;
 	}
 	tr.income td {
 		background: transparent;
-		&.value{
+		&.value {
 			background: $IncomesBGColor;
 		}
 	}
-	tr.date{
-		&:first-child td{
+	tr.date {
+		&:first-child td {
 			border: none;
 		}
 		td {
 			padding-top: 0.5em;
-			border-top: solid 5px #FFF;//$Green;
+			border-top: solid 5px #FFF;
 			span {
 				opacity: 1;
 				font-style: italic;
@@ -1084,11 +843,11 @@ tr:nth-child(2) td
 
 	.chequefooter,
 	.chequeheader,
-	.chequepos{
-		&.partial td{
+	.chequepos {
+		&.partial td {
 			background-color: $LightRed;
 		}
-		td{
+		td {
 			background-color: $LightGreen;
 		}
 	}
@@ -1096,8 +855,7 @@ tr:nth-child(2) td
 		td {
 			color: $DarkGreen;
 		}
-
-		&.partial td{
+		&.partial td {
 			color: $LinkHover !important;
 		}
 	}
@@ -1111,106 +869,86 @@ tr:nth-child(2) td
 		}
 	}
 
-	.partial+.last td{
+	.partial+.last td {
 		background-color: $LightRed !important;
 	}
 
 
-	.total td{
+	.total td {
 		color: #999;
-		border-top: solid 5px #FFF;//#DDD;//dashed 1px $Green;
+		border-top: solid 5px #FFF;
 	}
 
-	tr.error td{
-		background-color: #E33526;//#E32636;
+	tr.error td {
+		background-color: #E33526;
 		color: #FFF;
 	}
 
-	.errorDescription{
+	.errorDescription {
 		font-size: 90%;
 		font-style: italic;
 		color: #DDD !important;
 	}
 
-	.wodisc{
+	.wodisc {
 		color: $LinkHover;
 		text-decoration: line-through;
-		span{
+		span {
 			opacity: 0.5;
 			color: #666;
 			font-weight: normal;
 		}
 	}
-	tr.subtransaction td{
-	}
-
 }
 
 
-#top>div{
-	float:left;
+#top>div {
+	float: left;
 }
-/*#top + * {
-	clear:both;
-}
-*/
-#top:after{
+
+#top:after {
 	content: "";
 	display: table;
 	clear: both;
 }
 
-#remains{
-	//display:none;
-	font-size:120%;
+#remains {
+	font-size: 120%;
 	padding: 0.5em;
 }
 
-#ta-container{
-	/*overflow: hidden;*/
+#ta-container {
 	width: 100%;
-	/*max-width: 700px;*/
-	/*clip: both;*/
 	margin-bottom: 1em;
 	padding-left: 1em;
 	margin-left: -1em;
-	/*overflow: none;*/
-	&.active{
+	&.active {
 		padding-bottom: 1em;
 	}
 
-	#IDAjaxPreview,.form,.hint{
-		float:left;
-		/*overflow: auto;*/
-		
+	#IDAjaxPreview, .form, .hint {
+		float: left;
 	}
 
-	#examples{
-
+	#examples {
 		li {
 			list-style-type: none;
 			cursor: pointer;
-			/*bac: $Link;*/
-
-			div{
-				/*display: none;*/
+			div {
 				white-space: pre;
 				font-family: 'PT Mono', 'Consolas',  monospace;
 				font-size: 70%;
 			}
-			&:hover{
-				/*color: $LinkHover;*/
+			&:hover {
 				background-color: $LightGreen;
 			}
-			&.active{
+			&.active {
 				background-color: $Green;
 			}
 		}
-
 	}
 
-	.form{
-
+	.form {
 		padding-left: 1em;
 		margin-left: -1em;
 		width: 100%;
@@ -1219,73 +957,58 @@ tr:nth-child(2) td
 			max-width: none !important;
 		}
 		padding-right: 1em;
-		#controls{
-			/*margin-bottom: 1em;*/
-			/*overflow: hidden;*/
-		}
 	}
-
-
 }
 
 
-	#IDAjaxPreview{
-		.active &{
-			display: block !important;
-		}
-		.inactive &{
-			display: none !important;
-		}
-		/*overflow: hidden;*/
-		background-color: #F5F5DC;
-		border-radius: 6px;
-		/*border-radius: 0px 0px 6px 6px;*/
-/*		box-shadow: 0px 0px 5px 1px $LightGreen;
-		border: solid 1px $Green;*/
-		/*padding: 0.5em;*/
+#IDAjaxPreview {
+	.active & {
+		display: block !important;
+	}
+	.inactive & {
+		display: none !important;
+	}
+	background-color: #F5F5DC;
+	border-radius: 6px;
 
-		.grid.preview{
-			margin-left: 0;
-		}
-
+	.grid.preview {
+		margin-left: 0;
 	}
 
-.hidden{
+}
+
+.hidden {
 	visibility: hidden;
 }
 
-#howto2{
-
-	margin-top:-2.5em;
+#howto2 {
+	margin-top: -2.5em;
 	margin-bottom: 2em;
-	.active &{
+	.active & {
 		display: block !important;
 	}
 
-	span{
-		/*border-bottom: dashed 1px $LinkBorder;*/
+	span {
 		color: #000;
 		cursor: pointer;
 		border-radius: 15px;
 		display: block;
-		height:30px;
-		width:30px;
+		height: 30px;
+		width: 30px;
 		font-size: 15px;
-		/*font-size: 15px;*/
 		background: $LightGreen;
 		line-height: 30px;
 		text-align: center;
-		&:before{
+		&:before {
 			content: "?";
 		}
-		&:hover{
+		&:hover {
 			background-color: $Green;
 		}
 	}
-	&.expanded{
-		span{
-			/*content: "" !important;*/
-			&:before{
+	&.expanded {
+		span {
+			&:before {
 				content: "\00D7";
 			}
 			background-color: $DarkGreen;
@@ -1297,22 +1020,13 @@ tr:nth-child(2) td
 input:focus,
 textarea:focus,
 select:focus,
-button:focus{
+button:focus {
 	outline: none;
 }
 
-#transactions
-{
-	/*height: 15em;*/
+#transactions {
 	@include transition(height 0.15s ease-in-out);
 
-/*	&:hover{
-  -webkit-transition: all 1s ease-in-out;
-  -moz-transition: all 1s ease-in-out;
-  -o-transition: all 1s ease-in-out;
-  transition: all 1s ease-in-out;
-  height: 5em;
-}*/
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1325,83 +1039,78 @@ button:focus{
 	padding: 0.5em;
 	border: 1px solid #DDD;
 	border-radius: 6px;
-	/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 1px 0px #EEE;*/
 	box-shadow: inset 0px 0px 2px #DDD;
 	outline: none;
 	
 	&:hover,
-	.active &{
+	.active & {
 		border-color: #999;
 	}
 
-	&:focus{
+	&:focus {
 		color: #000;
 		border-color: $DarkGreen;
-		/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 8px $Green;*/
 		box-shadow: inset  0px 0px 3px $Green;
 
-		&::-webkit-input-placeholder{
+		&::-webkit-input-placeholder {
 			color: #EEE;
 		}
-
 	}
 
-	&::-webkit-input-placeholder{
+	&::-webkit-input-placeholder {
 		color: #999;
 	}
-	&:-moz-placeholder{
+	&:-moz-placeholder {
 		color: #999;
 	}
 
 }
 
 
-
-#controls{
+#controls {
 	margin-top: 1em;
-	text-align:right;
+	text-align: right;
 
-	.active &{
+	.active & {
 		display: block;
 	}
-	.inactive &{
+	.inactive & {
 		display: none;
 	}
 
-	input[type="submit"],button{
+	input[type="submit"], button {
 
-		font-weight:normal;
-		cursor:pointer;
+		font-weight: normal;
+		cursor: pointer;
 		box-shadow:inset 0px 1px 0px 0px $LightGreen;
-		background-color:$Green;
-		border-radius:6px;
+		background-color: $Green;
+		border-radius: 6px;
 		font-size: 120%;
 		border:1px solid $DarkGreen;
-		display:inline-block;
+		display: inline-block;
 		color: #000;
 		margin: 0 0 0 1em;
-		padding: 0.3em 1em;// 0.2em 1em;
-		/*line-height: 90%;*/
+		padding: 0.3em 1em;
 
-		&:disabled{
+		&:disabled {
 			opacity: 0.5;
 			background: #EEE !important;
 			cursor: auto !important;
 			border-color: #DDD !important;
 			box-shadow: none !important;
 		}
-		&:hover,&:active,&:focus {
+		&:hover, &:active, &:focus {
 			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
 		}
 
-		&.submit{
+		&.submit {
 			&:hover, &:focus, &:active {
-				background:$DarkGreen;
+				background: $DarkGreen;
 			}
 			width: 14em;
 		}
-		&.preview{
+		&.preview {
 			background: #EEE;
 			border-color: #CCC;
 			box-shadow:inset 0px 1px 0px 0px #EEE;
@@ -1414,230 +1123,198 @@ button:focus{
 	}
 }
 
-#howto p{
+#howto p {
 	margin: 0;
 	padding: 0;
 }
 
-#howto i{
+#howto i {
 	color: #555;
 }
 
 
-
-#IDLoginForm,#IDSignupForm{
+#IDLoginForm, #IDSignupForm {
 
 	float: left;
 
-	&:after{
+	&:after {
 		clear: both;
 		display: table;
 		content: "";
 	}
-	label{
-
-	font-size: 120%;
+	label {
+		font-size: 120%;
 	}
-	input{
+	input {
 		font-size: 120%;
 		margin-top: 0.75em;
 		display: block;
 	}
-	input[type="checkbox"]{
+	input[type="checkbox"] {
 		display: inline;
-	}.float *{
-	display: inline;
-}
+	}
+	.float * {
+		display: inline;
+	}
 	input[type="text"],
-	input[type="password"]{
+	input[type="password"] {
 		width: 20em;
 		padding: 0.3em 0.5em 0.3em 0.5em;
 		border: 1px solid #99958C;
-		//#6B6D55 ;//$Green;
 		border-radius: 5px;
 		box-shadow: inset 0px 0px 2px $DarkGreen;
-		&:focus{
+		&:focus {
 			box-shadow: inset 0px 0px 2px $DarkGreen;
-			/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 2px $DarkGreen;*/
 			background: transparent !important;
 			border-color: $DarkGreen !important;
 		}
 	}
 	input[type="submit"] {
-		float:right;
-		cursor:pointer;
-		box-shadow:inset 0px 1px 0px 0px $LightGreen;
-		background-color:$Green;
-		border-radius:6px;
-		border:1px solid $DarkGreen;
-		display:inline-block;
-		color:#000;
+		float: right;
+		cursor: pointer;
+		box-shadow: inset 0px 1px 0px 0px $LightGreen;
+		background-color: $Green;
+		border-radius: 6px;
+		border: 1px solid $DarkGreen;
+		display: inline-block;
+		color: #000;
 		margin-top: 1em;
 		padding: 0.3em 1em;
-		&:hover,&:active,&:focus {
-			background-color:$DarkGreen;
-			box-shadow:inset 0px 1px 0px 0px $Green;
+		&:hover, &:active, &:focus {
+			background-color: $DarkGreen;
+			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
 		}
-		&:disabled{
+		&:disabled {
 			opacity: 0.5;
-			/*background: $LightGreen !important;*/
 			cursor: default !important;
 		}
 	}
 }
 
-.actions{
-	float:left;
+.actions {
+	float: left;
 }
 
 
-.action{
-	font-size:110%;
-	&:first-child{
-		padding-top:0;
+.action {
+	font-size: 110%;
+	&:first-child {
+		padding-top: 0;
 		border: none;
 	}
-	&:nth-child(2){
+	&:nth-child(2) {
 		border: none;
 	}
-/*	&:hover{
-
-	background: $LightGreen;
-	}*/
-	margin-left:-1em;
+	margin-left: -1em;
 	padding: 1em 1em;
-	/*border-top: dashed 1px #999;*/
-	/*margin-bottom: 3em;*/
-	h2{
+	h2 {
 		font-size: 130%;
-		/*margin: 0.2em 0;*/
 		color: $DarkGreen;
-		/*color: #99958C;*/
 	}
-	input{
+	input {
 		margin-top: 0.5em !important;
 		font-size: 100%;
 	}
-	input[type="text"]{
+	input[type="text"] {
 		padding: 0.3em 0.5em 0.3em 0.5em;
 		border: 1px solid #99958C;
-		//#6B6D55 ;//$Green;
 		border-radius: 5px;
 		box-shadow: inset 0px 0px 2px $DarkGreen;
-		&:focus{
+		&:focus {
 			box-shadow: inset 0px 0px 2px $DarkGreen;
-			/*box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.047), 0px 0px 2px $DarkGreen;*/
 			background: transparent !important;
 			border-color: $DarkGreen !important;
 		}
 	}
 	input[type="submit"] {
-		cursor:pointer;
-		box-shadow:inset 0px 1px 0px 0px $LightGreen;
-		background-color:$Green;
-		border-radius:6px;
-		border:1px solid $DarkGreen;
-		display:inline-block;
-		color:#000;
+		cursor: pointer;
+		box-shadow: inset 0px 1px 0px 0px $LightGreen;
+		background-color: $Green;
+		border-radius: 6px;
+		border: 1px solid $DarkGreen;
+		display: inline-block;
+		color: #000;
 		margin-top: 1em;
 		padding: 0.3em 1em;
-		&:hover,&:active,&:focus {
-			background-color:$DarkGreen;
-			box-shadow:inset 0px 1px 0px 0px $Green;
+		&:hover, &:active, &:focus {
+			background-color: $DarkGreen;
+			box-shadow: inset 0px 1px 0px 0px $Green;
 			border-color: $SuperDarkGreen;
 		}
-		&:disabled{
+		&:disabled {
 			opacity: 0.5;
-			/*background: $LightGreen !important;*/
 			cursor: default !important;
-			background-color:$Green !important;
+			background-color: $Green !important;
 			border-color: $DarkGreen !important;
 		}
 	}
 }
 
 #actionRename,
-#actionMove{
-	input[type="text"]{
+#actionMove {
+	input[type="text"] {
 		width: 70%;
 		min-width: 10em;
 		max-width: 30em;
 	}
 }
 
-#actionEditTransactionDetails{
-	input[type="text"]{
+#actionEditTransactionDetails {
+	input[type="text"] {
 		text-align: right;
 	}
 
 }
 
-#actionRename{
-
-/*	h2{
-		color: #6B6D55  !important;
-	}*/
-
-
-
-	.controls{
-		/*display: none;*/
+#actionRename {
+	.controls {
 		div {
 			margin-top: 0.5em;
 		}
 	}
-	h2 span{
+	h2 span {
 		color: $SuperDarkGreen;
-		/*font-style: italic;*/
-		cursor:pointer;
+		cursor: pointer;
 		border-bottom: dashed 1px $SuperDarkGreen;
-		&:hover{
+		&:hover {
 			color: $SuperDarkGreen;
 		}
 	}
-
 }
 
-#actionEditTransactionDetails{
-	h2{
-		/*color: #6B6D55  !important;*/
-	}
-	div{
-		color: #333;//#6B6D55;//#99958C;
-		span{
+#actionEditTransactionDetails {
+	div {
+		color: #333;
+		span {
 			color: #000;
 			border-bottom: 1px dashed #000;
 			cursor: pointer;
-			display:none;
+			display: none;
 		}
-
 	}
 }
 
 
-#actionDeleteTransaction{
-	span{
+#actionDeleteTransaction {
+	span {
 		color: $LinkHover;
 		border-bottom: 1px dashed $LinkHover;
 		cursor: pointer;
 	}
-	#IDDeleteConfirm{
-
-	}
-	.controls{
+	.controls {
 		display: none;
 	}
 	.operamini & {
-		.controls{
+		.controls {
 			display: block;
 		}
 	}
-	&.confirm{
-		.controls{
+	&.confirm {
+		.controls {
 			display: block;
 		}
-		#IDDeleteConfirm{
+		#IDDeleteConfirm {
 			color: $DarkGreen;
 			border-color: $DarkGreen;
 			font-size: 80%;
@@ -1645,57 +1322,15 @@ button:focus{
 	}
 
 	input[type="submit"] {
-		margin-top:1em !important;
-		box-shadow:inset 0px 1px 0px 0px #CD5B45;
-		background-color:$LinkHover;
-		border:1px solid $LinkHover;
-		color:#FFF;
-		&:hover,&:active{
+		margin-top: 1em !important;
+		box-shadow: inset 0px 1px 0px 0px #CD5B45;
+		background-color: $LinkHover;
+		border: 1px solid $LinkHover;
+		color: #FFF;
+		&:hover, &:active {
 			background-color: #222;
-			box-shadow:inset 0px 1px 0px 0px #666;
+			box-shadow: inset 0px 1px 0px 0px #666;
 			border-color: #000;
 		}
 	}
-
-
-/*	div{
-		margin-top: 2em;
-		font-size: 120%;*/
-		/*color: $LinkHover;*/
-
-	/*}*/
 }
-
-
-/*
-
-input[type="checkbox"] {
-  display: none;
-}
-label {
-  cursor: pointer;
-  color: $DarkGreen;
-  font-size: 120%;
-}
-
-input[type="checkbox"] + label:before {
-  border-radius: 5px;
-  content: "\2713";
-  // "\00a0";
-  display: inline-block;
-  font: 1em sans-serif;
-  margin: 0 .25em 0 0;
-  padding: 0.1em 0.3em;
-  vertical-align: top;
-  background: $LightGreen;
-  color: transparent;
-}
-input[type="checkbox"]:checked + label:before {
-  background: $Green;
-  color: #FFF;
-  content: "\2713";
-  text-align: center;
-}
-input[type="checkbox"]:checked + label:after {
-  font-weight: bold;
-}*/
