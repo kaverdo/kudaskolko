@@ -1,17 +1,16 @@
 -- --------------------------------------------------------
 -- Host:                         localhost
--- Server version:               5.0.95-log - FreeBSD port: mysql-server-5.0.95
--- Server OS:                    portbld-freebsd8.3
+-- Server version:               5.5.44-1+wheezy1+mh1-log - (Debian)
+-- Server OS:                    debian-linux-gnu
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-01-19 22:05:19
+-- Date/time:                    2016-03-22 21:57:04
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!40014 SET FOREIGN_KEY_CHECKS=0 */;
 
--- Dumping database structure for kudaskolko
-CREATE DATABASE IF NOT EXISTS `kudaskolko` /*!40100 DEFAULT CHARACTER SET cp1251 */;
+CREATE DATABASE IF NOT EXISTS `kudaskolko` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `kudaskolko`;
 
 CREATE TABLE IF NOT EXISTS `acl` (
@@ -89,10 +88,10 @@ CREATE TABLE IF NOT EXISTS `items` (
   `iid` int(10) unsigned NOT NULL auto_increment,
   `pid` int(10) unsigned NOT NULL,
   `name` varchar(255) default NULL,
-  `level` smallint(6) NOT NULL,
+  `level` smallint(6) unsigned NOT NULL,
   `type` tinyint(3) unsigned default NULL,
   `alias_id` int(10) unsigned default NULL,
-  `user_id` smallint(5) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
   `is_auto_generated` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`iid`),
   KEY `pid` (`pid`),
@@ -114,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `nesting_data` (
   `iid` int(10) unsigned NOT NULL,
   `pid` int(10) unsigned NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
-  `user_id` smallint(5) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
   `type` tinyint(3) unsigned NOT NULL,
   KEY `level` (`level`),
   KEY `iid_pid` (`iid`,`pid`),
@@ -142,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `quantity` double unsigned NOT NULL,
   `description` varchar(255) default NULL,
   `type` tinyint(3) unsigned default NULL,
-  `user_id` tinyint(3) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
   PRIMARY KEY  (`tid`),
   KEY `is_displayed` (`is_displayed`),
   KEY `iid` (`iid`),
@@ -167,3 +166,6 @@ INSERT INTO auser (auser_id, name, passwd, email, description, auser_type_id, ri
 INSERT INTO auser (auser_id, name, passwd, email, description, auser_type_id, rights, is_published, dt_register) VALUES (2, 'Admins', 'group', 'group', 'Все администрирующие пользователи', 1, 16777215, 1, NOW());
 INSERT INTO auser (auser_id, name, passwd, email, description, auser_type_id, rights, is_published, dt_register) VALUES (3, 'admin', 'admin', 'misha@design.ru', '', 0, 16777215, 1, NOW());
 INSERT INTO auser_to_auser (auser_id, parent_id) VALUES (3,2);
+
+/*!40014 SET FOREIGN_KEY_CHECKS=1 */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
