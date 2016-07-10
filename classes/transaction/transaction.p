@@ -273,7 +273,7 @@ $tAccounts[^dbo:getAccounts[]]
 <form method="post" action="/" id="formTransactions">
 <input type="hidden" name="action" value="out"/>
 ^addOperdayField[]
-<textarea name="transactions" id="transactions" placeholder="Записать расходы и доходы..." 
+<textarea autocomplete="on" autocorrect="on" name="transactions" id="transactions" placeholder="Записать расходы и доходы..." 
 cols="50" rows="10">^if(def $sData){^untaint[as-is]{$sData}}</textarea>
 
 <div id="controls">
