@@ -6,7 +6,6 @@ locals
 
 @returnCategories[][locals]
 $isMove(def $form:move)
-$isOnlyLine(def $form:only_line && $form:only_line)
 $sOriginalInput[^form:term.lower[]]
 $sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
@@ -41,7 +40,7 @@ $sInput[^trimPrefixes[$sInput]]
 					^tResult.join[^getChecks[$tResultFromDB.iid]]
 				}{
 					^tResult.join[^getTopPrices[$isSubItem;$tResultFromDB.iid]]
-					^if($isOnlyLine){
+					^if(def $form:only_line && $form:only_line){
 						^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
 					}
 				}
