@@ -6,7 +6,7 @@ locals
 
 @returnCategories[][locals]
 $isMove(def $form:move)
-$isOnlyLine(def $form:only_line && $form:only_line eq true)
+$isOnlyLine($form:only_line)
 $sOriginalInput[^form:term.lower[]]
 $sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
