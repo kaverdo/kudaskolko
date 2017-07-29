@@ -27,13 +27,13 @@ $ChargesBGColor: #CCE17E;
 $ChargesBarColor: $Green;
 
 $IncomesTextColor: #D77E19;
-$IncomesBGColor: #F1C16D; 
+$IncomesBGColor: #F1C16D;
 $IncomesBarColor: #F1C16D;
 
 
 // spaces
 
-$lrMargin: 0.5em; 
+$lrMargin: 0.5em;
 $tbMargin: 0.2em;
 
 
@@ -48,11 +48,11 @@ $tbMargin: 0.2em;
 	&:after {
 		content: "";
 		display: table;
-		clear: both;	
+		clear: both;
 	}
 }
 
-.ui-autocomplete {
+.ui-menu {
 	border-radius: 10px;
 	font-family: 'PT Sans', 'Open Sans', 'Helvetica', sans-serif !important;
 	max-height: 300px;
@@ -80,6 +80,14 @@ $tbMargin: 0.2em;
 	.hover-search {
 		background-color: #ABCDEF !important;
 	}
+
+	.ui-menu-item:first-child {
+		font-size: 130%;
+		a {
+			padding: 1em .4em;
+		}
+	}
+
 	.ui-menu-item a {
 		text-decoration: none;
 		display: inline-block;
@@ -174,7 +182,7 @@ body.beta .home:after {
 		> span {
 			display: none;
 		}
-	
+
 		&.main #main,
 		&.reserve #reserve,
 		&.total #total {
@@ -507,7 +515,7 @@ a.day {
 	.weekend {
 		color: #AF321D;
 		border-color: #E9967A !important;
-	}	
+	}
 
 	&:first-child {
 		margin-left: -$lrMargin;
@@ -676,7 +684,7 @@ a.day {
 			a {
 				display: inline-block;
 				height: 100%;
-				width: 100%; 
+				width: 100%;
 			 	padding: 0.5em 0 0.5em 1em;
 				color: #999;
 				border: none;
@@ -718,7 +726,7 @@ a.day {
 			a, .a-replacer {
 				padding: 0.5em 0;
 				display: inline-block;
-				height: 100%; 
+				height: 100%;
 				width: 100%;
 			}
 			a {
@@ -765,7 +773,7 @@ a.day {
 		padding: 0.5em 0;
 
 		&.quantity {
-			padding: 0.5em 1em; 
+			padding: 0.5em 1em;
 		}
 		&.actions {
 			border-color: transparent;
@@ -1041,7 +1049,7 @@ button:focus {
 	border-radius: 6px;
 	box-shadow: inset 0px 0px 2px #DDD;
 	outline: none;
-	
+
 	&:hover,
 	.active & {
 		border-color: #999;
