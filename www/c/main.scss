@@ -84,15 +84,13 @@ $tbMargin: 0.2em;
 	.ui-menu-item:first-child {
 		font-size: 130%;
 		a {
-			padding: 1em .4em;
+			padding: 1em .4em !important;
 		}
 	}
 
 	.ui-menu-item a {
-		text-decoration: none;
-		display: inline-block;
 		overflow: auto;
-		padding: 0.5em .4em;
+		padding: 0.5em .4em !important;
 		line-height: 1.2 !important;
 		zoom: 1;
 		&:hover {
