@@ -27,7 +27,7 @@ $(function() {
 					cache: false,
 					data: {iid: id}
 				}).done(function( html ) {
-					
+
 					// $("#IDAjaxPreview .dataContainer").html(html);
 					// $("#IDAjaxPreview").removeClass("hidden");
 					// controlsPreview.attr("disabled",true);
@@ -79,7 +79,10 @@ $(function() {
 						return;
 					}
 					$.getJSON( "/?action=json",
-						{ term: term},
+						{
+							term: term,
+							only_line: $( "#transactions" ).val().lastIndexOf("\n") == -1
+						},
 						function( data, status, xhr ) {
 							cache[ term ] = data;
 							response( data );
@@ -134,7 +137,7 @@ $(function() {
 				};
 
 				var matcher = new RegExp("(\\s+|^|@|\\$|\\(|\\-)(" + $.ui.autocomplete.escapeRegex(t) + result+")", "ig" );
-						
+
 				if(item.iid && item.iid != 'undefined'){
 					var $anchor = $( "<div ><u>Все записи</u></div>" )
 						.addClass("search-link")
@@ -163,7 +166,7 @@ $(function() {
 				 	var resultValue = item.value;
 					if (item.label && item.label != 'undefined') {
 						resultValue = item.label;
-					} 
+					}
 					resultValue = resultValue.replace(matcher, "$1<i>$2</i>");
 					return $( "<li>" )
 					.append( $( "<a>" )
@@ -176,7 +179,7 @@ $(function() {
 				 	var resultValue = item.value;
 					if (item.label && item.label != 'undefined') {
 						resultValue = item.label;
-					} 
+					}
 					resultValue = resultValue.replace(matcher, "$1<i>$2</i>");
 
 					return $( "<li>" )
@@ -377,7 +380,7 @@ function ajaxPreview(text){
 		return;
 	}
 	var re = new RegExp(".?\\.$", "ig" );
-	var isSingleLine = (value.split("\n").length == 1) 
+	var isSingleLine = (value.split("\n").length == 1)
 	&& re.test($.ui.autocomplete.escapeRegex(value))
 	;
 	if (value == transactionsValue && !hasAjaxPreviewHTTPError){
@@ -400,7 +403,7 @@ function ajaxPreview(text){
 		data: {transactions: value}
 		// ,beforeSend: function(){
 		// 	$("#IDAjaxPreview").removeClass("hidden");
-		// 	$("#IDAjaxPreview .dataContainer").html("..."); 
+		// 	$("#IDAjaxPreview .dataContainer").html("...");
 		// }
 	}).done(function( html ) {
 		if (isSingleLine) {
@@ -412,7 +415,7 @@ function ajaxPreview(text){
 		$("#IDAjaxPreview").removeClass("hidden");
 		controlsPreview.attr("disabled",true);
 		hasAjaxPreviewFormatError = $("#IDAjaxPreview .dataContainer .grid").hasClass("hasError");
-		
+
 		controlsSubmit.attr("disabled", hasAjaxPreviewFormatError);
 		if (hasAjaxPreviewFormatError){
 			$("#IDAjaxPreview").effect("shake", { times:2, distance:10 }, 100);
@@ -455,9 +458,9 @@ $(function() {
 		minDate: new Date(1971, 1 - 1, 1),
 		maxDate: new Date(2037, 12 - 1, 31),
 		dayNamesMin: ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
-		monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", 
+		monthNames: [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август",
 		"Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
-		monthNamesShort: [ "января", "февраля", "марта", "апреля", "мая", "июня", "июля","августа", 
+		monthNamesShort: [ "января", "февраля", "марта", "апреля", "мая", "июня", "июля","августа",
 		"сентября", "октября", "ноября", "декабря" ]
 	});
 	$( "#IDTransactionDate" ).datepicker( "setDate", $( "#IDTransactionDate" ).attr("date") );
@@ -506,13 +509,13 @@ $(function() {
 	transactionsID.focus(function(){
 
 		// без нулевого таймаута или без явного указания, Хром не понимает, что поле получило фокус
-		setTimeout(function(){ 
+		setTimeout(function(){
 			showHideControls(transactionsID);
 		}, 0);
 
 		// showHideControlsAll(transactionsID, transactionsID.val() == '', true);
 
-		// без нулевого таймаута или без явного указания, Хром выставляет курсор в место, 
+		// без нулевого таймаута или без явного указания, Хром выставляет курсор в место,
 		// куда ткнул пользователь (а посколько поле пустое и показывается в виде одной строки,
 		// то фокус курсор попадает в первую строку с названием месяца)
 		setTimeout(function(){
@@ -539,7 +542,7 @@ $(function() {
 			ajaxPreview();
 		}
 		setRows(transactionsID,isEmpty,true);
-		var keyCode = (event.which ? event.which : event.keyCode);  
+		var keyCode = (event.which ? event.which : event.keyCode);
 		if (keyCode == 13 &&
 			!isEmpty &&
 			// $(this).val().trim() != "" &&
@@ -577,7 +580,7 @@ $(function() {
 			controlsSubmit.attr("disabled",false);
 			saveDraftTimer = setTimeout(function() {
 				$.cookie("draft", transactionsID.val().trim(), { expires : 90 });
-			}, 200); 
+			}, 200);
 			previewTimer = setTimeout(function() {
 				ajaxPreview();
 			}, 2000);
@@ -680,7 +683,7 @@ $(function() {
 	});
 
 
-	// $('.main, .reserve, .total').click(function() {                             
+	// $('.main, .reserve, .total').click(function() {
 	// 	this.className = {
 	// 		main : 'reserve', reserve: 'total', total: 'main'
 	// 	}[this.className];
@@ -699,11 +702,11 @@ $(function() {
 				accounts.removeClass(reserve).addClass(total);
 			} else {
 				accounts.removeClass(total).addClass(main);
-			}	
+			}
 		}
-		
+
 	});
-	
+
 
 	$("#IDCreateAliasSpan").click(function(e){
 		if($("#IDCreateAlias").val() == 1){

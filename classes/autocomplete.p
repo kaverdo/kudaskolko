@@ -6,6 +6,7 @@ locals
 
 @returnCategories[][locals]
 $isMove(def $form:move)
+$isOnlyLine(def $form:only_line && $form:only_line)
 $sOriginalInput[^form:term.lower[]]
 $sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
@@ -23,15 +24,13 @@ $sInput[^trimPrefixes[$sInput]]
 		^addDates[$tResult;$sInput]
 		^addPopularGoodsForPrices[$tResult;$sInput]
 	}
-	
+
 	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput;$isAccount]]
 
 	^if($tResultFromDB){
 
 		$isFirstEntryFullTyped(^sOriginalInput.trim[] eq ^tResultFromDB.value.lower[])
-		^if(!$isFirstEntryFullTyped){
-			^tResult.join[$tResultFromDB;$.limit(1)]
-		}
+		^tResult.join[$tResultFromDB;$.limit(1)]
 
 		^if(!$isMove){
 			$sTrimmedFirstEntry[^trimPrefixes[$tResultFromDB.value]]
@@ -42,7 +41,9 @@ $sInput[^trimPrefixes[$sInput]]
 					^tResult.join[^getChecks[$tResultFromDB.iid]]
 				}{
 					^tResult.join[^getTopPrices[$isSubItem;$tResultFromDB.iid]]
-					^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
+					^if($isOnlyLine){
+						^tResult.append{$tResultFromDB.value .	$tResultFromDB.value — Найти записи		}
+					}
 				}
 			}
 		}
@@ -69,7 +70,7 @@ $result[^oSql.table{
 
 	FROM items i
 	LEFT JOIN transactions t ON i.iid = t.iid
-	
+
 	WHERE
 	i.user_id = $dbo:USERID AND
 	i.is_auto_generated = 0 AND
@@ -106,11 +107,11 @@ $result[^oSql.table{
 $result[^oSql.table{
 	SELECT
 	CONCAT('@', cti.name, ' — Повторить чек') AS label,
-	CONCAT('@', cti.name,  '\n', 
+	CONCAT('@', cti.name,  '\n',
 		GROUP_CONCAT(CONCAT(ti.name, ' ',
 
 		 IF(t.quantity = 1, t.amount, ROUND(t.amount/t.quantity, 2)), ' * ') SEPARATOR '\n')) AS value
-	FROM transactions t 
+	FROM transactions t
 	LEFT JOIN transactions ct ON ct.tid = t.ctid
 	LEFT JOIN items ti ON ti.iid = t.iid
 	LEFT JOIN items cti ON cti.iid = ct.iid
@@ -148,8 +149,8 @@ $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
 		i.iid,
 		1 AS with_price
 		FROM items i
-		LEFT JOIN transactions t ON i.iid = t.iid 
-		WHERE 
+		LEFT JOIN transactions t ON i.iid = t.iid
+		WHERE
 		i.user_id = $dbo:USERID
 		AND i.is_auto_generated = 0
 		AND t.amount = ^tParts.1.int(0)
@@ -184,8 +185,8 @@ $result[^oSql.table{
 	i.iid,
 	1 AS with_price
 	FROM items i
-	LEFT JOIN transactions t ON i.iid = t.iid 
-	WHERE 
+	LEFT JOIN transactions t ON i.iid = t.iid
+	WHERE
 	i.user_id = $dbo:USERID
 	AND i.iid = $iid
 	AND i.is_auto_generated = 0
@@ -271,7 +272,7 @@ $tSplitted[^sInput.split[ ]]
 			)
 		}[AND]
 	]
-	
+
 }
 
 @changeKeyboard[sTranslit]
