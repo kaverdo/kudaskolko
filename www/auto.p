@@ -11,7 +11,7 @@ $oCalendar[]
 $oTransactions[]
 $oAction[]
 $MONEY[
-	$.SERVER_HOST[http://$env:SERVER_NAME]
+	$.SERVER_HOST[https://$env:SERVER_NAME]
 ]
 $isOperaMiniBrowser(^u:contains[$env:HTTP_USER_AGENT;Opera Mini] || 
 	^u:contains[$env:HTTP_USER_AGENT;NokiaC3-0])
@@ -36,7 +36,7 @@ $.csql[$oSql]
 
 	|| (def $form:action && $form:action eq signup && $oAuth.is_logon)){
 	^rem{ *** при logon/logout делаем external redirect на себя *** }
-	$response:location[http://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
+	$response:location[https://${env:SERVER_NAME}^request:uri.match[\?.*][]{}?rand^math:random(100)]
 }
 $USERID($oAuth.user.id)
 
