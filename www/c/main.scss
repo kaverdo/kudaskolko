@@ -654,8 +654,11 @@ a.day {
 				color: $ChargesTextColor;
 				border: none;
 			}
-			.cheque {
+			.cheque, .tag {
 				color: $LinkBorder;
+			}
+			.cheque:before {
+				content: '#\00A0';
 			}
 			.cheque:before {
 				content: '@\00A0';
