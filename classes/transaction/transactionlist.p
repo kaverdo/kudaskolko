@@ -309,8 +309,9 @@ $lastOperday[]
 		^if(^form:groupid.int(0)){
 			 <a class="notag" href="^makeQueryString[
 					$.p[$form:p]
+						$.expanded[$form:expanded]
 					$.operday[^if(def $form:operday){$form:operday}{$v.tEntries.operday}]
-				]"><span>$v.name</span></a> <span class="tag">^#$v.groupName</span>  <span>$v.date</span>
+				]"><span>$v.name</span></a> <span>^#</span>$v.groupName  <span>$v.date</span>
 		}{
 			$v.name <span>$v.date</span>
 		}
