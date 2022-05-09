@@ -647,6 +647,9 @@
  .iemobile .grid.preview td.name {
    max-width: none !important;
 }
+ .grid.preview td.name span.tag {
+  opacity: 0.5;
+}
  .grid.preview tr td {
    border-color: transparent;
    padding: 0.1em 0.5em;

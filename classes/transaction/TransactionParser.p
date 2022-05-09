@@ -31,34 +31,44 @@ $aTransactions[^array::new[]]
 $tTransactions[^sTransactions.match[
 
 ^^[ \t]* # лишние символы
-(\x23)? # возможность закомментировать строку знаком #
+#(?:\x23)? # возможность закомментировать строку знаком #
 (
 	(?:(^getDatePattern[])\s*)
-	|
-	(.*?))
+	| (?:\x23(.+)\s*)
+	| .*?)
 ^$][gmxi]]
 
 $oBaseTransaction[]
 $dtTransDate[^u:getJustDate[^date::now[]]]
+$transTag[]
 $hTransaction[^hash::create[]]
 $patternParseTransactionPattern[^getParseTransactionPattern[]]
 ^tTransactions.menu{
-^if(!def $tTransactions.2 && !def $tTransactions.1){
+^if(!def $tTransactions.1){
 	$hTransaction.isEmpty(true)
+	$transTag[]
+	$dtTransDate[]
 }{
-	^if(def $tTransactions.3){
-		$dtTransDate[^u:stringToDate[$tTransactions.3]]
-		$hTransaction.isEmpty(true)
+	^if(def $tTransactions.2 || def $tTransactions.3){
+		^if(def $tTransactions.2){
+			$dtTransDate[^u:stringToDate[$tTransactions.2]]
+			$hTransaction.isEmpty(true)
+		}{
+			$transTag[$tTransactions.3]
+			$hTransaction.isEmpty(true)
+		}
 	}{
 		$hTransaction.dtTransDate[$dtTransDate]
 
-		^hTransaction.add[^parseTransaction[$tTransactions.2;$patternParseTransactionPattern]]
+		$hTransaction.transTag[$transTag]
+
+		^hTransaction.add[^parseTransaction[$tTransactions.1;$patternParseTransactionPattern]]
 	}
 }
-^if(!def $tTransactions.1){
+#^if(!def $tTransactions.1){
 	^aTransactions.add[^hash::create[$hTransaction]]
 	$hTransaction[^hash::create[]]
-}
+# }
 }
 
 $result[^aTransactions.getHash[]]
@@ -69,7 +79,7 @@ $result[^regex::create[
 ^^\s*
 
 (?:(^getDatePattern[])\s+)? # 1 sDate
-
+(?:(\^#)\s*)? # 1.1 isTag
 (?:(-)\s*)? # 2 isSubTransaction
 (?:(@)\s*)? # 3 isCheque
 (?:(\^$)\s*)? # 4 isAccount
@@ -115,6 +125,7 @@ $tTransaction[^sTransaction.match[$pattern]]
 ^rem{ последовательность ключей соответствует последовательности полей в шаблоне match }
 $hStr[
 	$.sDate(1)
+	$.isTag(1)
 	$.isSubTransaction(1)
 	$.isCheque(1)
 	$.isAccount(1)
@@ -137,6 +148,9 @@ $i(1)
 
 ^if(def $h.sDate){
 	$hResult.dtTransDate[^u:stringToDate[$h.sDate]]
+}
+^if(def $h.isTag){
+	$hResult.isTag(true)
 }
 
 $hResult.sName[^u:capitalizeString[^h.sName.left(255)]]

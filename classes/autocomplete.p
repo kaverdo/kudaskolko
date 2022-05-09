@@ -9,6 +9,8 @@ $isMove(def $form:move)
 $sOriginalInput[^form:term.lower[]]
 $sInput[$sOriginalInput]
 $sFirst[^sInput.left(1)]
+
+$isTag($sFirst eq "#" || $sFirst eq "№")
 $isCheque($sFirst eq "@" || $sFirst eq "^"")
 $isAccount($sFirst eq "^$" || $sFirst eq "^;")
 $isSubItem($sFirst eq "-")
@@ -22,6 +24,7 @@ $sInput[^trimPrefixes[$sInput]]
 		^addFuzzyDates[$tResult;$sFirst;$sInput;$sChangedInput]
 		^addDates[$tResult;$sInput]
 		^addPopularGoodsForPrices[$tResult;$sInput]
+		^addTags[$tResult;$isTag;$sInput;$sChangedInput]
 	}
 	
 	$tResultFromDB[^getEntries[$isSubItem;$isCheque;$sInput;$sChangedInput;$isAccount]]
@@ -50,7 +53,13 @@ $sInput[^trimPrefixes[$sInput]]
 	}
 	$result[^json:string[$tResult;$.table[object]]]
 }{
-	$result[^json:string[^table::create{};$.table[object]]]
+	^if($isTag){
+		$tResult[^table::create{value	label	iid	with_price}]
+		^addTags[$tResult;$isTag;$sInput;$sChangedInput]
+		$result[^json:string[$tResult;$.table[object]]]
+	}{
+		$result[^json:string[^table::create{};$.table[object]]]
+	}
 }
 
 
@@ -121,6 +130,49 @@ $result[^oSql.table{
 	ORDER BY t.operday DESC
 	}[$.limit(1)]
 ]
+
+@addTags[tResult;isTag;sInput;sChangedInput]
+^if(def $sInput){
+	$tags[^oSql.table{
+		SELECT
+			CONCAT('#',i.name) AS value
+		FROM groups i
+		WHERE
+# 		i.user_id = $dbo:USERID AND
+		(
+			(
+				^splitInput[^trimPrefixes[$sInput];i.name]
+			)
+			^if($sChangedInput ne $sInput){
+				OR
+				(
+					^splitInput[$sChangedInput;i.name]
+				)
+			}
+		)
+		ORDER BY
+		ABS(STRCMP(i.name,"$sInput")),
+		ABS(STRCMP(LEFT(i.name, CHAR_LENGTH("$sInput")),"$sInput")),
+		i.name
+		}[$.limit(20)]
+	]
+
+	^tResult.join[$tags]
+}{
+	^if($isTag){	
+		$tags[^oSql.table{
+			SELECT
+				CONCAT('#',i.name) AS value
+			FROM groups i
+			
+			ORDER BY
+			i.name
+			}[$.limit(20)]
+		]
+		^tResult.join[$tags]
+	}
+}
+
 
 @addPopularGoodsForPrices[tResult;sInput]
 $tParts[^sInput.match[^^\s*(\d+)\s*(?:\*\s*(\d+)\s*)?^$][gmxi]]
@@ -338,4 +390,4 @@ $result[^selectFrom[$sFirst;^table::create{value
 послезавтра}]]
 
 @trimPrefixes[sInput]
-$result[^sInput.trim[left;^@ -^$^;^"]]
+$result[^sInput.trim[left;^#^@ -^$^;^"№]]

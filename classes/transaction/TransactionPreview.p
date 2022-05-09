@@ -9,6 +9,8 @@ $hTransactions[^hash::create[$hTransactions]]
 	<table class="grid preview ^if($hNotValid){hasError}" cellpadding="0" cellspacing="0">
 
 	$dtCurrentTransDate[]
+	$sCurrentTag[]
+
 	$iShopTransaction[]
 
 
@@ -29,7 +31,14 @@ $hTransactions[^hash::create[$hTransactions]]
 # 			}<br/>
 # 		}
 # 	}
-
+# 		^if($v.isTag ){
+# 			$sCurrentTag[$v.name $v.transTag]
+# 			^continue[]
+# 		}
+# 		^if($v.isEmpty && def $sCurrentTag){
+# 			$sCurrentTag[]
+# 		}
+		
 		^if($v.isEmpty || ($v.isCheque && def $iShopTransaction)){
 			^previewChequeFooter[]
 			$iShopTransaction[]
@@ -67,7 +76,7 @@ $hTransactions[^hash::create[$hTransactions]]
 		}
 		^if(^hNotValid.contains[$k]){
 			<tr class="error">
-			<td class="name">^if(def $v.sName){$v.sName}{^@$v.sChequeName}
+			<td class="name">^if(def $v.sName){^if(def $v.transTag){^#$v.transTag }$v.sName}{^@$v.sChequeName}
 			<span class="errorDescription">$hNotValid.$k</span></td>
 			<td class="quantity"></td>
 			<td class="oldvalue"></td>
@@ -118,7 +127,7 @@ $hTransactions[^hash::create[$hTransactions]]
 				}
 				<tr class="$sClassName">
 		
-				<td class="name">^if($v.isSubTransaction){&minus^; }$v.sName</td>
+				<td class="name">^if($v.isSubTransaction){&minus^; }^if(def $v.transTag){<span class="tag">^#$v.transTag </span>}$v.sName</td>
 				<td class="quantity">^if($v.dQuantity != 1){^u:formatQuantity($v.dQuantity)}</td>
 				<td class="oldvalue">
 				^if($v.dAmountWithoutDisc != $v.dAmount){
