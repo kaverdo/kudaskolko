@@ -272,7 +272,6 @@ $hResult[^hash::create[]]
 	$hResult.tValues[^oSql.table{
 		SELECT gid FROM groups where name = '$hParams.name'
 	}[$.limit(1)]]
-
 	^if($hResult.tValues.gid == 0){
 		^oSql.void{
 			INSERT INTO groups (
@@ -284,6 +283,7 @@ $hResult[^hash::create[]]
 			)}
 
 		$hResult.tValues[^oSql.table{SELECT LAST_INSERT_ID() AS gid}]
+
 	}
 }{
 	$hResult.isError(true)
@@ -427,6 +427,13 @@ $iLastInsert	^hParams.iid.int(0)}]
 	^if(^hParams.iid.int(0) == 0){
 		$result[$.isError(true)]
 	}{
+		^if(^hParams.gid.int(0)){
+			^oSql.void{
+			INSERT INTO transactions_in_groups (tid, gid)
+			VALUES ($iLastInsert, ^hParams.gid.int(0))
+			}
+		}
+
 		$result[^hash::create[$hResult]]
 	}
 }
@@ -510,6 +517,9 @@ SELECT
 FROM transactions t
 LEFT JOIN nesting_data nd ON nd.iid = t.iid
 LEFT JOIN items i ON i.iid = nd.pid
+^if(^hParams.gid.int(0) != 0){
+	JOIN transactions_in_groups tig2 ON tig2.tid = t.tid
+}
 #LEFT JOIN nesting_data ndi ON ndi.iid = nd.pid
 WHERE 
 	t.user_id = $USERID
@@ -520,6 +530,9 @@ WHERE
 		AND i.type = ^hParams.type.int(0)
 	}
 }
+	^if(^hParams.gid.int(0) != 0){
+		AND tig2.gid = ^hParams.gid.int(0)
+	}
 
 ^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0 && !^hParams.ctid.int(0)){
 	^if(^hParams.startOperday.int(0) == ^hParams.endOperday.int(0)){
@@ -593,7 +606,7 @@ LEFT JOIN items ai ON ai.iid = t2.alias_id
 LEFT JOIN transactions ct ON ct.tid = t2.ctid
 LEFT JOIN items ti ON ti.iid = ct.iid
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 ^if((^hParams.pid.int(0) || ^hParams.type.int(0)) && !^hParams.ctid.int(0)){
 	LEFT JOIN nesting_data nd ON nd.iid = t2.iid
@@ -743,7 +756,7 @@ LEFT JOIN items i ON t2.iid = i.iid
 LEFT JOIN items ti ON ti.iid = ct.iid
 # LEFT JOIN nesting_data nd ON nd.iid = t2.iid
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 
 LEFT JOIN nesting_data transaction_for_last_parent_nd ON transaction_for_last_parent_nd.iid = t2.iid 
@@ -846,7 +859,7 @@ LEFT JOIN items ti ON ti.iid = ct.iid
 # LEFT JOIN items parent_item ON i.pid = parent_item.iid
 
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	 JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 WHERE
 

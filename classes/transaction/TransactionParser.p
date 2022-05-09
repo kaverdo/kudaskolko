@@ -31,7 +31,6 @@ $aTransactions[^array::new[]]
 $tTransactions[^sTransactions.match[
 
 ^^[ \t]* # лишние символы
-#(?:\x23)? # возможность закомментировать строку знаком #
 (
 	(?:(^getDatePattern[])\s*)
 	| (?:\x23(.+)\s*)
@@ -65,10 +64,8 @@ $patternParseTransactionPattern[^getParseTransactionPattern[]]
 		^hTransaction.add[^parseTransaction[$tTransactions.1;$patternParseTransactionPattern]]
 	}
 }
-#^if(!def $tTransactions.1){
-	^aTransactions.add[^hash::create[$hTransaction]]
-	$hTransaction[^hash::create[]]
-# }
+^aTransactions.add[^hash::create[$hTransaction]]
+$hTransaction[^hash::create[]]
 }
 
 $result[^aTransactions.getHash[]]

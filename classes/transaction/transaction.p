@@ -4,6 +4,7 @@ transaction
 
 @USE
 ../common/array.p
+# ../utils.p
 TransactionParser.p
 TransactionPreview.p
 
@@ -206,6 +207,7 @@ $hBaseItem[]
 $hBaseTransaction[]
 $hItem[]
 $hTransaction[]
+$hCreatedTags[^hash::create[]]
 ^hTransactions.foreach[k;v]{
 	^if($v.isEmpty){
 		$hBaseItem[]
@@ -228,6 +230,11 @@ $hTransaction[]
 			$.adate[$dtNow]
 		]]
 	}{
+
+		^if(def $v.transTag){
+			$hCreatedTag[^dbo::createGroup[$.name[$v.transTag]]]
+			$hCreatedTags.[$v.transTag]($hCreatedTag.tValues.gid)
+		}
 		$hItem[^dbo:createItem[
 			$.name[$v.sName]
 
@@ -245,6 +252,9 @@ $hTransaction[]
 			}
 			$.operday[$v.dtTransDate]
 			$.tdate[$v.dtTransDate]
+			^if(def $v.transTag){
+				$.gid[$hCreatedTags.[$v.transTag]]
+			}
 
 			^if($v.iType && ($v.iType & $TransactionType:ACCOUNT) == $TransactionType:ACCOUNT){
 				$.type($v.iType)
