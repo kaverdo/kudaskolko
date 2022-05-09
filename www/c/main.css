@@ -648,7 +648,8 @@
    max-width: none !important;
 }
  .grid.preview td.name span.tag {
-  opacity: 0.5;
+  opacity: 1;
+     color: #9ebd2e;
 }
  .grid.preview tr td {
    border-color: transparent;
@@ -1028,7 +1029,7 @@
    background-color: #cce17e !important;
    border-color: #9ebd2e !important;
 }
- #actionRename input[type="text"], #actionMove input[type="text"] {
+ #actionRename input[type="text"], #actionMove input[type="text"], #actionEditTags input[type="text"]  {
    width: 70%;
    min-width: 10em;
    max-width: 30em;

@@ -52,30 +52,30 @@ $groupName[]
 		WHERE iid = ^form:p.int(0) AND iid = pid
 	}[$.limit(1)$.default(-1)])
 }{
-	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[] $groupName]
+	$hPage.sTitle[Расходы и доходы^if(def $groupName){ ^#$groupName}  ^oCalendar.printDateRange[]]
 }
-
+$hPrintResult[^hash::create[]]
 <div class="transactions">
 ^if($iType == 0 || $iType == $TransactionType:CHARGE){
 <div id="charges">^printTransactionByType[
 	$.type[$TransactionType:CHARGE]
 	$.title[Расходы]
 	$.title2[расходов]
-	$.groupName[$groupName]
-]</div>
+	$.groupName[$groupName];$hPrintResult]</div>
 }
 ^if(($iType == 0 && !^form:ctid.int(0)) || $iType == $TransactionType:INCOME){
 <div id="incomes">^printTransactionByType[
 	$.type[$TransactionType:INCOME]
 	$.title[Доходы]
 	$.title2[доходов]
-	$.groupName[$groupName]
-]</div>
+	$.groupName[$groupName];$hPrintResult]</div>
 }
 </div>
 
-@printTransactionByType[hParams][locals]
+@printTransactionByType[hParams;hPrintResult][locals]
 $hParams[^hash::create[$hParams]]
+$hPrintResult[^hash::create[$hPrintResult]]
+
 $intMaxOperday(^dbo:getLastOperday[])
 $intMaxOperday(^form:operday.int(0))
 $tEntries[^dbo:getEntries[
@@ -93,7 +93,14 @@ $tEntries[^dbo:getEntries[
 
 $entryName[$tEntries.name]
 $groupName[$hParams.groupName]
+$hPrintResult.[$hParams.type][$.isEmpty[1]]
+
 ^if(!$tEntries){
+
+	^if($hParams.type == $TransactionType:INCOME 
+		&& !$hPrintResult.[$TransactionType:CHARGE].isEmpty){
+		^return[]
+	}
 # 	^if(^form:groupid.int(0)){
 # 		$entryName[^oSql.string{
 # 			SELECT name
@@ -160,7 +167,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 # 	}
 # 	$hTransactions.0.date[^oCalendar.printDateRange[]]
 	^if(!def $hPage.sTitle){
-		$hPage.sTitle[$entryName ^oCalendar.printDateRange[] $groupName]
+		$hPage.sTitle[$entryName^if(def $groupName){ ^#$groupName} ^oCalendar.printDateRange[]]
 	}
 	^if(!def $form:detailed){
 		$h.iOffset(1)
