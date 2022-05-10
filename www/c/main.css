@@ -524,6 +524,19 @@ a.day.active:hover {
 .grid td.name h2 {
   color: #9EBD2E;
 }
+.grid td.name h2 > span.tag {
+  opacity: 1;
+  background-color: #E8F6B7;
+}
+.grid td.name h2 > a.notag:hover span {
+  color: #af321d;
+  border-bottom: 1px solid #af321d;
+}
+.grid td.name h2 > a.notag span {
+  color: #9ebd2e;
+  opacity: 1;
+  border-bottom: 1px solid #9ebd2e;
+}
 .grid td .expander {
   color: #999 !important;
   border: none !important;
@@ -550,8 +563,11 @@ a.day.active:hover {
   color: #9EBD2E;
   border: none;
 }
-.grid td .date .cheque {
+.grid td .date .cheque, .grid td .date .tag {
   color: #ABCDEF;
+}
+.grid td .date .tag:before {
+  content: "# ";
 }
 .grid td .date .cheque:before {
   content: "@ ";
@@ -677,8 +693,9 @@ a.day.active:hover {
 .grid.preview td.name {
   max-width: 600px;
 }
-.iemobile .grid.preview td.name {
-  max-width: none !important;
+.grid.preview td.name span.tag {
+  opacity: 1;
+  color: #9ebd2e;
 }
 .grid.preview tr td {
   border-color: transparent;
@@ -1087,6 +1104,7 @@ button:focus {
 }
 
 #actionRename input[type=text],
+#actionEditTags input[type=text],
 #actionMove input[type=text] {
   width: 70%;
   min-width: 10em;

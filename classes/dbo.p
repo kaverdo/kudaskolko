@@ -270,17 +270,17 @@ $hResult[^hash::create[]]
 ^if(def $hParams.name){
 
 	$hResult.tValues[^oSql.table{
-		SELECT gid FROM groups where name = '$hParams.name'
+		SELECT gid FROM groups WHERE user_id = $USERID AND name = '$hParams.name'
 	}[$.limit(1)]]
 
 	^if($hResult.tValues.gid == 0){
 		^oSql.void{
 			INSERT INTO groups (
 				name,
-				group_type
+				user_id
 			) values (
 				'$hParams.name',
-				^hParams.group_type.int(1)
+				$USERID
 			)}
 
 		$hResult.tValues[^oSql.table{SELECT LAST_INSERT_ID() AS gid}]
@@ -427,6 +427,13 @@ $iLastInsert	^hParams.iid.int(0)}]
 	^if(^hParams.iid.int(0) == 0){
 		$result[$.isError(true)]
 	}{
+		^if(^hParams.gid.int(0)){
+			^oSql.void{
+			INSERT INTO transactions_in_groups (tid, gid)
+			VALUES ($iLastInsert, ^hParams.gid.int(0))
+			}
+		}
+
 		$result[^hash::create[$hResult]]
 	}
 }
@@ -459,24 +466,17 @@ $hParams[^hash::create[$hParams]]
 $tGroups[^oSql.table{
 SELECT t.tid,g.name,g.gid
 FROM transactions_in_groups tig
-LEFT JOIN transactions t  ON tig.tid = t.tid
-LEFT JOIN groups g ON tig.gid = g.gid
+JOIN transactions t  ON tig.tid = t.tid
+JOIN groups g ON tig.gid = g.gid
 ^if($hParams > 0){
-
-#	^if(^hParams.operday.int(0) != 0){
-#	WHERE
-#		t.operday = ^hParams.operday.int(^getLastOperday[])
-#	}
 	^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0 ){
-#		AND t.operday = ^hParams.operday.int(^getLastOperday[])
-
-		WHERE t.operday >= ^hParams.startOperday.int(0)
+		WHERE
+		t.user_id = $USERID
+		AND g.user_id = $USERID
+		AND t.operday >= ^hParams.startOperday.int(0)
 		AND t.operday <= ^hParams.endOperday.int(0)
 }	
 	^if($hParams > 2){ AND }
-	^if(^hParams.group_type.int(0) != 0){
-		g.group_type = ^hParams.group_type.int(0)
-	}
 }
 }]
 
@@ -510,6 +510,9 @@ SELECT
 FROM transactions t
 LEFT JOIN nesting_data nd ON nd.iid = t.iid
 LEFT JOIN items i ON i.iid = nd.pid
+^if(^hParams.gid.int(0) != 0){
+	JOIN transactions_in_groups tig2 ON tig2.tid = t.tid
+}
 #LEFT JOIN nesting_data ndi ON ndi.iid = nd.pid
 WHERE 
 	t.user_id = $USERID
@@ -520,6 +523,9 @@ WHERE
 		AND i.type = ^hParams.type.int(0)
 	}
 }
+	^if(^hParams.gid.int(0) != 0){
+		AND tig2.gid = ^hParams.gid.int(0)
+	}
 
 ^if(^hParams.startOperday.int(0) != 0 && ^hParams.endOperday.int(0) != 0 && !^hParams.ctid.int(0)){
 	^if(^hParams.startOperday.int(0) == ^hParams.endOperday.int(0)){
@@ -593,7 +599,7 @@ LEFT JOIN items ai ON ai.iid = t2.alias_id
 LEFT JOIN transactions ct ON ct.tid = t2.ctid
 LEFT JOIN items ti ON ti.iid = ct.iid
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 ^if((^hParams.pid.int(0) || ^hParams.type.int(0)) && !^hParams.ctid.int(0)){
 	LEFT JOIN nesting_data nd ON nd.iid = t2.iid
@@ -743,7 +749,7 @@ LEFT JOIN items i ON t2.iid = i.iid
 LEFT JOIN items ti ON ti.iid = ct.iid
 # LEFT JOIN nesting_data nd ON nd.iid = t2.iid
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 
 LEFT JOIN nesting_data transaction_for_last_parent_nd ON transaction_for_last_parent_nd.iid = t2.iid 
@@ -846,7 +852,7 @@ LEFT JOIN items ti ON ti.iid = ct.iid
 # LEFT JOIN items parent_item ON i.pid = parent_item.iid
 
 ^if(^hParams.gid.int(0) != 0){
-	LEFT JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
+	 JOIN transactions_in_groups tig2 ON tig2.tid = t2.tid
 }
 WHERE
 
@@ -887,12 +893,6 @@ WHERE
 # 	}
 
 }
-
-#	AND (
-#	(g.name IS NOT NULL && g.group_type = $GROUP_TYPES.CHEQUE)
-#	OR
-#	g.name IS NULL
-#	)
 
 	^if(^hParams.gid.int(0) != 0){
 		AND tig2.gid = ^hParams.gid.int(0)

@@ -131,9 +131,15 @@ FROM transactions t
 	LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 
 }
+^if($data.gid){
+	JOIN transactions_in_groups tig ON tig.tid = t.tid
+}
 #  	LEFT JOIN items i ON nd.pid = i.iid
 WHERE
 	t.is_displayed = 1
+	^if($data.gid){
+		AND tig.gid = $data.gid
+	}
 	AND t.user_id = $USERID
 	AND 
 	(
@@ -371,7 +377,12 @@ $result[
 
 @getURI[][sResult]
 $sResult[]
-^if($data.pid){$sResult[&p=$data.pid]}
+^if($data.pid){
+	$sResult[$sResult&p=$data.pid]
+}	
+^if($data.gid){
+  $sResult[$sResult&groupid=$data.gid]
+}
 ^if($data.ciid){$sResult[&ciid=$data.ciid]}
 $result[$sResult]
 
@@ -417,11 +428,17 @@ FROM transactions t
 	^if($data.ciid){
 		LEFT JOIN transactions cheque ON cheque.tid = t.ctid
 	}
+	^if($data.gid){
+		JOIN transactions_in_groups tig ON tig.tid = t.tid
+	}
 WHERE	
 	^if($data.pid){
 		nd.pid = $data.pid
 	}{
 		(i.type = $TransactionType:CHARGE OR i.type = $TransactionType:INCOME)
+	}
+	^if($data.gid){
+		AND tig.gid = $data.gid
 	}
 	AND t.is_displayed = 1
 	AND t.user_id = $USERID

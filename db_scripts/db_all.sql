@@ -80,8 +80,9 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `gid` smallint(10) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
   `description` varchar(255) default NULL,
-  `group_type` tinyint(3) unsigned default NULL,
-  PRIMARY KEY  (`gid`)
+  `user_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`gid`),
+  KEY `user_id__name` (user_id, name)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `items` (

@@ -34,6 +34,17 @@ $tParents[^dbo:getParentItems[$.iid[^form:p.int(0)]]]
 @anotherWayToMakeTrees[][locals]
 ^printBreadScrumbs[]
 $iType(^form:type.int(0))
+$groupName[]
+^if(^form:groupid.int(0)){
+	$groupName[^oSql.string{
+		SELECT name
+		FROM groups
+		WHERE 
+		user_id = $USERID AND
+		gid = ^form:groupid.int(0)
+	}[	$.limit(1)$.default[default]]]
+
+}
 ^if(^form:p.int(0)){
 	$iType(^oSql.int{
 		SELECT type 
@@ -41,28 +52,30 @@ $iType(^form:type.int(0))
 		WHERE iid = ^form:p.int(0) AND iid = pid
 	}[$.limit(1)$.default(-1)])
 }{
-	$hPage.sTitle[Расходы и доходы ^oCalendar.printDateRange[]]
+	$hPage.sTitle[Расходы и доходы^if(def $groupName){ ^#$groupName}  ^oCalendar.printDateRange[]]
 }
-
+$hPrintResult[^hash::create[]]
 <div class="transactions">
 ^if($iType == 0 || $iType == $TransactionType:CHARGE){
 <div id="charges">^printTransactionByType[
 	$.type[$TransactionType:CHARGE]
 	$.title[Расходы]
 	$.title2[расходов]
-]</div>
+	$.groupName[$groupName];$hPrintResult]</div>
 }
 ^if(($iType == 0 && !^form:ctid.int(0)) || $iType == $TransactionType:INCOME){
 <div id="incomes">^printTransactionByType[
 	$.type[$TransactionType:INCOME]
 	$.title[Доходы]
 	$.title2[доходов]
-]</div>
+	$.groupName[$groupName];$hPrintResult]</div>
 }
 </div>
 
-@printTransactionByType[hParams][k;v]
+@printTransactionByType[hParams;hPrintResult][locals]
 $hParams[^hash::create[$hParams]]
+$hPrintResult[^hash::create[$hPrintResult]]
+
 $intMaxOperday(^dbo:getLastOperday[])
 $intMaxOperday(^form:operday.int(0))
 $tEntries[^dbo:getEntries[
@@ -79,7 +92,14 @@ $tEntries[^dbo:getEntries[
 ]]
 
 $entryName[$tEntries.name]
+$groupName[$hParams.groupName]
+$hPrintResult.[$hParams.type][$.isEmpty[1]]
+
 ^if(!$tEntries){
+	^if($hParams.type == $TransactionType:INCOME
+		&& !$hPrintResult.[$TransactionType:CHARGE].isEmpty){
+		^return[]
+	}
 	$entryName[^oSql.string{
 		SELECT name
 		FROM items
@@ -105,6 +125,7 @@ $h.iSum(0)
 
 $hTransactions[^hash::create[]]
 $hTransactions.0[^hash::create[]]
+$hTransactions.0.groupName[$groupName]
 
 ^if(def $form:detailed){
 	^tEntries.menu{^h.iSum.inc($tEntries.sum)}
@@ -120,6 +141,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 
 	}
 
+# 	$hTransactions.
 	$hTransactions.0.name[$entryName]
 	$hTransactions.0.value[^u:formatValueByType($h.iSum;$hParams.type)]
 # 	^if($tEntries.has_children == 1){
@@ -134,7 +156,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 # 	}
 # 	$hTransactions.0.date[^oCalendar.printDateRange[]]
 	^if(!def $hPage.sTitle){
-		$hPage.sTitle[$entryName ^oCalendar.printDateRange[]]
+		$hPage.sTitle[$entryName^if(def $groupName){ ^#$groupName} ^oCalendar.printDateRange[]]
 	}
 	^if(!def $form:detailed){
 		$h.iOffset(1)
@@ -151,7 +173,7 @@ $hTransactions.0.date[^oCalendar.printDateRange[]]
 	^tEntries.offset(1)
 
 }{
-	$hPage.sTitle[$hParams.title ^oCalendar.printDateRange[]]
+	$hPage.sTitle[$hParams.title ^oCalendar.printDateRange[] $groupName]
 	$hTransactions.0.name[$hParams.title]
 # 	$hTransactions.0.date[^u:formatOperday[$tEntries.operday]]
 	$hTransactions.0.expandLink[^makeQueryString[
@@ -194,14 +216,12 @@ $h.iTotalSum(^dbo:getTotalOut[
 
 $hCurrent.value[^u:formatValueByType($tEntries.sum;$hParams.type)]
 $hCurrent.percent[^calculatePercent($tEntries.sum;$h.iTotalSum)]
-
+$hCurrent.groupName[$groupName]
 	^if($tEntries.has_children == 0 &&
 		$tEntries.count_of_transactions == 1 &&
 		def $hGroups.[$tEntries.tid]){
 		$tGroupsForItem[$hGroups.[$tEntries.tid]]
-		$hCurrent.groups[
-			^tGroupsForItem.menu{<a href="/?groupid=$tGroupsForItem.gid">$tGroupsForItem.name</a>}
-		]
+		$hCurrent.groupsForItem[$tGroupsForItem]
 	}
 	^h.iSum.dec($tEntries.sum)
 	^h.dRestQuantity.dec($tEntries.quantity)
@@ -278,7 +298,16 @@ $lastOperday[]
 				<a class="expander" href="/$hTransactions.0.expandLink&expanded=1^if(!^form:p.int(0)){&type=$hParams.type}" title="Развернуть категории">+</a>
 			}
 
-		} $v.name <span>$v.date</span>
+		} 
+		^if(^form:groupid.int(0)){
+			 <a class="notag" href="^makeQueryString[
+					$.p[$form:p]
+						$.expanded[$form:expanded]
+					$.operday[^if(def $form:operday){$form:operday}{$v.tEntries.operday}]
+				]"><span>$v.name</span></a> <span>^#</span>$v.groupName  <span>$v.date</span>
+		}{
+			$v.name <span>$v.date</span>
+		}
 # 	^if(def $hTransactions.0.expandLink && !^form:detailed.int(0) && !def $hTransactions.1.no_entries){
 # 		^if(^form:expanded.int(0) == 1){
 # 			<a class="expander" href="/$hTransactions.0.expandLink" title="Свернуть все обратно">&minus^;</a>
@@ -293,7 +322,6 @@ $lastOperday[]
 			</td>
 			<td class="quantity"><h2>$v.quantity</h2></td>
 			<td class="value"><h2>$v.value</h2></td>
-# 			<td class="groups"></td>
 			<td class="actions"></td>
 		</tr>
 	}{
@@ -307,7 +335,6 @@ $lastOperday[]
 				]"><span>^u:formatOperday[$v.tEntries.operday]</span></a></td>
 				<td class="quantity"></td>
 				<td class="value"></td>
-# 			<td class="groups"></td>
 				<td class="actions"></td>
 			</tr>
 			}
@@ -371,6 +398,20 @@ $lastOperday[]
 			</span>]
 		}
 
+		^if(def $v.groupsForItem){
+			$tGroups[$v.groupsForItem]
+			^tGroups.menu{
+				^if(^form:groupid.int(0) != $tGroups.gid){
+					$sDate[^if(def $sDate){$sDate }<span class="tag"><a href="^makeQueryString[
+						$.p[$form:p]
+						$.groupid[$tGroups.gid]
+						$.expanded[$form:expanded]
+						$.detailed[$form:detailed]
+						$.operday[$form:operday]
+					]"><span>$tGroups.name</span></a>]
+				}
+			}
+		}
 		<tr class="$v.no_entries^if($v.isRest){ rest}">
 		^if(def $sDate){
 			$sDate[<div class="date">$sDate</div>]
@@ -396,7 +437,6 @@ $lastOperday[]
 # 			<div class="date">^actions[$v.tEntries;Изменить;class="dt"]</div>
 # 			<div style="background-size: $v.percent% 100%">$v.value</div>
 			</td>
-# 			<td class="groups"></td>→
 			<td class="actions">^if(!def $v.no_entries && !$v.isRest){^actions[$v.tEntries; ]}</td>
 		</tr>
 	}

@@ -9,6 +9,8 @@ $hTransactions[^hash::create[$hTransactions]]
 	<table class="grid preview ^if($hNotValid){hasError}" cellpadding="0" cellspacing="0">
 
 	$dtCurrentTransDate[]
+	$sCurrentTag[]
+
 	$iShopTransaction[]
 
 
@@ -18,18 +20,6 @@ $hTransactions[^hash::create[$hTransactions]]
 	$isPartial(false)
 	^hTransactions.foreach[k;v]{
 		
-# <hr/>	^v.foreach[kk;vv]{
-# 		^if(def $vv){
-# 			$kk = 
-# 			^if($vv is string || $vv is double ||$vv is int){
-# 				$vv
-# 			}
-# 			^if($vv is bool){
-# 				^if($vv){YES}{NO}
-# 			}<br/>
-# 		}
-# 	}
-
 		^if($v.isEmpty || ($v.isCheque && def $iShopTransaction)){
 			^previewChequeFooter[]
 			$iShopTransaction[]
@@ -118,7 +108,10 @@ $hTransactions[^hash::create[$hTransactions]]
 				}
 				<tr class="$sClassName">
 		
-				<td class="name">^if($v.isSubTransaction){&minus^; }$v.sName</td>
+				<td class="name">^if($v.isSubTransaction){&minus^; }
+				$v.sName
+				^if(def $v.transTag){<span class="tag">^#$v.transTag </span>}
+				</td>
 				<td class="quantity">^if($v.dQuantity != 1){^u:formatQuantity($v.dQuantity)}</td>
 				<td class="oldvalue">
 				^if($v.dAmountWithoutDisc != $v.dAmount){

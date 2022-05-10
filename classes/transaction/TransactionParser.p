@@ -31,34 +31,41 @@ $aTransactions[^array::new[]]
 $tTransactions[^sTransactions.match[
 
 ^^[ \t]* # лишние символы
-(\x23)? # возможность закомментировать строку знаком #
 (
 	(?:(^getDatePattern[])\s*)
-	|
-	(.*?))
+	| (?:\x23(.+)\s*)
+	| .*?)
 ^$][gmxi]]
 
 $oBaseTransaction[]
 $dtTransDate[^u:getJustDate[^date::now[]]]
+$transTag[]
 $hTransaction[^hash::create[]]
 $patternParseTransactionPattern[^getParseTransactionPattern[]]
 ^tTransactions.menu{
-^if(!def $tTransactions.2 && !def $tTransactions.1){
+^if(!def $tTransactions.1){
 	$hTransaction.isEmpty(true)
+	$transTag[]
+	$dtTransDate[]
 }{
-	^if(def $tTransactions.3){
-		$dtTransDate[^u:stringToDate[$tTransactions.3]]
-		$hTransaction.isEmpty(true)
+	^if(def $tTransactions.2 || def $tTransactions.3){
+		^if(def $tTransactions.2){
+			$dtTransDate[^u:stringToDate[$tTransactions.2]]
+			$hTransaction.isEmpty(true)
+		}{
+			$transTag[$tTransactions.3]
+			$hTransaction.isEmpty(true)
+		}
 	}{
 		$hTransaction.dtTransDate[$dtTransDate]
 
-		^hTransaction.add[^parseTransaction[$tTransactions.2;$patternParseTransactionPattern]]
+		$hTransaction.transTag[$transTag]
+
+		^hTransaction.add[^parseTransaction[$tTransactions.1;$patternParseTransactionPattern]]
 	}
 }
-^if(!def $tTransactions.1){
-	^aTransactions.add[^hash::create[$hTransaction]]
-	$hTransaction[^hash::create[]]
-}
+^aTransactions.add[^hash::create[$hTransaction]]
+$hTransaction[^hash::create[]]
 }
 
 $result[^aTransactions.getHash[]]

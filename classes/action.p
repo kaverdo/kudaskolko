@@ -18,6 +18,9 @@ $self.USERID(^hParams.USERID.int(0))
 	^case[rename_category]{
 		^renameCategory[]
 	}
+	^case[edit_tags]{
+		^editTags[]
+	}
 	^case[change_transaction_details]{
 		^changeTransactionDetails[]
 	}
@@ -42,6 +45,7 @@ $self.USERID(^hParams.USERID.int(0))
 <div class="actions">
 ^moveCategory[]
 ^renameCategory[]
+^editTags[]
 ^changeTransactionDetails[]
 ^deleteTransaction[]
 </div>
@@ -574,6 +578,99 @@ $response:location[^goBack[
 	</form>
 }
 </div>
+
+
+
+
+@editTags[]
+$tTags[^oSql.table{
+	SELECT gid, name, UPPER(name) AS up_name FROM groups
+	WHERE gid IN (SELECT gid FROM transactions_in_groups WHERE tid = ^form:t.int(0))
+	AND user_id = $self.USERID
+}]
+
+^if(!def $form:tags_edited){
+	$sTags[^tTags.menu{^#$tTags.name}[ ]]
+	<div class="action" id="actionEditTags">
+	<form action="/" method="get">
+	<input type="hidden"
+^printGoBackFields[
+	$.action[edit_tags]
+	$.tags_edited[true]
+	$.t[^form:t.int(0)]
+	^if(^form:i.int(0)){
+		$.i[^form:i.int(0)]
+	}
+
+]
+	$sActionName[^if(def $sTags){Изменить}{Добавить}]
+	<h2>$sActionName теги</h2>
+	<input type="text" name="tags" id="IDTags" size="50" value="^if(def $sTags){$sTags}{$cookie:lasttags}" /> 
+	<input type="submit" value="$sActionName"/>
+	</form>
+</div>
+	^return[]
+}
+^if(!def ^form:tags.trim[]){
+	^if($tTags){
+		^oSql.void{DELETE FROM transactions_in_groups
+		WHERE tid = (SELECT tid FROM transactions WHERE tid = ^form:t.int(0) AND user_id = $self.USERID)
+		}
+	}{
+# 			ничего не изменилось
+	}
+
+}{
+
+	$cookie:lasttags[$form:tags]
+	$tPath[^form:tags.split[^#;;p]]
+
+	$hExistTags[^tTags.hash[up_name]]
+
+	$tTagsToCreate[^table::create{name}]
+	$tTagsToRemove[^table::create{gid}]
+	^tTags.menu{
+		^tTagsToRemove.append{$tTags.gid}
+	}
+
+
+	^tPath.menu{
+		$tagName[^tPath.p.trim[]]
+		^if(!def $tagName){
+			^continue[]
+		}
+
+		^if(def $hExistTags.[^tagName.upper[]]){
+			^if(^tTagsToRemove.locate[gid;$hExistTags.[^tagName.upper[]].gid]){
+				^tTagsToRemove.delete[]
+			}
+		}{
+			^tTagsToCreate.append{$tagName}
+		}
+		
+	}
+	^if($tTagsToCreate){
+		^tTagsToCreate.menu{
+			$hCreatedTag[^dbo:createGroup[$.name[^tTagsToCreate.name.trim[]]]]
+			^oSql.void{
+				INSERT INTO transactions_in_groups (tid, gid)
+				SELECT tid, $hCreatedTag.tValues.gid FROM transactions WHERE tid = ^form:t.int(0) AND user_id = $self.USERID
+			}
+		}
+	}
+	^if($tTagsToRemove){
+		^oSql.void{DELETE FROM transactions_in_groups 
+			WHERE tid = (SELECT tid FROM transactions WHERE tid = ^form:t.int(0) AND user_id = $self.USERID)
+			AND gid IN (^tTagsToRemove.menu{$tTagsToRemove.gid})}
+	}
+
+}
+
+$response:location[^goBack[
+	$.t[^form:t.int(0)]
+	$.i[^form:i.int(0)]
+]]
+
 
 
 @getPath[iItemID]

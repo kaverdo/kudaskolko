@@ -689,10 +689,24 @@ a.day {
         &:hover span {
           border-bottom: 1px solid $LinkBorderHover;
         }
+
       }
 
       h2 {
         color: $ChargesTextColor;
+        & > span.tag {
+          opacity: 1;
+          background-color: #E8F6B7;
+        }
+        &> a.notag:hover span {
+          color: #af321d;
+          border-bottom: 1px solid #af321d;
+        }
+        &>a.notag span {
+          color: #9ebd2e;
+          opacity: 1;
+          border-bottom: 1px solid #9ebd2e;
+        }
       }
     }
 
@@ -729,8 +743,12 @@ a.day {
         border: none;
       }
 
-      .cheque {
+      .cheque, .tag {
         color: $LinkBorder;
+      }
+
+      .tag:before {
+        content: '#\00A0';
       }
 
       .cheque:before {
@@ -896,8 +914,9 @@ a.day {
   td.name {
     max-width: 600px;
 
-    .iemobile & {
-      max-width: none !important;
+    span.tag {
+      opacity: 1;
+      color: #9ebd2e;
     }
   }
 
@@ -1400,6 +1419,7 @@ button:focus {
 }
 
 #actionRename,
+#actionEditTags,
 #actionMove {
   input[type="text"] {
     width: 70%;
